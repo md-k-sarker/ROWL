@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?eclipse version="3.0"?>
+
+<plugin>
+
+	<extension id="daseView"
+		point="org.protege.editor.core.application.WorkspaceTab">
+		<label value="Rule to OWL as Tab" />
+		<class value="edu.wsu.dase.ui.ViewAsTab" />
+		<index value="X" />
+		<editorKitId value="OWLEditorKit" />
+	</extension>
+
+	<!-- <extension id="daseViewComponent"
+		point="org.protege.editor.core.application.ViewComponent">
+		<label value="Rule to OWL" />
+		<class value="edu.wsu.dase.RuleViewComponent" />
+		<category value="@org.protege.ontologycategory">
+		</category>
+	</extension>
+
+	class value must be org.protege.editor.owl.ui.OWLWorkspaceViewsTab 
+		to store multiple view
+	<extension id="daseViewComplicated"
+		point="org.protege.editor.core.application.WorkspaceTab">
+		<label value="Rule to OWL as ViewComponent" />
+		<class value="org.protege.editor.owl.ui.OWLWorkspaceViewsTab" />
+		<index value="X" />
+		<editorKitId value="OWLEditorKit" />
+		<defaultViewConfigFileName value="custom.layout.xml" />
+	</extension> -->
+
+</plugin>

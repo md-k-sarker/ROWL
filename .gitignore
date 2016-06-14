@@ -1,0 +1,36 @@
+
+# Java build artifacts class files
+*.class
+
+# other generated files/folder
+.settings/
+target/
+bin/
+
+# Eclipse project files
+.classpath
+.project
+
+#Java Memory error log file
+*.log
+
+# local configuration file (for Android sdk path, etc)
+local.properties
+
+# OSX files
+.DS_Store
+
+
+# Android Studio
+*.iml
+.idea
+.gradle
+
+
+#NDK
+obj/ 
+
+# Android built artifacts
+*.apk
+*.ap_
+*.dex
