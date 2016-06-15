@@ -29,7 +29,7 @@ import org.swrlapi.ui.model.SWRLRuleEngineModel;
 import org.swrlapi.ui.view.rules.SWRLRulesView;
 import org.swrltab.ui.ProtegeIRIResolver;
 
-import edu.wsu.dase.view.SWRLRulesViewExtended;
+import edu.wsu.dase.view.RulesViewMain;
 
 public class ViewAsTab extends OWLWorkspaceViewsTab {
 
@@ -38,7 +38,7 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 	private static final Logger log = LoggerFactory.getLogger(ViewAsTab.class);
 
 	private SWRLRuleEngineModel swrlRuleEngineModel;
-	private SWRLRulesViewExtended rulesView;
+	private RulesViewMain rulesView;
 	private SWRLRulesView swrlRulesView;
 
 	private JTabbedPane tabbedPane;
@@ -100,7 +100,7 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 						.createSWRLRuleEngineDialogManager(swrlRuleEngineModel);
 
 				// Create the custom tab View
-				this.rulesView = new SWRLRulesViewExtended(swrlRuleEngineModel, dialogManager, activeOntology,
+				this.rulesView = new RulesViewMain(swrlRuleEngineModel, dialogManager, activeOntology,
 						tabbedPane);
 				this.rulesView.initialize();
 
