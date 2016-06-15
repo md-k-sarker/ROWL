@@ -31,6 +31,20 @@ public class Engine {
 		return this.rulesWithID;
 	}
 
+	public RuleModel getRulebyID(String ruleName) {
+		if (rulesWithID.containsKey(ruleName)) {
+			return rulesWithID.get(ruleName);
+		}
+		return null;
+	}
+
+	public Set<OWLAxiom> getAxiomsbyID(String ruleName) {
+		if (axiomsWithID.containsKey(ruleName)) {
+			return axiomsWithID.get(ruleName);
+		}
+		return null;
+	}
+
 	public void OntologyChanged() {
 		reloadRulesAndAxiomsFromOntology();
 	}
@@ -76,7 +90,6 @@ public class Engine {
 										ruleID = values[0];
 									}
 								}
-
 							}
 						}
 					}
