@@ -7,6 +7,8 @@ import org.swrlapi.ui.dialog.SWRLRuleEngineDialogManager;
 import org.swrlapi.ui.model.SWRLRuleEngineModel;
 import org.swrlapi.ui.model.SWRLRulesAndSQWRLQueriesTableModel;
 
+import edu.wsu.dase.controller.Engine;
+
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -32,8 +34,8 @@ public class RuleTablePanel extends JPanel {
 	private static final String EDIT_BUTTON_TITLE = "Edit";
 	private static final String DELETE_BUTTON_TITLE = "Delete";
 
-	private static final int ACTIVE_COLUMN_PREFERRED_WIDTH = 30;
-	private static final int ACTIVE_COLUMN_MAX_WIDTH = 50;
+	//private static final int ACTIVE_COLUMN_PREFERRED_WIDTH = 30;
+	//private static final int ACTIVE_COLUMN_MAX_WIDTH = 50;
 	private static final int RULE_NAME_COLUMN_PREFERRED_WIDTH = 150;
 	private static final int RULE_NAME_COLUMN_MAX_WIDTH = 200;
 	private static final int RULE_TEXT_COLUMN_PREFERRED_WIDTH = 500;
@@ -46,14 +48,17 @@ public class RuleTablePanel extends JPanel {
 	@NonNull
 	private final SWRLRuleEngineDialogManager dialogManager;*/
 	@NonNull
+	private final Engine engineModel;
+	@NonNull
 	private final JTable swrlRulesTable;
 	@NonNull
 	private final JButton editButton, deleteButton;
 	DefaultTableModel tableModel;
 
-	public RuleTablePanel(DefaultTableModel tableModel) {
+	public RuleTablePanel(Engine engineModel, DefaultTableModel tableModel) {
 /*		this.swrlRuleEngineModel = swrlRuleEngineModel;
 		this.dialogManager = dialogManager;*/
+		this.engineModel = engineModel;
 		this.tableModel = tableModel;
 		this.swrlRulesTable = new JTable(this.tableModel);
 		this.swrlRulesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -108,9 +113,6 @@ public class RuleTablePanel extends JPanel {
 	private void setPreferredColumnWidths() {
 		TableColumnModel columnModel = this.swrlRulesTable.getColumnModel();
 
-		columnModel.getColumn(SWRLRulesAndSQWRLQueriesTableModel.ACTIVE_COLUMN)
-				.setPreferredWidth(ACTIVE_COLUMN_PREFERRED_WIDTH);
-		columnModel.getColumn(SWRLRulesAndSQWRLQueriesTableModel.ACTIVE_COLUMN).setMaxWidth(ACTIVE_COLUMN_MAX_WIDTH);
 		columnModel.getColumn(SWRLRulesAndSQWRLQueriesTableModel.RULE_NAME_COLUMN)
 				.setPreferredWidth(RULE_NAME_COLUMN_PREFERRED_WIDTH);
 		columnModel.getColumn(SWRLRulesAndSQWRLQueriesTableModel.RULE_NAME_COLUMN)
@@ -157,7 +159,7 @@ public class RuleTablePanel extends JPanel {
 		}
 	}
 
-	private void createComponents(SWRLRuleEngineDialogManager dialogManager) {
+	private void createComponents() {
 		JScrollPane scrollPane = new JScrollPane(this.swrlRulesTable);
 		JViewport viewport = scrollPane.getViewport();
 

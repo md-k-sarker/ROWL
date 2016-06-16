@@ -38,7 +38,7 @@ public class RulesViewMain extends JSplitPane implements SWRLAPIView {
 
 	public RulesViewMain(@NonNull SWRLRuleEngineModel ruleEngineModel,
 			@NonNull SWRLRuleEngineDialogManager dialogManager, OWLOntology activeOntology, JTabbedPane tabbedPane) throws SWRLAPIException {
-		this.ruleTablesView = new SWRLRulesTableView(ruleEngineModel, dialogManager);
+		this.ruleTablesView = new RuleTablePanel(ruleEngineModel, dialogManager);
 		this.activeOntology = activeOntology;
 		
 		topPnl = new JPanel();

@@ -99,6 +99,9 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 				SWRLRuleEngineDialogManager dialogManager = SWRLAPIFactory
 						.createSWRLRuleEngineDialogManager(swrlRuleEngineModel);
 
+				
+				
+				
 				// Create the custom tab View
 				this.rulesView = new RulesViewMain(swrlRuleEngineModel, dialogManager, activeOntology,
 						tabbedPane);

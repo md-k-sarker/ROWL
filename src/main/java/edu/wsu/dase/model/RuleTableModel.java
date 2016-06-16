@@ -256,7 +256,7 @@ public class RuleTableModel extends AbstractTableModel
     @NonNull private final String ruleName, ruleText, comment;
     private boolean active;
 
-    public SWRLRuleModel(@NonNull String ruleName, @NonNull String ruleText, @NonNull String comment)
+    public  (@NonNull String ruleName, @NonNull String ruleText, @NonNull String comment)
     {
       this.active = true;
       this.ruleText = ruleText;

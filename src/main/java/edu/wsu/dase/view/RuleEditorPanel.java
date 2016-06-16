@@ -191,6 +191,14 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		super.setVisible(b);
 	}
 
+	public void loadEdittingRule(String ruleName, String ruleComment,String ruleText){
+		this.ruleNameTextField.setText(ruleName); //
+		this.ruleNameTextField.setCaretPosition(this.ruleNameTextField.getText().length());
+		this.ruleTextTextArea.setText(ruleText);
+		this.commentTextField.setText(ruleComment);
+		this.statusTextField.setText("");
+		updateStatus();
+	}
 	public void setCreateMode() {
 		cancelEditMode();
 
