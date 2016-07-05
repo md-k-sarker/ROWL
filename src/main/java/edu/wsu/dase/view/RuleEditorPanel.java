@@ -64,7 +64,7 @@ import org.swrlapi.parser.SWRLParser;
 import edu.wsu.dase.model.ruletoaxiom.Transformer;
 
 /**
- * developed by sarker.3 Modal dialog providing a SWRL rule
+ * developed by sarker.3 JPanel providing a SWRL rule
  *
  */
 public class RuleEditorPanel extends JPanel implements SWRLAPIView {
@@ -72,7 +72,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 	private static final Logger log = LoggerFactory.getLogger(RuleEditorPanel.class);
 
-	//private static final String TITLE = "Edit";
+	// private static final String TITLE = "Edit";
 	private static final String RULE_NAME_TITLE = "Name";
 	private static final String COMMENT_LABEL_TITLE = "Comment";
 	private static final String STATUS_LABEL_TITLE = "Status";
@@ -128,6 +128,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	private OWLOntologyManager owlOntologyManager;
 	JPanel pnlForCreateNewEntity;
 
+	// for test purpose only
 	private RuleEditorPanel() {
 
 		// this.dialogManager = dialogManager;
@@ -139,12 +140,13 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		this.cancelButton = new JButton(CANCEL_BUTTON_TITLE);
 		this.ruleNameTextField = new JTextField("");
 		this.commentTextField = new JTextField("");
-		this.statusTextField = new JTextField("");
+		this.statusTextField = new JTextField(STATUS_NO_RULE_TEXT);
 		initialize();
 	}
 
 	public RuleEditorPanel(@NonNull SWRLRuleEngineModel swrlRuleEngineModel, OWLOntology activeOntology,
 			@NonNull SWRLRuleEngineDialogManager dialogManager, JTabbedPane tabbedPane) {
+
 		this.swrlRuleEngineModel = swrlRuleEngineModel;
 		this.dialogManager = dialogManager;
 		this.loweredBevelBorder = BorderFactory.createLoweredBevelBorder();
@@ -160,7 +162,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		lbl2 = new JLabel();
 		this.ruleNameTextField = new JTextField("");
 		this.commentTextField = new JTextField("");
-		this.statusTextField = new JTextField("");
+		this.statusTextField = new JTextField(STATUS_NO_RULE_TEXT);
 		initialize();
 	}
 
@@ -191,7 +193,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		super.setVisible(b);
 	}
 
-	public void loadEdittingRule(String ruleName, String ruleComment,String ruleText){
+	public void loadEdittingRule(String ruleName, String ruleComment, String ruleText) {
 		this.ruleNameTextField.setText(ruleName); //
 		this.ruleNameTextField.setCaretPosition(this.ruleNameTextField.getText().length());
 		this.ruleTextTextArea.setText(ruleText);
@@ -199,6 +201,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		this.statusTextField.setText("");
 		updateStatus();
 	}
+
 	public void setCreateMode() {
 		cancelEditMode();
 
@@ -794,30 +797,30 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 					 */
 				} else {
 					try {
-						String[] rules = rule.split("\\.");
-						for (String text : rules) {
-							SWRLRule swrlRules = getSWRLRule(text);
+						// String[] rules = rule.split("\\.");
+						// for (String text : rules) {
+						SWRLRule swrlRules = getSWRLRule(rule);
 
-							if (swrlRules != null) {
-								Set<OWLAxiom> owlAxioms = Transformer.ruleToAxioms(swrlRules);
+						if (swrlRules != null) {
+							Set<OWLAxiom> owlAxioms = Transformer.ruleToAxioms(swrlRules);
 
-								if (!Transformer.isTransferred) {
-									applyChangetoOntology(owlAxioms);
-									for (OWLAxiom axiom : owlAxioms) {
-										System.out.println(axiom);
-									}
-									// apply that change to existing ontology
-								} else {
-									// can not transfer to axioms need to switch
-									// to swrltab
-
-									switchToSWRLTab(text);
-
-									System.out.println("can not transfer to axioms");
+							if (!Transformer.isTransferred) {
+								applyChangetoOntology(owlAxioms);
+								for (OWLAxiom axiom : owlAxioms) {
+									System.out.println(axiom);
 								}
-								return;
+								// apply that change to existing ontology
+							} else {
+								// can not transfer to axioms need to switch
+								// to swrltab
+
+								switchToSWRLTab(rule);
+
+								System.out.println("can not transfer to axioms");
 							}
+							return;
 						}
+						// }
 
 					} catch (Exception e1) {
 						// TODO Auto-generated catch block

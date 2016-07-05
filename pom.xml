@@ -18,16 +18,23 @@
 		<swrlapi.drools.version>1.0.8</swrlapi.drools.version>
 	</properties>
 
+	<developers>
+		<developer>
+			<name>Md Kamruzzaman Sarker</name>
+			<email>mdkamruzzamansarker@gmail.com</email>
+		</developer>
+	</developers>
+
 	<scm>
-		<connection>scm:git:git@github.com:protegeproject/swrltab-plugin.git</connection>
-		<developerConnection>scm:git:git@github.com:protegeproject/swrltab-plugin.git</developerConnection>
+		<connection>scm:git:git@github.com/md-k-sarker/ROWL.git</connection>
+		<developerConnection>scm:git:git@github.com:md-k-sarker/ROWL.git</developerConnection>
 		<url>https://github.com/protegeproject/swrltab-plugin</url>
-		<tag>release-1.0.0-beta-52</tag>
+		<tag>release-0.0.1-beta-0</tag>
 	</scm>
 
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://github.com/protegeproject/swrltab-plugin/issues</url>
+		<url>https://github.com/md-k-sarker/ROWL/issues</url>
 	</issueManagement>
 
 	<dependencies>

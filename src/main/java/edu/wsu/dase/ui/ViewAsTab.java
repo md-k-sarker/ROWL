@@ -124,11 +124,12 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 
 			} else {
 				// log.warn("SWRLTab update failed - no active OWL ontology");
-				System.out.println("SWRLTab update failed - no active OWL ontology");
+				System.out.println("ROWL plugin update failed - no active OWL ontology");
 			}
 		} catch (RuntimeException e) {
 			// log.error("Error updating SWRLTab", e);
-			System.out.println("Error updating SWRLTab" + e);
+			System.out.println("Error updating ROWL" + e);
+			e.printStackTrace();
 		}
 		this.updating = false;
 		retrieveOWLAnnot();
