@@ -22,8 +22,10 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
@@ -534,6 +536,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		public void keyPressed(@NonNull KeyEvent event) {
 			int code = event.getKeyCode();
 			if ((code == KeyEvent.VK_TAB) || (code == KeyEvent.VK_SPACE && event.isControlDown())) {
+				
 				autoComplete();
 				event.consume();
 			} else if (code == KeyEvent.VK_ESCAPE) {
@@ -797,6 +800,9 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 					 */
 				} else {
 					try {
+						
+						
+						
 						// String[] rules = rule.split("\\.");
 						// for (String text : rules) {
 						SWRLRule swrlRules = getSWRLRule(rule);
@@ -896,5 +902,16 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		frame.add(new RuleEditorPanel());
 		frame.setSize(500, 500);
 		frame.setVisible(true);
+	}
+	
+	private class EditorPopup extends JPopupMenu {
+		/**
+		 * 
+		 */
+		public EditorPopup(JTextPane textPane) {
+			// TODO Auto-generated constructor stub
+			add(new JMenuItem("Create Class"));
+			add(new JMenuItem("Create ObjectProperty"));
+		}
 	}
 }

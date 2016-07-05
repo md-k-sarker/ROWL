@@ -77,7 +77,12 @@ public class Engine {
 		Set<OWLAxiom> tmpAxioms = new HashSet<OWLAxiom>();
 		String ruleID = "";
 		int i = 0;
-
+		
+		
+		/**
+		 * when converting rule to owl, single rule can generate multiple axioms.
+		 * That means multiple axioms need to be binded for a single rule-id
+		 */
 		for (OWLAxiom ax : activeOntology.getAxioms()) {
 			for (OWLAnnotation ann : ax.getAnnotations()) {
 				for (OWLAnnotationProperty anp : ann.getAnnotationPropertiesInSignature()) {
@@ -94,14 +99,14 @@ public class Engine {
 								rulesWithID.put(ruleid, new RuleModel(ruleid, ruleText, ruleComment));
 
 								// add to axioms with ID
-								if (i == 0) {
+								if (i == 0) {    //initial case
 									tmpAxioms.add(ax);
 									ruleID = values[0];
 									i++;
-								} else {
-									if (ruleID == values[0]) {
+								} else {   //latter case
+									if (ruleID == values[0]) {   //this rule-id has this axiom and may contain more axiom
 										tmpAxioms.add(ax);
-									} else {
+									} else {     //now this rule-id is saturated and tmpAxioms is filled with all Axioms binded to this rule-id
 										axiomsWithID.put(values[0], tmpAxioms);
 
 										tmpAxioms.clear();
