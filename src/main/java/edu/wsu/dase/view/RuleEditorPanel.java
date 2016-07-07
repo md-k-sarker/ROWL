@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -32,6 +33,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -64,6 +66,7 @@ import org.swrlapi.parser.SWRLParseException;
 import org.swrlapi.parser.SWRLParser;
 
 import edu.wsu.dase.model.ruletoaxiom.Transformer;
+import edu.wsu.dase.view.axiomManchesterDialog.AxiomsDialog;
 
 /**
  * developed by sarker.3 JPanel providing a SWRL rule
@@ -93,7 +96,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	private static final String DUPLICATE_RULE_TITLE = "Duplicate Name";
 	private static final String INTERNAL_ERROR_TITLE = "Internal Error";
 
-	private static final int BUTTON_PREFERRED_WIDTH = 150;
+	private static final int BUTTON_PREFERRED_WIDTH = 200;
 	private static final int BUTTON_PREFERRED_HEIGHT = 30;
 	private static final int RULE_EDIT_AREA_COLUMNS = 20;
 	private static final int RULE_EDIT_AREA_ROWS = 60;
@@ -681,6 +684,9 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		if (pnlForCreateNewEntity == null) {
 			pnlForCreateNewEntity = new JPanel();
 		}
+		
+		
+		
 		pnlForCreateNewEntity.setLayout(new BorderLayout());
 		lbl1.setText(message + " can not be transformed to OWL Axiom.");
 		lbl2.setText("Do you want to switch to SWRLTab ?");
@@ -696,11 +702,11 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 			// parser.setforRuletoOWL(true);
 			rule = parser.parseSWRLRule(ruleText, false, getRuleName(), "comment");
+			
 			if (rule.isPresent()) {
 				System.out.println("rule, body: " + rule.get().getBody() + " head:" + rule.get().getHead());
 				return rule.get();
 			}
-
 		}
 		// catch (SWRLAtomNotFoundException e) {
 		// System.out.println(e.getMessage() + " not found in vocabulary");
@@ -752,11 +758,40 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		return null;
 	}
 
+	Set<OWLAxiom> generatedAxioms = new HashSet<OWLAxiom>();
+	
+	/**
+	 * @return the generatedAxioms
+	 */
+	public Set<OWLAxiom> getGeneratedAxioms() {
+		return generatedAxioms;
+	}
+
+	/**
+	 * @param generatedAxioms the generatedAxioms to set
+	 */
+	public void setGeneratedAxioms(Set<OWLAxiom> generatedAxioms) {
+		this.generatedAxioms = generatedAxioms;
+	}
+
 	private void applyChangetoOntology(Set<OWLAxiom> owlAxioms) {
 		for (OWLAxiom axiom : owlAxioms) {
 			AddAxiom addaxiom = new AddAxiom(activeOntology, axiom);
 			owlOntologyManager.applyChange(addaxiom);
 		}
+	}
+	
+	public void showAxiomsDialog(Set<OWLAxiom> owlAxioms){
+		System.out.println(owlAxioms.size());
+		for(OWLAxiom ax: owlAxioms){
+			System.out.println(ax);
+		}
+		
+		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+		
+		new AxiomsDialog(this, topFrame,activeOntology);
+		
+		applyChangetoOntology(owlAxioms);
 	}
 
 	private void switchToSWRLTab(String rule) {
@@ -800,22 +835,21 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 					 */
 				} else {
 					try {
-						
-						
-						
+
 						// String[] rules = rule.split("\\.");
 						// for (String text : rules) {
 						SWRLRule swrlRules = getSWRLRule(rule);
 
 						if (swrlRules != null) {
 							Set<OWLAxiom> owlAxioms = Transformer.ruleToAxioms(swrlRules);
-
-							if (!Transformer.isTransferred) {
-								applyChangetoOntology(owlAxioms);
-								for (OWLAxiom axiom : owlAxioms) {
-									System.out.println(axiom);
-								}
+							generatedAxioms.clear();
+							generatedAxioms.addAll(owlAxioms);
+							if (Transformer.isTransferred) {
+								
+								showAxiomsDialog(owlAxioms);
 								// apply that change to existing ontology
+								
+								
 							} else {
 								// can not transfer to axioms need to switch
 								// to swrltab

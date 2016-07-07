@@ -116,7 +116,7 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 					remove(this.tabbedPane);
 				}
 
-				this.tabbedPane.addTab("Rule to OWL", this.rulesView);
+				this.tabbedPane.addTab("ROWL", this.rulesView);
 				this.tabbedPane.addTab("SWRL", this.swrlRulesView);
 
 				add(this.tabbedPane, java.awt.BorderLayout.CENTER);

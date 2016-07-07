@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.table.DefaultTableModel;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -28,7 +29,7 @@ public class RulesViewMain extends JSplitPane implements SWRLAPIView {
 	private static final double SPLIT_PANE_RESIZE_WEIGHT = 0.6;
 
 	@NonNull
-	private  SWRLRulesTableView ruleTablesView;
+	private  RuleTablePanel ruleTablesView;
 	// @NonNull private final SWRLRuleExecutionView ruleExecutionView;
 	@NonNull
 	private JPanel topPnl;
@@ -39,7 +40,8 @@ public class RulesViewMain extends JSplitPane implements SWRLAPIView {
 	public RulesViewMain(@NonNull SWRLRuleEngineModel ruleEngineModel,
 			@NonNull SWRLRuleEngineDialogManager dialogManager, OWLOntology activeOntology, JTabbedPane tabbedPane) throws SWRLAPIException {
 		
-		//this.ruleTablesView = new RuleTablePanel(ruleEngineModel, dialogManager);
+		//this.ruleTablesView = new SWRLRulesTableView(ruleEngineModel, dialogManager);
+		this.ruleTablesView = new RuleTablePanel(ruleEngineModel, dialogManager);
 		
 		this.activeOntology = activeOntology;
 		
@@ -55,18 +57,18 @@ public class RulesViewMain extends JSplitPane implements SWRLAPIView {
 
 	@Override
 	public void initialize() {
-		//this.ruleTablesView.initialize();
+		this.ruleTablesView.initialize();
 		// this.ruleExecutionView.initialize();
 
 		setOrientation(JSplitPane.VERTICAL_SPLIT);
 		setResizeWeight(SPLIT_PANE_RESIZE_WEIGHT);
 		setTopComponent(this.topPnl);
-		//setBottomComponent(this.ruleTablesView);
+		setBottomComponent(this.ruleTablesView);
 	}
 
 	@Override
 	public void update() {
-		//this.ruleTablesView.update();
+		this.ruleTablesView.update();
 		// this.ruleExecutionView.update();
 	}
 }

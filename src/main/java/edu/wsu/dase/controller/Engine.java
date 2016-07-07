@@ -70,6 +70,8 @@ public class Engine {
 
 	private void reloadRulesAndAxiomsFromOntology() {
 
+		//JPopupMenu
+		
 		rulesWithID.clear();
 		OWLAnnotationProperty annotP = activeOntology.getOWLOntologyManager().getOWLDataFactory()
 				.getOWLAnnotationProperty(Constants.FIXED_ANNOTATION_NAME, new DefaultPrefixManager());
