@@ -784,7 +784,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	public void showAxiomsDialog(Set<OWLAxiom> owlAxioms){
 		System.out.println(owlAxioms.size());
 		for(OWLAxiom ax: owlAxioms){
-			System.out.println(ax);
+			//System.out.println(ax);
 		}
 		
 		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -841,10 +841,11 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 						if (swrlRules != null) {
 							Set<OWLAxiom> owlAxioms = Transformer.ruleToAxioms(swrlRules);
-							generatedAxioms.clear();
-							generatedAxioms.addAll(owlAxioms);
-							if (! Transformer.isTransferred) {
+							
+							if ( Transformer.isTransferred) {
 								
+								generatedAxioms.clear();
+								generatedAxioms.addAll(owlAxioms);
 								showAxiomsDialog(owlAxioms);
 								// apply that change to existing ontology
 								

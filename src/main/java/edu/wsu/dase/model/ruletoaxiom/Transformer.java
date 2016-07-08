@@ -47,13 +47,13 @@ public class Transformer {
 			Set<SWRLVariable> headSplitVariables = Srd.getVariablesToSet(headSplit);
 			if (headSplitVariables.size() == 0) {
 				axioms.addAll(zeroVarsHeadRuleToAxiom(body, headSplit));
-				isTransferred = true;
+				
 			} else if (headSplitVariables.size() == 1) {
 				axioms.addAll(oneVarHeadRuleToAxiom(body, headSplit));
-				isTransferred = true;
+			
 			} else if (headSplitVariables.size() == 2) {
 				axioms.addAll(twoVarsHeadRuleToAxioms(body, headSplit));
-				isTransferred = true;
+				
 			} else {
 				isTransferred = false;
 				System.out.println("WARNING!!! headSplit with more than 2 variables at ruleToAxioms.");
@@ -118,7 +118,7 @@ public class Transformer {
 		for (OWLAxiom ax : axioms) {
 			//System.out.println("OWL Axiom " + ax);
 		}
-		
+		isTransferred = true;
 		return axioms;
 	}
 
@@ -134,6 +134,9 @@ public class Transformer {
 		if (body.isEmpty()) {
 			axioms.add(new OWLSubObjectPropertyOfAxiomImpl(factory.getOWLTopObjectProperty(),
 					factory.getOWLObjectProperty(IRI.create(binaryHeadAtom.getPredicate().toString().replace("<", "").replace(">", ""))), new HashSet<OWLAnnotation>()));
+			
+			isTransferred = true;
+			
 			return axioms;
 		}
 
