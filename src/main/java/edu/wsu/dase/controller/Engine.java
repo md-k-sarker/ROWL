@@ -6,10 +6,12 @@ import java.util.SortedMap;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.protege.editor.owl.ui.prefix.PrefixUtilities;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.PrefixManager;
 import org.semanticweb.owlapi.util.DefaultPrefixManager;
 
 import edu.wsu.dase.model.Constants;
@@ -21,9 +23,15 @@ public class Engine {
 	private boolean ontologyChanged;
 	private SortedMap<String, Set<OWLAxiom>> axiomsWithID;
 	private SortedMap<String, RuleModel> rulesWithID;
+	private PrefixManager prefixManager;
+	private OWLAnnotationProperty fixedAnnotationProperty;
 
 	public Engine(OWLOntology activeOntology) {
 		this.activeOntology = activeOntology;
+		this.prefixManager = PrefixUtilities.getPrefixOWLOntologyFormat(activeOntology);
+		fixedAnnotationProperty = activeOntology.getOWLOntologyManager().getOWLDataFactory()
+				.getOWLAnnotationProperty(Constants.FIXED_ANNOTATION_NAME, prefixManager);
+		
 		reloadRulesAndAxiomsFromOntology();
 	}
 
@@ -73,8 +81,7 @@ public class Engine {
 		//JPopupMenu
 		
 		rulesWithID.clear();
-		OWLAnnotationProperty annotP = activeOntology.getOWLOntologyManager().getOWLDataFactory()
-				.getOWLAnnotationProperty(Constants.FIXED_ANNOTATION_NAME, new DefaultPrefixManager());
+		
 
 		Set<OWLAxiom> tmpAxioms = new HashSet<OWLAxiom>();
 		String ruleID = "";
@@ -88,7 +95,7 @@ public class Engine {
 		for (OWLAxiom ax : activeOntology.getAxioms()) {
 			for (OWLAnnotation ann : ax.getAnnotations()) {
 				for (OWLAnnotationProperty anp : ann.getAnnotationPropertiesInSignature()) {
-					if (anp.equals(annotP)) {
+					if (anp.equals(fixedAnnotationProperty)) {
 						System.out.println(ann.getValue().asLiteral().get().getLiteral());
 						String val = ann.getValue().asLiteral().get().getLiteral();
 						String[] values = val.split("___", 3);

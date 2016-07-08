@@ -41,13 +41,20 @@ import javax.swing.text.SimpleAttributeSet;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.protege.editor.owl.ui.framelist.SwitchToDefiningOntologyAction;
+import org.protege.editor.owl.ui.prefix.PrefixUtilities;
 import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDeclarationAxiom;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.SWRLRule;
 import org.slf4j.Logger;
@@ -65,6 +72,7 @@ import org.swrlapi.parser.SWRLIncompleteRuleException;
 import org.swrlapi.parser.SWRLParseException;
 import org.swrlapi.parser.SWRLParser;
 
+import edu.wsu.dase.model.Constants;
 import edu.wsu.dase.model.ruletoaxiom.Transformer;
 import edu.wsu.dase.view.axiomManchesterDialog.AxiomsDialog;
 
@@ -539,7 +547,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		public void keyPressed(@NonNull KeyEvent event) {
 			int code = event.getKeyCode();
 			if ((code == KeyEvent.VK_TAB) || (code == KeyEvent.VK_SPACE && event.isControlDown())) {
-				
+
 				autoComplete();
 				event.consume();
 			} else if (code == KeyEvent.VK_ESCAPE) {
@@ -684,9 +692,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		if (pnlForCreateNewEntity == null) {
 			pnlForCreateNewEntity = new JPanel();
 		}
-		
-		
-		
+
 		pnlForCreateNewEntity.setLayout(new BorderLayout());
 		lbl1.setText(message + " can not be transformed to OWL Axiom.");
 		lbl2.setText("Do you want to switch to SWRLTab ?");
@@ -702,7 +708,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 			// parser.setforRuletoOWL(true);
 			rule = parser.parseSWRLRule(ruleText, false, getRuleName(), "comment");
-			
+
 			if (rule.isPresent()) {
 				System.out.println("rule, body: " + rule.get().getBody() + " head:" + rule.get().getHead());
 				return rule.get();
@@ -759,7 +765,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	}
 
 	Set<OWLAxiom> generatedAxioms = new HashSet<OWLAxiom>();
-	
+
 	/**
 	 * @return the generatedAxioms
 	 */
@@ -768,7 +774,8 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	}
 
 	/**
-	 * @param generatedAxioms the generatedAxioms to set
+	 * @param generatedAxioms
+	 *            the generatedAxioms to set
 	 */
 	public void setGeneratedAxioms(Set<OWLAxiom> generatedAxioms) {
 		this.generatedAxioms = generatedAxioms;
@@ -780,29 +787,91 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 			owlOntologyManager.applyChange(addaxiom);
 		}
 	}
-	
-	public void showAxiomsDialog(Set<OWLAxiom> owlAxioms){
+
+	public void showAxiomsDialog(Set<OWLAxiom> owlAxioms) {
 		System.out.println(owlAxioms.size());
-		for(OWLAxiom ax: owlAxioms){
-			//System.out.println(ax);
-		}
-		
+
 		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-		
-		new AxiomsDialog(this, topFrame,activeOntology);
-		
+		// show the dialog
+		new AxiomsDialog(this, topFrame, activeOntology);
+
+		// save the rule with annotations
+		Set<OWLAxiom> axiomWithAnnotations = new HashSet<OWLAxiom>();
+		OWLAnnotationProperty fixedAnnotationProperty;
+		fixedAnnotationProperty = owlDataFactory.getOWLAnnotationProperty(Constants.FIXED_ANNOTATION_NAME,
+				PrefixUtilities.getPrefixOWLOntologyFormat(activeOntology));
+
+		String value = getRuleName() + "___" + getRuleText() + "___" + getComment();
+
+		OWLAnnotationValue owlLiteral = owlDataFactory.getOWLLiteral(value);
+		OWLAnnotation annotation = owlDataFactory.getOWLAnnotation(fixedAnnotationProperty, owlLiteral);
+		for (OWLAxiom ax : owlAxioms) {
+			// System.out.println(ax);
+
+		}
+
 		applyChangetoOntology(owlAxioms);
 	}
 
-	private void switchToSWRLTab(String ruleName,String ruleText,String ruleComment) {
+	// for test purpose
+	public OWLOntology addAxiomAnnotation(OWLOntology ontology, OWLAxiom axiom, String annotationValue,
+			String annotationProperty) {
+		// 1. Get the Ontology Manager
+		OWLOntologyManager manager = ontology.getOWLOntologyManager();
+		OWLDataFactory factory = manager.getOWLDataFactory();
+
+		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+
+		// 1'. Get the existing annotations
+		Set<OWLAnnotation> existingAnnotations = getAnnotations(axiom, ontology);
+
+		// 2. Create annotation
+		OWLAnnotation annotation = factory.getOWLAnnotation(
+				factory.getOWLAnnotationProperty(IRI.create(annotationProperty)),
+				factory.getOWLLiteral(annotationValue));
+
+		Set<OWLAnnotation> newAnnotations = new HashSet<OWLAnnotation>();
+		for (OWLAnnotation anno : existingAnnotations)
+			newAnnotations.add(anno);
+
+		newAnnotations.add(annotation);
+
+		// 3. Bind annotation to axiom
+		// OWLAxiom annotatedAxiom =
+		axiom.getAnnotatedAxiom(newAnnotations); // this does not wirk for
+													// DECLARATION
+		OWLAxiom annotatedAxiom;
+		if (axiom.getAxiomType() == AxiomType.DECLARATION)
+			annotatedAxiom = factory.getOWLAnnotationAssertionAxiom(((OWLDeclarationAxiom) axiom).getEntity().getIRI(),
+					annotation, existingAnnotations);
+		else
+			annotatedAxiom = axiom.getAnnotatedAxiom(newAnnotations);
+
+		//changes.add(new RemoveAxiom(ontology, axiom));
+		changes.add(new AddAxiom(ontology, annotatedAxiom));
+
+		// System.out.println("Old axiom: " + axiom);
+		// System.out.println("New axiom: " + annotatedAxiom);
+
+		// 4. Update the ontology
+		// manager.applyChange(new AddAxiom(ontology, annotatedAxiom));
+		// manager.applyChange(new RemoveAxiom(ontology, axiom));
+
+		manager.applyChanges(changes);
+
+		return ontology;
+	}
+
+	private void switchToSWRLTab(String ruleName, String ruleText, String ruleComment) {
 
 		if (JOptionPane.OK_OPTION == JOptionPane.showOptionDialog(this, getPnlForSwitchToSWRLTab(ruleText),
-				"Not transferable to OWL Axiom.", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null,
-				null)) {
+				"Not transferable to OWL Axiom.", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null,
+				null, null)) {
 			// switch to swrltab;
 
 			tabbedPane.setSelectedIndex(1);
-			SWRLRuleEditorDialog dialog = (SWRLRuleEditorDialog) this.dialogManager.getSWRLRuleEditorDialog(this,ruleName,ruleText,ruleComment); 
+			SWRLRuleEditorDialog dialog = (SWRLRuleEditorDialog) this.dialogManager.getSWRLRuleEditorDialog(this,
+					ruleName, ruleText, ruleComment);
 			dialog.setVisible(true);
 			System.out.println("Clicked to switch to swrltab");
 
@@ -841,20 +910,19 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 						if (swrlRules != null) {
 							Set<OWLAxiom> owlAxioms = Transformer.ruleToAxioms(swrlRules);
-							
-							if ( Transformer.isTransferred) {
-								
+
+							if (Transformer.isTransferred) {
+
 								generatedAxioms.clear();
 								generatedAxioms.addAll(owlAxioms);
 								showAxiomsDialog(owlAxioms);
 								// apply that change to existing ontology
-								
-								
+
 							} else {
 								// can not transfer to axioms need to switch
 								// to swrltab
 
-								switchToSWRLTab(getRuleName(),rule,getComment());
+								switchToSWRLTab(getRuleName(), rule, getComment());
 
 								System.out.println("can not transfer to axioms");
 							}
@@ -937,7 +1005,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		frame.setSize(500, 500);
 		frame.setVisible(true);
 	}
-	
+
 	private class EditorPopup extends JPopupMenu {
 		/**
 		 * 
