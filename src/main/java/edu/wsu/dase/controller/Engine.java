@@ -58,6 +58,7 @@ public class Engine {
 	}
 
 	public Set<OWLAxiom> getAxiomsbyID(String ruleName) {
+
 		if (axiomsWithID.containsKey(ruleName)) {
 			return axiomsWithID.get(ruleName);
 		}
@@ -96,7 +97,7 @@ public class Engine {
 			axiomsWithID.clear();
 
 		Set<OWLAxiom> tmpAxioms = new HashSet<OWLAxiom>();
-		String ruleID = "";
+		String tmpRuleID = "";
 		int i = 0;
 
 		/**
@@ -108,47 +109,69 @@ public class Engine {
 			for (OWLAnnotation ann : ax.getAnnotations()) {
 				for (OWLAnnotationProperty anp : ann.getAnnotationPropertiesInSignature()) {
 					if (anp.equals(fixedAnnotationProperty)) {
-						// System.out.println(ann.getValue().asLiteral().get().getLiteral());
+						 System.out.println("\n\naxiom before parse: " +ax.toString()+"\n\n");
 						String val = ann.getValue().asLiteral().get().getLiteral();
 						String[] values = val.split("___", 3);
-						System.out.println("splitted length: " + values.length);
-						for (String s : values) {
-							System.out.println("spiltted: " + s);
-						}
+						
 						if (values.length == 3) {
-							String ruleid = values[0];
+							String ruleID = values[0];
 							String ruleText = values[1];
 							String ruleComment = values[2];
-							if (ruleid.length() > 0 && ruleText.length() > 0) {
-								
-								System.out.println("rulesWithID length before: " + rulesWithID.size());
-								// add to rulewith ID
-								rulesWithID.put(ruleid, new RuleModel(ruleid, ruleText, ruleComment));
-								System.out.println("rulesWithID length after: " + rulesWithID.size());
-								
-								// add to axioms with ID
-								if (i == 0) { // initial case
-									tmpAxioms.add(ax);
-									ruleID = values[0];
-									i++;
-								} else { // latter case
-									if (ruleID == values[0]) { // this rule-id
-																// has this
-																// axiom and may
-																// contain more
-																// axiom
-										tmpAxioms.add(ax);
-									} else { // now this rule-id is saturated
-												// and tmpAxioms is filled with
-												// all Axioms binded to this
-												// rule-id
-										axiomsWithID.put(values[0], tmpAxioms);
+							if (ruleID.length() > 0 && ruleText.length() > 0) {
 
-										tmpAxioms.clear();
-										tmpAxioms.add(ax);
-										ruleID = values[0];
-									}
+								// add to rulewith ID
+								rulesWithID.put(ruleID, new RuleModel(ruleID, ruleText, ruleComment));
+
+								System.out.println("axiomsWithID length before: " + axiomsWithID.size());
+								// add to axioms with ID
+								System.out.println("equal or not:  "+tmpRuleID +"  "+ ruleID);
+								
+								if(axiomsWithID.containsKey(ruleID)){
+									axiomsWithID.get(ruleID).add(ax);
+								}else{
+									tmpAxioms = new HashSet<OWLAxiom>();
+									tmpAxioms.add(ax);
+									axiomsWithID.put(ruleID, tmpAxioms);
 								}
+								
+								// if (tmpRuleID != ruleID) {
+								// tmpAxioms.clear();
+								// }
+								//
+								// tmpRuleID = ruleID;
+								// tmpAxioms.add(ax);
+								// System.out.println("tmpAxioms Size: "+
+								// tmpAxioms.size());
+								// axiomsWithID.put(ruleID, tmpAxioms);
+
+								// if (i == 0) { // initial case
+								// tmpAxioms.add(ax);
+								// axiomsWithID.put(values[0], tmpAxioms);
+								// tmpRuleID = values[0];
+								// i++;
+								// } else { // latter case
+								// if (tmpRuleID == values[0]) {
+								// /**
+								// * this rule-id has this axiom and may
+								// * contain more axiom
+								// */
+								// tmpAxioms.add(ax);
+								// axiomsWithID.put(values[0], tmpAxioms);
+								// } else {
+								// /**
+								// * now this rule-id is saturated and
+								// * tmpAxioms is filled with all Axioms
+								// * binded to this rule-id
+								// */
+								//
+								// axiomsWithID.put(values[0], tmpAxioms);
+								//
+								// tmpAxioms.clear();
+								// tmpAxioms.add(ax);
+								// tmpRuleID = values[0];
+								// }
+								// }
+								System.out.println("axiomsWithID length after: " + axiomsWithID.size());
 							}
 						} else {
 							System.out.println("Annotation doesn't have 3 parts");

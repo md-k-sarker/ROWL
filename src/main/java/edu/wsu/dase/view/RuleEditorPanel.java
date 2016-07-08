@@ -799,10 +799,9 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		// show the dialog
 		new AxiomsDialog(this, topFrame, activeOntology);
 
-		
 		// create axioms with annotation from the generated axiom
 		/**
-		 * annotation:-   ruleName___ruleText___ruleComment
+		 * annotation:- ruleName___ruleText___ruleComment
 		 */
 		Set<OWLAxiom> axiomWithAnnotations = new HashSet<OWLAxiom>();
 		OWLAnnotationProperty fixedAnnotationProperty;
@@ -813,21 +812,39 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 		OWLAnnotationValue owlLiteral = owlDataFactory.getOWLLiteral(value);
 		OWLAnnotation annotation = owlDataFactory.getOWLAnnotation(fixedAnnotationProperty, owlLiteral);
-		
+
 		for (OWLAxiom ax : owlAxioms) {
 			// System.out.println(ax);
 			axiomWithAnnotations.add(addAxiomAnnotation(ax, annotation));
 		}
 
-		//save changes
+		// save changes
 		applyChangetoOntology(axiomWithAnnotations);
-		
+
 		Engine engine = new Engine(activeOntology);
-		
+
 		LinkedHashMap<String, RuleModel> rulesWithID = engine.getRules();
-		System.out.println("size: "+rulesWithID.size());
-		for(RuleModel ruleModel: rulesWithID.values()){
-			System.out.println("here: "+ruleModel.getRuleName() +"\t"+ ruleModel.getRuleText());
+		System.out.println("rulesWithID size: " + rulesWithID.size());
+		
+//		for (RuleModel ruleModel : rulesWithID.values()) {
+//			System.out.println("\n\nruleID: " + ruleModel.getRuleName() + "\t" + ruleModel.getRuleText());
+//			
+//			Set<OWLAxiom> _axiom = engine.getAxiomsbyID(ruleModel.getRuleName());
+//			if (_axiom != null) {
+//				for (OWLAxiom ax : _axiom) {
+//					System.out.println("\nhere Axiom: "+ax.toString());
+//				}
+//			}
+//		}
+		for(String key: rulesWithID.keySet()){
+			Set<OWLAxiom> _axiom = engine.getAxiomsbyID(key);
+			if (_axiom != null) {
+				for (OWLAxiom ax : _axiom) {
+					System.out.println("\nfor key: "+key+"  Axiom: "+ax.toString());
+				}
+			}else{
+				System.out.println("\nfor key: "+key+" Axiom is null ");
+			}
 		}
 	}
 
