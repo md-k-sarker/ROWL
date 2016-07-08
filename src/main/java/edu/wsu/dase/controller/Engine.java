@@ -1,6 +1,8 @@
 package edu.wsu.dase.controller;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.SortedMap;
 
@@ -21,8 +23,8 @@ public class Engine {
 
 	private OWLOntology activeOntology;
 	private boolean ontologyChanged;
-	private SortedMap<String, Set<OWLAxiom>> axiomsWithID;
-	private SortedMap<String, RuleModel> rulesWithID;
+	private LinkedHashMap<String, Set<OWLAxiom>> axiomsWithID;
+	private LinkedHashMap<String, RuleModel> rulesWithID;
 	private PrefixManager prefixManager;
 	private OWLAnnotationProperty fixedAnnotationProperty;
 
@@ -31,11 +33,20 @@ public class Engine {
 		this.prefixManager = PrefixUtilities.getPrefixOWLOntologyFormat(activeOntology);
 		fixedAnnotationProperty = activeOntology.getOWLOntologyManager().getOWLDataFactory()
 				.getOWLAnnotationProperty(Constants.FIXED_ANNOTATION_NAME, prefixManager);
-		
+
+		initializeDataStructure();
+
 		reloadRulesAndAxiomsFromOntology();
+
 	}
 
-	public SortedMap<String, RuleModel> getRules() {
+	private void initializeDataStructure() {
+		rulesWithID = new LinkedHashMap<String, RuleModel>();
+		axiomsWithID = new LinkedHashMap<String, Set<OWLAxiom>>();
+	}
+
+	public LinkedHashMap<String, RuleModel> getRules() {
+
 		return this.rulesWithID;
 	}
 
@@ -78,44 +89,59 @@ public class Engine {
 
 	private void reloadRulesAndAxiomsFromOntology() {
 
-		//JPopupMenu
-		
-		rulesWithID.clear();
-		
+		// JPopupMenu
+		if (rulesWithID != null)
+			rulesWithID.clear();
+		if (axiomsWithID != null)
+			axiomsWithID.clear();
 
 		Set<OWLAxiom> tmpAxioms = new HashSet<OWLAxiom>();
 		String ruleID = "";
 		int i = 0;
-		
-		
+
 		/**
-		 * when converting rule to owl, single rule can generate multiple axioms.
-		 * That means multiple axioms need to be binded for a single rule-id
+		 * when converting rule to owl, single rule can generate multiple
+		 * axioms. That means multiple axioms need to be binded for a single
+		 * rule-id
 		 */
 		for (OWLAxiom ax : activeOntology.getAxioms()) {
 			for (OWLAnnotation ann : ax.getAnnotations()) {
 				for (OWLAnnotationProperty anp : ann.getAnnotationPropertiesInSignature()) {
 					if (anp.equals(fixedAnnotationProperty)) {
-						System.out.println(ann.getValue().asLiteral().get().getLiteral());
+						// System.out.println(ann.getValue().asLiteral().get().getLiteral());
 						String val = ann.getValue().asLiteral().get().getLiteral();
 						String[] values = val.split("___", 3);
+						System.out.println("splitted length: " + values.length);
+						for (String s : values) {
+							System.out.println("spiltted: " + s);
+						}
 						if (values.length == 3) {
 							String ruleid = values[0];
-							String ruleComment = values[1];
-							String ruleText = values[2];
+							String ruleText = values[1];
+							String ruleComment = values[2];
 							if (ruleid.length() > 0 && ruleText.length() > 0) {
+								
+								System.out.println("rulesWithID length before: " + rulesWithID.size());
 								// add to rulewith ID
 								rulesWithID.put(ruleid, new RuleModel(ruleid, ruleText, ruleComment));
-
+								System.out.println("rulesWithID length after: " + rulesWithID.size());
+								
 								// add to axioms with ID
-								if (i == 0) {    //initial case
+								if (i == 0) { // initial case
 									tmpAxioms.add(ax);
 									ruleID = values[0];
 									i++;
-								} else {   //latter case
-									if (ruleID == values[0]) {   //this rule-id has this axiom and may contain more axiom
+								} else { // latter case
+									if (ruleID == values[0]) { // this rule-id
+																// has this
+																// axiom and may
+																// contain more
+																// axiom
 										tmpAxioms.add(ax);
-									} else {     //now this rule-id is saturated and tmpAxioms is filled with all Axioms binded to this rule-id
+									} else { // now this rule-id is saturated
+												// and tmpAxioms is filled with
+												// all Axioms binded to this
+												// rule-id
 										axiomsWithID.put(values[0], tmpAxioms);
 
 										tmpAxioms.clear();
@@ -124,6 +150,8 @@ public class Engine {
 									}
 								}
 							}
+						} else {
+							System.out.println("Annotation doesn't have 3 parts");
 						}
 					}
 				}

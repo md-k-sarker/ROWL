@@ -15,9 +15,11 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -72,7 +74,9 @@ import org.swrlapi.parser.SWRLIncompleteRuleException;
 import org.swrlapi.parser.SWRLParseException;
 import org.swrlapi.parser.SWRLParser;
 
+import edu.wsu.dase.controller.Engine;
 import edu.wsu.dase.model.Constants;
+import edu.wsu.dase.model.RuleModel;
 import edu.wsu.dase.model.ruletoaxiom.Transformer;
 import edu.wsu.dase.view.axiomManchesterDialog.AxiomsDialog;
 
@@ -795,7 +799,11 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		// show the dialog
 		new AxiomsDialog(this, topFrame, activeOntology);
 
-		// save the rule with annotations
+		
+		// create axioms with annotation from the generated axiom
+		/**
+		 * annotation:-   ruleName___ruleText___ruleComment
+		 */
 		Set<OWLAxiom> axiomWithAnnotations = new HashSet<OWLAxiom>();
 		OWLAnnotationProperty fixedAnnotationProperty;
 		fixedAnnotationProperty = owlDataFactory.getOWLAnnotationProperty(Constants.FIXED_ANNOTATION_NAME,
@@ -805,61 +813,34 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 		OWLAnnotationValue owlLiteral = owlDataFactory.getOWLLiteral(value);
 		OWLAnnotation annotation = owlDataFactory.getOWLAnnotation(fixedAnnotationProperty, owlLiteral);
+		
 		for (OWLAxiom ax : owlAxioms) {
 			// System.out.println(ax);
-
+			axiomWithAnnotations.add(addAxiomAnnotation(ax, annotation));
 		}
 
-		applyChangetoOntology(owlAxioms);
+		//save changes
+		applyChangetoOntology(axiomWithAnnotations);
+		
+		Engine engine = new Engine(activeOntology);
+		
+		LinkedHashMap<String, RuleModel> rulesWithID = engine.getRules();
+		System.out.println("size: "+rulesWithID.size());
+		for(RuleModel ruleModel: rulesWithID.values()){
+			System.out.println("here: "+ruleModel.getRuleName() +"\t"+ ruleModel.getRuleText());
+		}
 	}
 
 	// for test purpose
-	public OWLOntology addAxiomAnnotation(OWLOntology ontology, OWLAxiom axiom, String annotationValue,
-			String annotationProperty) {
-		// 1. Get the Ontology Manager
-		OWLOntologyManager manager = ontology.getOWLOntologyManager();
-		OWLDataFactory factory = manager.getOWLDataFactory();
-
-		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
-
-		// 1'. Get the existing annotations
-		Set<OWLAnnotation> existingAnnotations = getAnnotations(axiom, ontology);
-
-		// 2. Create annotation
-		OWLAnnotation annotation = factory.getOWLAnnotation(
-				factory.getOWLAnnotationProperty(IRI.create(annotationProperty)),
-				factory.getOWLLiteral(annotationValue));
+	public OWLAxiom addAxiomAnnotation(OWLAxiom axiom, OWLAnnotation annotation) {
 
 		Set<OWLAnnotation> newAnnotations = new HashSet<OWLAnnotation>();
-		for (OWLAnnotation anno : existingAnnotations)
-			newAnnotations.add(anno);
 
 		newAnnotations.add(annotation);
 
-		// 3. Bind annotation to axiom
-		// OWLAxiom annotatedAxiom =
-		axiom.getAnnotatedAxiom(newAnnotations); // this does not wirk for
-													// DECLARATION
-		OWLAxiom annotatedAxiom;
-		if (axiom.getAxiomType() == AxiomType.DECLARATION)
-			annotatedAxiom = factory.getOWLAnnotationAssertionAxiom(((OWLDeclarationAxiom) axiom).getEntity().getIRI(),
-					annotation, existingAnnotations);
-		else
-			annotatedAxiom = axiom.getAnnotatedAxiom(newAnnotations);
+		OWLAxiom annotatedAxiom = axiom.getAnnotatedAxiom(newAnnotations);
 
-		//changes.add(new RemoveAxiom(ontology, axiom));
-		changes.add(new AddAxiom(ontology, annotatedAxiom));
-
-		// System.out.println("Old axiom: " + axiom);
-		// System.out.println("New axiom: " + annotatedAxiom);
-
-		// 4. Update the ontology
-		// manager.applyChange(new AddAxiom(ontology, annotatedAxiom));
-		// manager.applyChange(new RemoveAxiom(ontology, axiom));
-
-		manager.applyChanges(changes);
-
-		return ontology;
+		return annotatedAxiom;
 	}
 
 	private void switchToSWRLTab(String ruleName, String ruleText, String ruleComment) {
