@@ -794,16 +794,15 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		applyChangetoOntology(owlAxioms);
 	}
 
-	private void switchToSWRLTab(String rule) {
+	private void switchToSWRLTab(String ruleName,String ruleText,String ruleComment) {
 
-		if (JOptionPane.OK_OPTION == JOptionPane.showOptionDialog(this, getPnlForSwitchToSWRLTab(rule),
-				"Not transferable to OWL Axiom.", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null,
+		if (JOptionPane.OK_OPTION == JOptionPane.showOptionDialog(this, getPnlForSwitchToSWRLTab(ruleText),
+				"Not transferable to OWL Axiom.", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null,
 				null)) {
 			// switch to swrltab;
 
 			tabbedPane.setSelectedIndex(1);
-			SWRLRuleEditorDialog dialog = (SWRLRuleEditorDialog) this.dialogManager.getSWRLRuleEditorDialog(this); // .setRuleText(rule);
-			// dialog.setRuleText(rule);
+			SWRLRuleEditorDialog dialog = (SWRLRuleEditorDialog) this.dialogManager.getSWRLRuleEditorDialog(this,ruleName,ruleText,ruleComment); 
 			dialog.setVisible(true);
 			System.out.println("Clicked to switch to swrltab");
 
@@ -844,7 +843,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 							Set<OWLAxiom> owlAxioms = Transformer.ruleToAxioms(swrlRules);
 							generatedAxioms.clear();
 							generatedAxioms.addAll(owlAxioms);
-							if (Transformer.isTransferred) {
+							if (! Transformer.isTransferred) {
 								
 								showAxiomsDialog(owlAxioms);
 								// apply that change to existing ontology
@@ -854,7 +853,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 								// can not transfer to axioms need to switch
 								// to swrltab
 
-								switchToSWRLTab(rule);
+								switchToSWRLTab(getRuleName(),rule,getComment());
 
 								System.out.println("can not transfer to axioms");
 							}
