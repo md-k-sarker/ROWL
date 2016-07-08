@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -823,7 +824,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 		Engine engine = new Engine(activeOntology);
 
-		LinkedHashMap<String, RuleModel> rulesWithID = engine.getRules();
+		TreeMap<String, RuleModel> rulesWithID = engine.getRules();
 		System.out.println("rulesWithID size: " + rulesWithID.size());
 		
 //		for (RuleModel ruleModel : rulesWithID.values()) {
@@ -836,6 +837,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 //				}
 //			}
 //		}
+		
 		for(String key: rulesWithID.keySet()){
 			Set<OWLAxiom> _axiom = engine.getAxiomsbyID(key);
 			if (_axiom != null) {

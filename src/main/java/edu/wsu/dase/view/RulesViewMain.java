@@ -16,6 +16,9 @@ import org.swrlapi.ui.view.SWRLAPIView;
 import org.swrlapi.ui.view.SWRLRulesTableView;
 import org.swrlapi.ui.view.queries.SQWRLQueriesView;
 
+import edu.wsu.dase.controller.Engine;
+import edu.wsu.dase.model.RuleTableModel;
+
 
 /**
  * Component that presents a SWRL editor and rule execution graphical interface.
@@ -29,7 +32,16 @@ public class RulesViewMain extends JSplitPane implements SWRLAPIView {
 	private static final double SPLIT_PANE_RESIZE_WEIGHT = 0.6;
 
 	@NonNull
-	private  RuleTablePanel ruleTablesView;
+	private final RuleTablePanel ruleTablesView;
+	
+	@NonNull
+	private final RuleEditorPanel ruleEditorView;
+	
+	@NonNull
+	private final Engine engine;
+	
+	private RuleTableModel ruleTableModel;
+	
 	// @NonNull private final SWRLRuleExecutionView ruleExecutionView;
 	@NonNull
 	private JPanel topPnl;
@@ -37,20 +49,27 @@ public class RulesViewMain extends JSplitPane implements SWRLAPIView {
 	//private IntegrateWithOntologyAction actionlistener;
 	private OWLOntology activeOntology;
 
-	public RulesViewMain(@NonNull SWRLRuleEngineModel ruleEngineModel,
-			@NonNull SWRLRuleEngineDialogManager dialogManager, OWLOntology activeOntology, JTabbedPane tabbedPane) throws SWRLAPIException {
+	public RulesViewMain(@NonNull SWRLRuleEngineModel ruleEngineModel,Engine engine,
+			@NonNull SWRLRuleEngineDialogManager dialogManager,  OWLOntology activeOntology, JTabbedPane tabbedPane) throws SWRLAPIException {
 		
 		//this.ruleTablesView = new SWRLRulesTableView(ruleEngineModel, dialogManager);
-		this.ruleTablesView = new RuleTablePanel(ruleEngineModel, dialogManager);
 		
 		this.activeOntology = activeOntology;
+		this.engine = engine;
+		
+		this.ruleEditorView = new RuleEditorPanel(ruleEngineModel,this.activeOntology,dialogManager, tabbedPane);
+		this.ruleTableModel = new RuleTableModel(this.engine);
+		
+		this.ruleTablesView = new RuleTablePanel(this.engine, this.ruleTableModel, ruleEditorView);
+		
+		
 		
 		topPnl = new JPanel();
 		topPnl.setLayout(new BorderLayout());
 		//integrateWithOntologybtn = new JButton("Convert to OWL Axioms.");
 		//actionlistener = new IntegrateWithOntologyAction();
 		//integrateWithOntologybtn.addActionListener(actionlistener);
-		topPnl.add(new RuleEditorPanel(ruleEngineModel,this.activeOntology,dialogManager, tabbedPane),BorderLayout.CENTER);
+		topPnl.add(ruleEditorView,BorderLayout.CENTER);
 		//topPnl.add(integrateWithOntologybtn,BorderLayout.PAGE_END);
 		// this.ruleExecutionView = new SWRLRuleExecutionView(ruleEngineModel);
 	}

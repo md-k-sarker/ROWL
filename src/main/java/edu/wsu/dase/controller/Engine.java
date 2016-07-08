@@ -2,7 +2,7 @@ package edu.wsu.dase.controller;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
+import java.util.TreeMap;
 import java.util.Set;
 import java.util.SortedMap;
 
@@ -12,7 +12,9 @@ import org.protege.editor.owl.ui.prefix.PrefixUtilities;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.PrefixManager;
 import org.semanticweb.owlapi.util.DefaultPrefixManager;
 
@@ -22,14 +24,18 @@ import edu.wsu.dase.model.RuleModel;
 public class Engine {
 
 	private OWLOntology activeOntology;
-	private boolean ontologyChanged;
-	private LinkedHashMap<String, Set<OWLAxiom>> axiomsWithID;
-	private LinkedHashMap<String, RuleModel> rulesWithID;
+	private TreeMap<String, Set<OWLAxiom>> axiomsWithID;
+	private TreeMap<String, RuleModel> rulesWithID;
 	private PrefixManager prefixManager;
+	private OWLOntologyManager owlOntologyManager;
+	private OWLDataFactory owlDataFactory;
 	private OWLAnnotationProperty fixedAnnotationProperty;
 
 	public Engine(OWLOntology activeOntology) {
 		this.activeOntology = activeOntology;
+		this.owlOntologyManager = this.activeOntology.getOWLOntologyManager();
+		this.owlDataFactory = this.owlOntologyManager.getOWLDataFactory();
+
 		this.prefixManager = PrefixUtilities.getPrefixOWLOntologyFormat(activeOntology);
 		fixedAnnotationProperty = activeOntology.getOWLOntologyManager().getOWLDataFactory()
 				.getOWLAnnotationProperty(Constants.FIXED_ANNOTATION_NAME, prefixManager);
@@ -41,11 +47,11 @@ public class Engine {
 	}
 
 	private void initializeDataStructure() {
-		rulesWithID = new LinkedHashMap<String, RuleModel>();
-		axiomsWithID = new LinkedHashMap<String, Set<OWLAxiom>>();
+		rulesWithID = new TreeMap<String, RuleModel>();
+		axiomsWithID = new TreeMap<String, Set<OWLAxiom>>();
 	}
 
-	public LinkedHashMap<String, RuleModel> getRules() {
+	public TreeMap<String, RuleModel> getRules() {
 
 		return this.rulesWithID;
 	}
@@ -65,8 +71,41 @@ public class Engine {
 		return null;
 	}
 
+	public void addARulessWithID(String ruleName, RuleModel rule) {
+		rulesWithID.put(ruleName, rule);
+	}
+
+	public void addAxiomsWithID(String ruleName, Set<OWLAxiom> axiomSet) {
+		axiomsWithID.put(ruleName, axiomSet);
+	}
+
+	/**
+	 * Delete Rule from the table.
+	 * 
+	 * 
+	 * has to be sure from Adila.
+	 * 
+	 * Possible option 1. also remove corresponding
+	 * axioms from ontology or 2. only remove corresponding annotations from
+	 * those axioms
+	 * 
+	 * Current implementation remove corresponding axioms from ontology
+	 * 
+	 * @param ruleName
+	 */
+	public void deleteRule(String ruleName) {
+		if (rulesWithID.containsKey(ruleName)) {
+			rulesWithID.remove(ruleName);
+		}
+
+		if (axiomsWithID.containsKey(ruleName)) {
+			owlOntologyManager.removeAxioms(activeOntology, axiomsWithID.get(ruleName));
+			axiomsWithID.remove(ruleName);
+		}
+	}
+
 	public void OntologyChanged() {
-		reloadRulesAndAxiomsFromOntology();
+		// reloadRulesAndAxiomsFromOntology();
 	}
 
 	public boolean checkDuplicateRuleName(String RuleName) {
@@ -109,10 +148,10 @@ public class Engine {
 			for (OWLAnnotation ann : ax.getAnnotations()) {
 				for (OWLAnnotationProperty anp : ann.getAnnotationPropertiesInSignature()) {
 					if (anp.equals(fixedAnnotationProperty)) {
-						 System.out.println("\n\naxiom before parse: " +ax.toString()+"\n\n");
+						System.out.println("\n\naxiom before parse: " + ax.toString() + "\n\n");
 						String val = ann.getValue().asLiteral().get().getLiteral();
 						String[] values = val.split("___", 3);
-						
+
 						if (values.length == 3) {
 							String ruleID = values[0];
 							String ruleText = values[1];
@@ -124,16 +163,16 @@ public class Engine {
 
 								System.out.println("axiomsWithID length before: " + axiomsWithID.size());
 								// add to axioms with ID
-								System.out.println("equal or not:  "+tmpRuleID +"  "+ ruleID);
-								
-								if(axiomsWithID.containsKey(ruleID)){
+								System.out.println("equal or not:  " + tmpRuleID + "  " + ruleID);
+
+								if (axiomsWithID.containsKey(ruleID)) {
 									axiomsWithID.get(ruleID).add(ax);
-								}else{
+								} else {
 									tmpAxioms = new HashSet<OWLAxiom>();
 									tmpAxioms.add(ax);
 									axiomsWithID.put(ruleID, tmpAxioms);
 								}
-								
+
 								// if (tmpRuleID != ruleID) {
 								// tmpAxioms.clear();
 								// }
