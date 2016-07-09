@@ -19,12 +19,10 @@ import org.swrlapi.ui.view.queries.SQWRLQueriesView;
 import edu.wsu.dase.controller.Engine;
 import edu.wsu.dase.model.RuleTableModel;
 
-
 /**
- * Component that presents a SWRL editor and rule execution graphical interface.
- * It can be used to embed SWRL rule editing and execution into an application.
- *
- * @see SQWRLQueriesView
+ * Component that presents a SWRL rule editor and rule table view graphical
+ * interface.
+ * 
  */
 public class RulesViewMain extends JSplitPane implements SWRLAPIView {
 	private static final long serialVersionUID = 1L;
@@ -33,45 +31,38 @@ public class RulesViewMain extends JSplitPane implements SWRLAPIView {
 
 	@NonNull
 	private final RuleTablePanel ruleTablesView;
-	
+
 	@NonNull
 	private final RuleEditorPanel ruleEditorView;
-	
+
 	@NonNull
 	private final Engine engine;
-	
-	private RuleTableModel ruleTableModel;
-	
-	// @NonNull private final SWRLRuleExecutionView ruleExecutionView;
+
 	@NonNull
-	private JPanel topPnl;
-	//private JButton integrateWithOntologybtn;
-	//private IntegrateWithOntologyAction actionlistener;
+	private RuleTableModel ruleTableModel;
+
+	@NonNull
 	private OWLOntology activeOntology;
 
-	public RulesViewMain(@NonNull SWRLRuleEngineModel ruleEngineModel,Engine engine,
-			@NonNull SWRLRuleEngineDialogManager dialogManager,  OWLOntology activeOntology, JTabbedPane tabbedPane) throws SWRLAPIException {
-		
-		//this.ruleTablesView = new SWRLRulesTableView(ruleEngineModel, dialogManager);
-		
+	public RulesViewMain(@NonNull SWRLRuleEngineModel swrlRuleEngineModel, Engine engine,
+			@NonNull SWRLRuleEngineDialogManager dialogManager, OWLOntology activeOntology, JTabbedPane tabbedPane)
+			throws SWRLAPIException {
+
 		this.activeOntology = activeOntology;
 		this.engine = engine;
-		
-		this.ruleEditorView = new RuleEditorPanel(ruleEngineModel,this.activeOntology,dialogManager, tabbedPane);
+
+		this.ruleEditorView = new RuleEditorPanel(swrlRuleEngineModel, this.engine, this.activeOntology, dialogManager,
+				tabbedPane);
+		this.engine.setRuleEditorPanel(this.ruleEditorView);
+
 		this.ruleTableModel = new RuleTableModel(this.engine);
-		
+		this.engine.setRuleTableModel(this.ruleTableModel);
+
 		this.ruleTablesView = new RuleTablePanel(this.engine, this.ruleTableModel, ruleEditorView);
+		this.engine.setRuleTablePanel(this.ruleTablesView);
 		
-		
-		
-		topPnl = new JPanel();
-		topPnl.setLayout(new BorderLayout());
-		//integrateWithOntologybtn = new JButton("Convert to OWL Axioms.");
-		//actionlistener = new IntegrateWithOntologyAction();
-		//integrateWithOntologybtn.addActionListener(actionlistener);
-		topPnl.add(ruleEditorView,BorderLayout.CENTER);
-		//topPnl.add(integrateWithOntologybtn,BorderLayout.PAGE_END);
-		// this.ruleExecutionView = new SWRLRuleExecutionView(ruleEngineModel);
+		this.ruleTableModel.setView(this.ruleTablesView);
+
 	}
 
 	@Override
@@ -81,7 +72,7 @@ public class RulesViewMain extends JSplitPane implements SWRLAPIView {
 
 		setOrientation(JSplitPane.VERTICAL_SPLIT);
 		setResizeWeight(SPLIT_PANE_RESIZE_WEIGHT);
-		setTopComponent(this.topPnl);
+		setTopComponent(this.ruleEditorView);
 		setBottomComponent(this.ruleTablesView);
 	}
 

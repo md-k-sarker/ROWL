@@ -36,6 +36,9 @@ public class RuleTableModel extends AbstractTableModel {
 	private static final String RULE_TEXT_COLUMN_TITLE = "Rule";
 	private static final String RULE_COMMENT_COLUMN_TITLE = "Comment";
 
+	@NonNull
+	private Optional<@NonNull SWRLAPIView> view = Optional.<@NonNull SWRLAPIView> empty();
+
 	public static final int NUMBER_OF_COLUMNS = 3;
 
 	@NonNull
@@ -60,10 +63,10 @@ public class RuleTableModel extends AbstractTableModel {
 		updateRuleModels();
 	}
 
-	// public void setView(@NonNull SWRLAPIView view) {
-	// this.view = Optional.of(view);
-	// updateRuleModels();
-	// }
+	public void setView(@NonNull SWRLAPIView view) {
+		this.view = Optional.of(view);
+		updateRuleModels();
+	}
 
 	public void updateModel(@NonNull Engine engine) {
 		this.engine = engine;
@@ -184,6 +187,9 @@ public class RuleTableModel extends AbstractTableModel {
 	public void updateView() {
 
 		updateRuleModels();
+		if (this.view != null && this.view.isPresent()) {
+			this.view.get().update();
+		}
 	}
 
 	@NonNull

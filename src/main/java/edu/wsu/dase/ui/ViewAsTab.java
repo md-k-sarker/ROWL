@@ -116,7 +116,6 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 			e.printStackTrace();
 		}
 		this.updating = false;
-		retrieveOWLAnnot();
 	}
 
 	private void updateSWRLTab() {

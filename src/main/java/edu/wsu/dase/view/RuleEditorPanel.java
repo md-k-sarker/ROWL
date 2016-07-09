@@ -78,6 +78,7 @@ import org.swrlapi.parser.SWRLParser;
 import edu.wsu.dase.controller.Engine;
 import edu.wsu.dase.model.Constants;
 import edu.wsu.dase.model.RuleModel;
+import edu.wsu.dase.model.RuleTableModel;
 import edu.wsu.dase.model.ruletoaxiom.Transformer;
 import edu.wsu.dase.view.axiomManchesterDialog.AxiomsDialog;
 
@@ -94,7 +95,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	private static final String RULE_NAME_TITLE = "Name";
 	private static final String COMMENT_LABEL_TITLE = "Comment";
 	private static final String STATUS_LABEL_TITLE = "Status";
-	private static final String OK_BUTTON_TITLE = "Convert to OWL Axiom";
+	private static final String CONVERT_TO_OWL_BUTTON_TITLE = "Convert to OWL Axiom";
 	private static final String CANCEL_BUTTON_TITLE = "Clear";
 	private static final String STATUS_OK = "Ok";
 	private static final String STATUS_NO_RULE_TEXT = "Use Tab key to cycle through auto-completions;"
@@ -118,6 +119,10 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	private SWRLRuleEngineModel swrlRuleEngineModel;
 	@NonNull
 	private SWRLRuleEngineDialogManager dialogManager;
+
+	@NonNull
+	private Engine engine;
+
 	@NonNull
 	private final SWRLRuleEditorInitialDialogState initialDialogState = new SWRLRuleEditorInitialDialogState();
 	@NonNull
@@ -125,7 +130,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	@NonNull
 	private final JTextPane ruleTextTextArea;
 	@NonNull
-	private final JButton saveButton, cancelButton;
+	private final JButton convertToOWLButton, cancelButton;
 	@NonNull
 	private final Border loweredBevelBorder;
 	@NonNull
@@ -154,7 +159,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		this.yellowBorder = BorderFactory.createLineBorder(Color.YELLOW);
 
 		this.ruleTextTextArea = new JTextPane();
-		this.saveButton = new JButton(OK_BUTTON_TITLE);
+		this.convertToOWLButton = new JButton(CONVERT_TO_OWL_BUTTON_TITLE);
 		this.cancelButton = new JButton(CANCEL_BUTTON_TITLE);
 		this.ruleNameTextField = new JTextField("");
 		this.commentTextField = new JTextField("");
@@ -162,16 +167,18 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		initialize();
 	}
 
-	public RuleEditorPanel(@NonNull SWRLRuleEngineModel swrlRuleEngineModel, OWLOntology activeOntology,
-			@NonNull SWRLRuleEngineDialogManager dialogManager, JTabbedPane tabbedPane) {
+	public RuleEditorPanel(@NonNull SWRLRuleEngineModel swrlRuleEngineModel, @NonNull Engine engine,
+			@NonNull OWLOntology activeOntology, @NonNull SWRLRuleEngineDialogManager dialogManager,
+			@NonNull JTabbedPane tabbedPane) {
 
 		this.swrlRuleEngineModel = swrlRuleEngineModel;
 		this.dialogManager = dialogManager;
+		this.engine = engine;
 		this.loweredBevelBorder = BorderFactory.createLoweredBevelBorder();
 		this.yellowBorder = BorderFactory.createLineBorder(Color.YELLOW);
 		this.ruleTextTextArea = new JTextPane();
 		this.tabbedPane = tabbedPane;
-		this.saveButton = new JButton(OK_BUTTON_TITLE);
+		this.convertToOWLButton = new JButton(CONVERT_TO_OWL_BUTTON_TITLE);
 		this.cancelButton = new JButton(CANCEL_BUTTON_TITLE);
 		this.activeOntology = activeOntology;
 		this.owlDataFactory = activeOntology.getOWLOntologyManager().getOWLDataFactory();
@@ -187,18 +194,12 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	@Override
 	public void initialize() {
 		// Container contentPane = getContentPane();
-		// setTitle(TITLE);
-		// setModal(true);
 
 		initializeComponents();
 
-		// setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-
-		// addWindowListener(new CloseWindowListener(contentPane));
-
 		this.ruleTextTextArea.addKeyListener(new SWRLRuleEditorKeyAdapter());
-		this.cancelButton.addActionListener(new CancelSWRLRuleEditActionListener(this));
-		this.saveButton.addActionListener(new SaveSWRLRuleActionListener(this));
+		this.cancelButton.addActionListener(new CancelSWRLRuleEditActionListener());
+		this.convertToOWLButton.addActionListener(new ConvertSWRLRuleActionListener(this));
 	}
 
 	@Override
@@ -314,7 +315,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		this.statusTextField.setBorder(this.loweredBevelBorder);
 
 		this.cancelButton.setPreferredSize(new Dimension(BUTTON_PREFERRED_WIDTH, BUTTON_PREFERRED_HEIGHT));
-		this.saveButton.setPreferredSize(new Dimension(BUTTON_PREFERRED_WIDTH, BUTTON_PREFERRED_HEIGHT));
+		this.convertToOWLButton.setPreferredSize(new Dimension(BUTTON_PREFERRED_WIDTH, BUTTON_PREFERRED_HEIGHT));
 
 		this.setLayout(new BorderLayout());
 
@@ -334,7 +335,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		rulePanel.add(this.scrollPane);
 
 		buttonPanel.add(cancelButton);
-		buttonPanel.add(this.saveButton);
+		buttonPanel.add(this.convertToOWLButton);
 
 		surroundPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
@@ -458,11 +459,11 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	}
 
 	private void disableSave() {
-		// this.saveButton.setEnabled(false);
+		this.convertToOWLButton.setEnabled(false);
 	}
 
 	private void enableSave() {
-		this.saveButton.setEnabled(true);
+		this.convertToOWLButton.setEnabled(true);
 	}
 
 	private void setInformationalStatusText(@NonNull String status) {
@@ -525,14 +526,15 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		return this.swrlRuleEngineModel.createSWRLParser();
 	}
 
-	private @NonNull SWRLRulesAndSQWRLQueriesTableModel getSWRLRulesTableModel() {
-		return this.swrlRuleEngineModel.getSWRLRulesTableModel();
+	private @NonNull RuleTableModel getRuleTableModel() {
+
+		return this.engine.getRuleTableModel();
 	}
 
-	/*
-	 * @NonNull private SWRLRuleEngineDialogManager getDialogManager() { return
-	 * this.dialogManager; }
-	 */
+	@NonNull
+	private SWRLRuleEngineDialogManager getDialogManager() {
+		return this.dialogManager;
+	}
 
 	private void setInitialDialogState() {
 		this.initialDialogState.setState(getRuleName(), getComment(), getRuleText());
@@ -542,9 +544,15 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		return this.initialDialogState.hasStateChanged(getRuleName(), getComment(), getRuleText());
 	}
 
-	private void clearIfOk(@NonNull Component parent) {
+	private void clearIfOk() {
 
+		this.ruleNameTextField.setText(""); //
+		this.ruleNameTextField.setCaretPosition(this.ruleNameTextField.getText().length());
 		this.ruleTextTextArea.setText("");
+		this.commentTextField.setText("");
+		this.statusTextField.setText("");
+		updateStatus();
+
 	}
 
 	private class SWRLRuleEditorKeyAdapter extends KeyAdapter {
@@ -573,30 +581,15 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		}
 	}
 
-	/*
-	 * class CloseWindowListener extends WindowAdapter {
-	 * 
-	 * @NonNull private final Component parent;
-	 * 
-	 * public CloseWindowListener(@NonNull Component parent) { this.parent =
-	 * parent; }
-	 * 
-	 * @Override public void windowClosing(WindowEvent e) {
-	 * closeIfOk(this.parent); } }
-	 */
-
 	private class CancelSWRLRuleEditActionListener implements ActionListener {
 
-		@NonNull
-		private final Component parent;
+		public CancelSWRLRuleEditActionListener() {
 
-		public CancelSWRLRuleEditActionListener(@NonNull Component parent) {
-			this.parent = parent;
 		}
 
 		@Override
 		public void actionPerformed(@NonNull ActionEvent e) {
-			clearIfOk(this.parent);
+			clearIfOk();
 		}
 	}
 
@@ -706,19 +699,19 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		return pnlForCreateNewEntity;
 	}
 
-	private SWRLRule getSWRLRule(String ruleText) {
+	private SWRLRule getSWRLRule(String ruleText) throws SWRLParseException {
 		SWRLParser parser = createSWRLParser();
-		try {
-			Optional<@NonNull SWRLRule> rule = null;
 
-			// parser.setforRuletoOWL(true);
-			rule = parser.parseSWRLRule(ruleText, false, getRuleName(), "comment");
+		Optional<@NonNull SWRLRule> rule = null;
 
-			if (rule.isPresent()) {
-				System.out.println("rule, body: " + rule.get().getBody() + " head:" + rule.get().getHead());
-				return rule.get();
-			}
+		// parser.setforRuletoOWL(true);
+		rule = parser.parseSWRLRule(ruleText, false, getRuleName(), "comment");
+
+		if (rule.isPresent()) {
+			System.out.println("rule, body: " + rule.get().getBody() + " head:" + rule.get().getHead());
+			return rule.get();
 		}
+
 		// catch (SWRLAtomNotFoundException e) {
 		// System.out.println(e.getMessage() + " not found in vocabulary");
 		// try {
@@ -759,12 +752,6 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		// }
 		//
 		// }
-		catch (SWRLParseException e) {
-			// Parse exception occurred
-			e.printStackTrace();
-		} finally {
-			// parser.setforRuletoOWL(false);
-		}
 
 		return null;
 	}
@@ -793,18 +780,8 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		}
 	}
 
-	public void showAxiomsDialog(Set<OWLAxiom> owlAxioms) {
-		System.out.println(owlAxioms.size());
+	private OWLAnnotation getOWLAnnotation() {
 
-		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-		// show the dialog
-		new AxiomsDialog(this, topFrame, activeOntology);
-
-		// create axioms with annotation from the generated axiom
-		/**
-		 * annotation:- ruleName___ruleText___ruleComment
-		 */
-		Set<OWLAxiom> axiomWithAnnotations = new HashSet<OWLAxiom>();
 		OWLAnnotationProperty fixedAnnotationProperty;
 		fixedAnnotationProperty = owlDataFactory.getOWLAnnotationProperty(Constants.FIXED_ANNOTATION_NAME,
 				PrefixUtilities.getPrefixOWLOntologyFormat(activeOntology));
@@ -814,43 +791,9 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		OWLAnnotationValue owlLiteral = owlDataFactory.getOWLLiteral(value);
 		OWLAnnotation annotation = owlDataFactory.getOWLAnnotation(fixedAnnotationProperty, owlLiteral);
 
-		for (OWLAxiom ax : owlAxioms) {
-			// System.out.println(ax);
-			axiomWithAnnotations.add(addAxiomAnnotation(ax, annotation));
-		}
-
-		// save changes
-		applyChangetoOntology(axiomWithAnnotations);
-
-		Engine engine = new Engine(activeOntology);
-
-		TreeMap<String, RuleModel> rulesWithID = engine.getRules();
-		System.out.println("rulesWithID size: " + rulesWithID.size());
-		
-//		for (RuleModel ruleModel : rulesWithID.values()) {
-//			System.out.println("\n\nruleID: " + ruleModel.getRuleName() + "\t" + ruleModel.getRuleText());
-//			
-//			Set<OWLAxiom> _axiom = engine.getAxiomsbyID(ruleModel.getRuleName());
-//			if (_axiom != null) {
-//				for (OWLAxiom ax : _axiom) {
-//					System.out.println("\nhere Axiom: "+ax.toString());
-//				}
-//			}
-//		}
-		
-		for(String key: rulesWithID.keySet()){
-			Set<OWLAxiom> _axiom = engine.getAxiomsbyID(key);
-			if (_axiom != null) {
-				for (OWLAxiom ax : _axiom) {
-					System.out.println("\nfor key: "+key+"  Axiom: "+ax.toString());
-				}
-			}else{
-				System.out.println("\nfor key: "+key+" Axiom is null ");
-			}
-		}
+		return annotation;
 	}
 
-	// for test purpose
 	public OWLAxiom addAxiomAnnotation(OWLAxiom axiom, OWLAnnotation annotation) {
 
 		Set<OWLAnnotation> newAnnotations = new HashSet<OWLAnnotation>();
@@ -860,6 +803,68 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		OWLAxiom annotatedAxiom = axiom.getAnnotatedAxiom(newAnnotations);
 
 		return annotatedAxiom;
+	}
+
+	public void showAxiomsDialog() {
+
+		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+		// show the dialog
+		AxiomsDialog dialog = new AxiomsDialog(this, topFrame, activeOntology);
+
+		
+		/**
+		 * create axioms with annotation from the generated axiom
+		 * annotation:- ruleName___ruleText___ruleComment
+		 */
+		Set<OWLAxiom> axiomWithAnnotations = new HashSet<OWLAxiom>();
+
+		if (dialog.isClickedOK()) {
+			Set<OWLAxiom> selectedAxioms = dialog.getSelectedAxioms();
+			if (!selectedAxioms.isEmpty()) {
+				for (OWLAxiom axiom : selectedAxioms) {
+					axiomWithAnnotations.add(addAxiomAnnotation(axiom, getOWLAnnotation()));
+				}
+
+				// save changes in the ontology. 
+				applyChangetoOntology(axiomWithAnnotations);
+				
+				
+				//show the rule in the table
+				RuleModel rule = new RuleModel(getRuleName(), getRuleText(), getComment());
+				this.engine.addARulessWithID(getRuleName(), rule);
+				getRuleTableModel().updateView();
+			}
+		}
+
+		// Engine engine = new Engine(activeOntology);
+		//
+		// TreeMap<String, RuleModel> rulesWithID = engine.getRules();
+		// System.out.println("rulesWithID size: " + rulesWithID.size());
+		//
+		// // for (RuleModel ruleModel : rulesWithID.values()) {
+		// // System.out.println("\n\nruleID: " + ruleModel.getRuleName() + "\t"
+		// +
+		// // ruleModel.getRuleText());
+		// //
+		// // Set<OWLAxiom> _axiom =
+		// engine.getAxiomsbyID(ruleModel.getRuleName());
+		// // if (_axiom != null) {
+		// // for (OWLAxiom ax : _axiom) {
+		// // System.out.println("\nhere Axiom: "+ax.toString());
+		// // }
+		// // }
+		// // }
+		//
+		// for (String key : rulesWithID.keySet()) {
+		// Set<OWLAxiom> _axiom = engine.getAxiomsbyID(key);
+		// if (_axiom != null) {
+		// for (OWLAxiom ax : _axiom) {
+		// System.out.println("\nfor key: " + key + " Axiom: " + ax.toString());
+		// }
+		// } else {
+		// System.out.println("\nfor key: " + key + " Axiom is null ");
+		// }
+		// }
 	}
 
 	private void switchToSWRLTab(String ruleName, String ruleText, String ruleComment) {
@@ -878,66 +883,17 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		}
 	}
 
-	private class SaveSWRLRuleActionListener implements ActionListener {
-		@NonNull
-		private final Component parent;
+	private class ConvertSWRLRuleActionListener implements ActionListener {
 
-		public SaveSWRLRuleActionListener(@NonNull Component parent) {
+		@NonNull
+		Component parent;
+
+		public ConvertSWRLRuleActionListener(Component parent) {
 			this.parent = parent;
 		}
 
 		@Override
 		public void actionPerformed(@NonNull ActionEvent e) {
-			/// new rcode
-			String rule = getRuleText();
-			if (rule.length() > 0) {
-				if (rule.contains(":-")) {
-					/**
-					 * datalog support is now disabled
-					 */
-					/*
-					 * try { for (BasicClause c : DatalogParser.parseProgram(new
-					 * DatalogTokenizer(new StringReader(rule)))) { //
-					 * getSWRLRule(c); } } catch (DatalogParseException e1) { //
-					 * TODO Auto-generated catch block e1.printStackTrace(); }
-					 */
-				} else {
-					try {
-
-						// String[] rules = rule.split("\\.");
-						// for (String text : rules) {
-						SWRLRule swrlRules = getSWRLRule(rule);
-
-						if (swrlRules != null) {
-							Set<OWLAxiom> owlAxioms = Transformer.ruleToAxioms(swrlRules);
-
-							if (Transformer.isTransferred) {
-
-								generatedAxioms.clear();
-								generatedAxioms.addAll(owlAxioms);
-								showAxiomsDialog(owlAxioms);
-								// apply that change to existing ontology
-
-							} else {
-								// can not transfer to axioms need to switch
-								// to swrltab
-
-								switchToSWRLTab(getRuleName(), rule, getComment());
-
-								System.out.println("can not transfer to axioms");
-							}
-							return;
-						}
-						// }
-
-					} catch (Exception e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				}
-			}
-
-			/// new code end
 
 			String ruleName = getRuleName();
 			String ruleText = getRuleText();
@@ -945,57 +901,74 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 			boolean errorOccurred;
 
 			if (ruleName.trim().length() == 0) {
-				// getDialogManager().showErrorMessageDialog(this.parent,
-				// MISSING_RULE_NAME, MISSING_RULE_NAME_TITLE);
+				getDialogManager().showErrorMessageDialog(this.parent, MISSING_RULE_NAME, MISSING_RULE_NAME_TITLE);
 				errorOccurred = true;
 			} else if (ruleText.trim().length() == 0) {
-				// getDialogManager().showErrorMessageDialog(this.parent,
-				// MISSING_RULE, MISSING_RULE);
+				getDialogManager().showErrorMessageDialog(this.parent, MISSING_RULE, MISSING_RULE);
 				errorOccurred = true;
-			} else if (getSWRLRulesTableModel().hasSWRLRule(ruleName) && !RuleEditorPanel.this.editMode) {
-				// getDialogManager().showErrorMessageDialog(this.parent,
-				// DUPLICATE_RULE_TEXT, DUPLICATE_RULE_TITLE);
+			} else if (getRuleTableModel().hasRule(ruleName) && !RuleEditorPanel.this.editMode) {
+				getDialogManager().showErrorMessageDialog(this.parent, DUPLICATE_RULE_TEXT, DUPLICATE_RULE_TITLE);
 				errorOccurred = true;
-			} else {
+			}
+
+			else {
 				try {
-					if (RuleEditorPanel.this.editMode) {
-						getSWRLRuleEngineModel().getSWRLRuleEngine().replaceSWRLRule(
-								getInitialDialogState().getRuleName(), ruleName, ruleText, comment, true);
-						errorOccurred = false;
-					} else {
-						if (getSWRLRulesTableModel().hasSWRLRule(ruleName)) {
-							// getDialogManager().showErrorMessageDialog(this.parent,
-							// DUPLICATE_RULE_TEXT,
-							// DUPLICATE_RULE_TITLE);
+					// if (RuleEditorPanel.this.editMode) {
+					// getSWRLRuleEngineModel().getSWRLRuleEngine().replaceSWRLRule(
+					// getInitialDialogState().getRuleName(), ruleName,
+					// ruleText, comment, true);
+					// errorOccurred = false;
+					// } else
+					{
+						if (engine.getRuleTableModel().hasRule(ruleName)) {
+							getDialogManager().showErrorMessageDialog(this.parent, DUPLICATE_RULE_TEXT,
+									DUPLICATE_RULE_TITLE);
 							errorOccurred = true;
 						} else {
-							getSWRLRuleEngine().createSWRLRule(ruleName, ruleText, comment, true);
-							getSWRLRulesTableModel().updateView();
+							SWRLRule swrlRules = getSWRLRule(ruleText);
+
+							if (swrlRules != null) {
+								Set<OWLAxiom> owlAxioms = Transformer.ruleToAxioms(swrlRules);
+
+								if (Transformer.isTransferred) {
+
+									generatedAxioms.clear();
+									generatedAxioms.addAll(owlAxioms);
+									showAxiomsDialog();
+
+								} else {
+									// can not transfer to axioms need to switch
+									// to swrltab
+
+									switchToSWRLTab(ruleName, ruleText, comment);
+									System.out.println("can not transfer to axioms");
+								}
+								return;
+							}
+
 							errorOccurred = false;
 						}
 					}
 				} catch (SWRLParseException pe) {
-					// getDialogManager().showErrorMessageDialog(this.parent,
-					// (pe.getMessage() != null ? pe.getMessage() : ""),
-					// INVALID_RULE_TITLE);
+					getDialogManager().showErrorMessageDialog(this.parent,
+							(pe.getMessage() != null ? pe.getMessage() : ""), INVALID_RULE_TITLE);
 					errorOccurred = true;
 				} catch (RuntimeException pe) {
-					// getDialogManager().showErrorMessageDialog(this.parent,
-					// (pe.getMessage() != null ? pe.getMessage() : ""),
-					// INTERNAL_ERROR_TITLE);
+					getDialogManager().showErrorMessageDialog(this.parent,
+							(pe.getMessage() != null ? pe.getMessage() : ""), INTERNAL_ERROR_TITLE);
 					errorOccurred = true;
 					StringWriter sw = new StringWriter();
 					PrintWriter pw = new PrintWriter(sw);
 					pe.printStackTrace(pw);
 					log.warn(sw.toString());
 				}
-			}
 
-			if (!errorOccurred) {
-				setVisible(false);
-				cancelEditMode();
-			} else
-				updateStatus();
+				if (!errorOccurred) {
+					setVisible(false);
+					cancelEditMode();
+				} else
+					updateStatus();
+			}
 		}
 	}
 

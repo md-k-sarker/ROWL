@@ -20,6 +20,9 @@ import org.semanticweb.owlapi.util.DefaultPrefixManager;
 
 import edu.wsu.dase.model.Constants;
 import edu.wsu.dase.model.RuleModel;
+import edu.wsu.dase.model.RuleTableModel;
+import edu.wsu.dase.view.RuleEditorPanel;
+import edu.wsu.dase.view.RuleTablePanel;
 
 public class Engine {
 
@@ -30,6 +33,54 @@ public class Engine {
 	private OWLOntologyManager owlOntologyManager;
 	private OWLDataFactory owlDataFactory;
 	private OWLAnnotationProperty fixedAnnotationProperty;
+	
+	private RuleTableModel ruleTableModel;
+	
+	private RuleTablePanel ruleTablePanel;
+	
+	private RuleEditorPanel ruleEditorPanel;
+
+	/**
+	 * @return the ruleEditorPanel
+	 */
+	public RuleEditorPanel getRuleEditorPanel() {
+		return ruleEditorPanel;
+	}
+
+	/**
+	 * @param ruleEditorPanel the ruleEditorPanel to set
+	 */
+	public void setRuleEditorPanel(RuleEditorPanel ruleEditorPanel) {
+		this.ruleEditorPanel = ruleEditorPanel;
+	}
+
+	/**
+	 * @return the ruleTablePanel
+	 */
+	public RuleTablePanel getRuleTablePanel() {
+		return ruleTablePanel;
+	}
+
+	/**
+	 * @param ruleTablePanel the ruleTablePanel to set
+	 */
+	public void setRuleTablePanel(RuleTablePanel ruleTablePanel) {
+		this.ruleTablePanel = ruleTablePanel;
+	}
+
+	/**
+	 * @return the ruleTableModel
+	 */
+	public RuleTableModel getRuleTableModel() {
+		return ruleTableModel;
+	}
+
+	/**
+	 * @param ruleTableModel the ruleTableModel to set
+	 */
+	public void setRuleTableModel(RuleTableModel ruleTableModel) {
+		this.ruleTableModel = ruleTableModel;
+	}
 
 	public Engine(OWLOntology activeOntology) {
 		this.activeOntology = activeOntology;
