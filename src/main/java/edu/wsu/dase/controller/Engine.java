@@ -122,7 +122,7 @@ public class Engine {
 		return null;
 	}
 
-	public void addARulessWithID(String ruleName, RuleModel rule) {
+	public void addARulesWithID(String ruleName, RuleModel rule) {
 		rulesWithID.put(ruleName, rule);
 	}
 
