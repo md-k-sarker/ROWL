@@ -38,9 +38,13 @@ import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.protege.editor.owl.ui.framelist.SwitchToDefiningOntologyAction;
@@ -115,6 +119,18 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	private static final int RULE_EDIT_AREA_COLUMNS = 20;
 	private static final int RULE_EDIT_AREA_ROWS = 60;
 
+	private StyleContext styleContext = StyleContext.getDefaultStyleContext();
+	private AttributeSet redColor = styleContext.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground,
+			Color.RED);
+	private AttributeSet blackColor = styleContext.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground,
+			Color.BLACK);
+
+	private AttributeSet setUnderLine = styleContext.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Underline,
+			true);
+	private AttributeSet clearUnderLine = styleContext.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Underline,
+			false);
+	private StyledDocument styledDoc;
+
 	@NonNull
 	private SWRLRuleEngineModel swrlRuleEngineModel;
 	@NonNull
@@ -177,6 +193,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		this.loweredBevelBorder = BorderFactory.createLoweredBevelBorder();
 		this.yellowBorder = BorderFactory.createLineBorder(Color.YELLOW);
 		this.ruleTextTextPane = new JTextPane();
+		this.styledDoc = this.ruleTextTextPane.getStyledDocument();
 		this.tabbedPane = tabbedPane;
 		this.convertToOWLButton = new JButton(CONVERT_TO_OWL_BUTTON_TITLE);
 		this.cancelButton = new JButton(CANCEL_BUTTON_TITLE);
@@ -222,31 +239,104 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	/**
 	 * 
 	 */
-	private void updateSuggestion(){
-		
+
+	private String getAtom(String errorText) {
+		if (errorText.contains("'")) {
+			int firstIndex = errorText.indexOf("'");
+			int lastIndex = errorText.lastIndexOf("'");
+
+			String atom = errorText.substring(firstIndex + 1, lastIndex);
+
+			// System.out.println("inside: " + firstIndex + "\t " + lastIndex +
+			// "\t" + atom);
+
+			return atom;
+		} else {
+			// System.out.println("not found");
+			return "";
+		}
 	}
-	
+
+	private void showSuggestion(String errorText) {
+
+		String atom = getAtom(errorText);
+		if (atom.length() > 0) {
+			String ruleText = getRuleText();
+
+			int firstIndex = ruleText.indexOf(atom);
+			int lastIndex = firstIndex + atom.length();
+
+			int argumentNo = noOfArgument(ruleText, atom);
+
+			// System.out.println("inside: " + firstIndex + "\t " + lastIndex +
+			// "\t" + atom);
+		} else {
+			// System.out.println("nothing to show");
+		}
+
+	}
+
+	private void showColor(String errorText) {
+		String atom = getAtom(errorText);
+		if (atom.length() > 0) {
+			String ruleText = getRuleText();
+
+			int firstIndex = ruleText.indexOf(atom);
+			int lastIndex = firstIndex + atom.length();
+
+			styledDoc.setCharacterAttributes(firstIndex, lastIndex, setUnderLine, true);
+			styledDoc.setCharacterAttributes(firstIndex, lastIndex, redColor, false);
+
+			System.out.println("color set at : " + firstIndex + "\t " + lastIndex + "\t of " + atom);
+
+		} else {
+			System.out.println("not invalid. means incomplete state");
+			removeColor();
+		}
+
+	}
+
+	private void removeColor() {
+		styledDoc.setCharacterAttributes(0, styledDoc.getLength(), clearUnderLine, true);
+		styledDoc.setCharacterAttributes(0, styledDoc.getLength(), blackColor, true);
+		System.out.println("cleared color");
+	}
+
 	private void updateStatus() {
 		String ruleText = getRuleText();
 
 		if (ruleText.isEmpty()) {
 			setInformationalStatusText(STATUS_NO_RULE_TEXT);
 			disableSave();
+			removeColor();
 		} else {
 			try {
 				createSWRLParser().parseSWRLRule(ruleText, true, getRuleName(), getComment());
 				this.ruleTextTextPane.requestFocus();
 				setInformationalStatusText(STATUS_OK);
 				enableSave();
+				removeColor();
 			} catch (SWRLIncompleteRuleException e) {
 				setIncompleteStatusText(e.getMessage() == null ? "" : e.getMessage());
 				disableSave();
+
+				if (e.getMessage() != null) {
+					System.out.println("incomplete State");
+					showColor(e.getMessage());
+					showSuggestion(e.getMessage());
+				}
 			} catch (SWRLParseException e) {
 				setErrorStatusText(e.getMessage() == null ? "" : e.getMessage());
 				disableSave();
+				if (e.getMessage() != null) {
+					System.out.println("parseException State");
+					showColor(e.getMessage());
+					showSuggestion(e.getMessage());
+				}
 			} catch (RuntimeException e) {
 				setInformationalStatusText(e.getMessage() == null ? "" : e.getMessage());
 				disableSave();
+				System.out.println("runtime: " + e.getMessage());
 			}
 		}
 	}
@@ -551,8 +641,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		@Override
 		public void keyReleased(@NonNull KeyEvent event) {
 			updateStatus();
-			
-			updateSuggestion();
+
 		}
 	}
 
@@ -597,7 +686,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	 * this.equivalentAxioms; }
 	 */
 
-	private int noOfArgument(String ruleText, String Atom) throws SWRLParseException {
+	private int noOfArgument(String ruleText, String Atom) {
 		try {
 			String tmp = ruleText.substring(ruleText.lastIndexOf(Atom) + 1);
 			if (tmp.length() > 0) {
@@ -605,12 +694,13 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 				if (tmp.length() > 0) {
 					String[] ss = tmp.split(",");
 					return ss.length;
-				}
-			}
-		} catch (Exception e) {
-			throw new SWRLParseException("Parse Exception");
+				} else
+					return -1;
+			} else
+				return -1;
+		} catch (IndexOutOfBoundsException e) {
+			return -1;
 		}
-		throw new SWRLParseException("Parse Exception");
 	}
 
 	private int createNewClass(String className) {
@@ -799,9 +889,10 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 					axiomWithAnnotations.add(addAxiomAnnotation(axiom, getOWLAnnotation()));
 				}
 
-				//if the ruleID exist then remove the corresponding axioms first
+				// if the ruleID exist then remove the corresponding axioms
+				// first
 				this.engine.deleteRule(getRuleName());
-				
+
 				// save changes in the ontology.
 				applyChangetoOntology(axiomWithAnnotations);
 
@@ -809,8 +900,8 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 				RuleModel rule = new RuleModel(getRuleName(), getRuleText(), getComment());
 				this.engine.addARulesWithID(getRuleName(), rule);
 				getRuleTableModel().updateView();
-				
-				//clear the rule textarea
+
+				// clear the rule textarea
 				clearIfOk();
 			}
 		}
@@ -830,6 +921,14 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 			System.out.println("Clicked to switch to swrltab");
 
 		}
+	}
+
+	private int getStartPosition(String text) {
+		return 0;
+	}
+
+	private int getEndPosition(String text) {
+		return 0;
 	}
 
 	private class ConvertSWRLRuleActionListener implements ActionListener {
@@ -870,8 +969,8 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 							generatedAxioms.clear();
 							generatedAxioms.addAll(owlAxioms);
-							
-							//show axioms dialog and take decisons
+
+							// show axioms dialog and take decisons
 							showAxiomsDialog();
 
 						} else {
