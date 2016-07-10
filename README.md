@@ -20,7 +20,7 @@ See the video <a href="https://github.com/md-k-sarker/OWLAx/blob/master/plugin/d
 2. Select ROWL Tab from
 	 Window -> Tabs -> ROWL
 	 
-	 ![Alt Click on ROWLTab to Select](https://github.com/md-k-sarker/ROWL/blob/master/plugin/docs/ScreenShots/SelectROWLTab.png)
+	 ![Alt Click on ROWLTab to Select](https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/SelectROWLTab.png)
 	 
 3. Start Using OWLAx Plugin
 
