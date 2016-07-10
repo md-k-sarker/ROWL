@@ -36,6 +36,7 @@ public class Suggestion {
 
 		JTextPane textPane = new JTextPane();
 		StyledDocument sDoc = textPane.getStyledDocument();
+		
 
 		button.addActionListener(new ActionListener() {
 
@@ -49,6 +50,7 @@ public class Suggestion {
 					s += sDoc.getCharacterElement(textPane.getCaretPosition()).getStartOffset() + "\t";
 					s += sDoc.getCharacterElement(textPane.getCaretPosition()).getEndOffset() + "\n";
 					s += sDoc.getStartPosition()+"\n";
+					
 					System.out.println(s);
 				} catch (BadLocationException e1) {
 					// TODO Auto-generated catch block

@@ -784,7 +784,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
 		// show the dialog
-		AxiomsDialog dialog = new AxiomsDialog(this, topFrame, activeOntology);
+		AxiomsDialog axiomDialog = new AxiomsDialog(this, topFrame, activeOntology);
 
 		/**
 		 * create axioms with annotation from the generated axiom annotation:-
@@ -792,8 +792,8 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		 */
 		Set<OWLAxiom> axiomWithAnnotations = new HashSet<OWLAxiom>();
 
-		if (dialog.isClickedOK()) {
-			Set<OWLAxiom> selectedAxioms = dialog.getSelectedAxioms();
+		if (axiomDialog.isClickedOK()) {
+			Set<OWLAxiom> selectedAxioms = axiomDialog.getSelectedAxioms();
 			if (!selectedAxioms.isEmpty()) {
 				for (OWLAxiom axiom : selectedAxioms) {
 					axiomWithAnnotations.add(addAxiomAnnotation(axiom, getOWLAnnotation()));
@@ -870,6 +870,8 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 							generatedAxioms.clear();
 							generatedAxioms.addAll(owlAxioms);
+							
+							//show axioms dialog and take decisons
 							showAxiomsDialog();
 
 						} else {

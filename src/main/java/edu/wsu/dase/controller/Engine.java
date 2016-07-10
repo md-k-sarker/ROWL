@@ -199,7 +199,7 @@ public class Engine {
 			for (OWLAnnotation ann : ax.getAnnotations()) {
 				for (OWLAnnotationProperty anp : ann.getAnnotationPropertiesInSignature()) {
 					if (anp.equals(fixedAnnotationProperty)) {
-						System.out.println("\n\naxiom before parse: " + ax.toString() + "\n\n");
+						//System.out.println("\n\naxiom before parse: " + ax.toString() + "\n\n");
 						String val = ann.getValue().asLiteral().get().getLiteral();
 						String[] values = val.split("___", 3);
 
@@ -212,9 +212,9 @@ public class Engine {
 								// add to rulewith ID
 								rulesWithID.put(ruleID, new RuleModel(ruleID, ruleText, ruleComment));
 
-								System.out.println("axiomsWithID length before: " + axiomsWithID.size());
+								//System.out.println("axiomsWithID length before: " + axiomsWithID.size());
 								// add to axioms with ID
-								System.out.println("equal or not:  " + tmpRuleID + "  " + ruleID);
+								//System.out.println("equal or not:  " + tmpRuleID + "  " + ruleID);
 
 								if (axiomsWithID.containsKey(ruleID)) {
 									axiomsWithID.get(ruleID).add(ax);
@@ -261,10 +261,10 @@ public class Engine {
 								// tmpRuleID = values[0];
 								// }
 								// }
-								System.out.println("axiomsWithID length after: " + axiomsWithID.size());
+								//System.out.println("axiomsWithID length after: " + axiomsWithID.size());
 							}
 						} else {
-							System.out.println("Annotation doesn't have 3 parts");
+							System.out.println("Cannot retrieve annotation. Annotation doesn't have 3 parts");
 						}
 					}
 				}
