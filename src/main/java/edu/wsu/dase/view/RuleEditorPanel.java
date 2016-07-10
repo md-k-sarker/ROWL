@@ -128,7 +128,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	@NonNull
 	private final JTextField ruleNameTextField, commentTextField, statusTextField;
 	@NonNull
-	private final JTextPane ruleTextTextArea;
+	private final JTextPane ruleTextTextPane;
 	@NonNull
 	private final JButton convertToOWLButton, cancelButton;
 	@NonNull
@@ -158,7 +158,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		this.loweredBevelBorder = BorderFactory.createLoweredBevelBorder();
 		this.yellowBorder = BorderFactory.createLineBorder(Color.YELLOW);
 
-		this.ruleTextTextArea = new JTextPane();
+		this.ruleTextTextPane = new JTextPane();
 		this.convertToOWLButton = new JButton(CONVERT_TO_OWL_BUTTON_TITLE);
 		this.cancelButton = new JButton(CANCEL_BUTTON_TITLE);
 		this.ruleNameTextField = new JTextField("");
@@ -176,7 +176,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		this.engine = engine;
 		this.loweredBevelBorder = BorderFactory.createLoweredBevelBorder();
 		this.yellowBorder = BorderFactory.createLineBorder(Color.YELLOW);
-		this.ruleTextTextArea = new JTextPane();
+		this.ruleTextTextPane = new JTextPane();
 		this.tabbedPane = tabbedPane;
 		this.convertToOWLButton = new JButton(CONVERT_TO_OWL_BUTTON_TITLE);
 		this.cancelButton = new JButton(CANCEL_BUTTON_TITLE);
@@ -197,7 +197,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 		initializeComponents();
 
-		this.ruleTextTextArea.addKeyListener(new SWRLRuleEditorKeyAdapter());
+		this.ruleTextTextPane.addKeyListener(new SWRLRuleEditorKeyAdapter());
 		this.cancelButton.addActionListener(new CancelSWRLRuleEditActionListener());
 		this.convertToOWLButton.addActionListener(new ConvertSWRLRuleActionListener(this));
 	}
@@ -207,7 +207,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		cancelEditMode();
 		this.ruleNameTextField.setText(ruleName); //
 		this.ruleNameTextField.setCaretPosition(this.ruleNameTextField.getText().length());
-		this.ruleTextTextArea.setText(ruleText);
+		this.ruleTextTextPane.setText(ruleText);
 		this.commentTextField.setText(ruleComment);
 		this.statusTextField.setText("");
 		updateStatus();
@@ -219,6 +219,13 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		updateStatus();
 	}
 
+	/**
+	 * 
+	 */
+	private void updateSuggestion(){
+		
+	}
+	
 	private void updateStatus() {
 		String ruleText = getRuleText();
 
@@ -228,7 +235,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		} else {
 			try {
 				createSWRLParser().parseSWRLRule(ruleText, true, getRuleName(), getComment());
-				this.ruleTextTextArea.requestFocus();
+				this.ruleTextTextPane.requestFocus();
 				setInformationalStatusText(STATUS_OK);
 				enableSave();
 			} catch (SWRLIncompleteRuleException e) {
@@ -247,9 +254,9 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	private void cancelEditMode() {
 		this.ruleNameTextField.setText("");
 		this.ruleNameTextField.setEnabled(true);
-		this.ruleTextTextArea.setText("");
-		this.ruleTextTextArea.setEnabled(true);
-		this.ruleTextTextArea.setText("");
+		this.ruleTextTextPane.setText("");
+		this.ruleTextTextPane.setEnabled(true);
+		this.ruleTextTextPane.setText("");
 		this.commentTextField.setText("");
 		this.statusTextField.setText("");
 
@@ -270,8 +277,8 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 		// this.ruleTextTextArea.setLineWrap(true);
 		// this.ruleTextTextArea.setWrapStyleWord(true);
-		this.ruleTextTextArea.setBorder(this.loweredBevelBorder);
-		this.ruleTextTextArea.setPreferredSize(new Dimension(300, 300));
+		this.ruleTextTextPane.setBorder(this.loweredBevelBorder);
+		this.ruleTextTextPane.setPreferredSize(new Dimension(300, 300));
 
 		this.commentTextField.setDisabledTextColor(Color.BLACK);
 		this.commentTextField.setBorder(this.loweredBevelBorder);
@@ -294,7 +301,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		upperPanel.add(this.statusTextField);
 
 		rulePanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-		this.scrollPane = new JScrollPane(this.ruleTextTextArea);
+		this.scrollPane = new JScrollPane(this.ruleTextTextPane);
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setPreferredSize(new Dimension(300, 200));
@@ -315,7 +322,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	private void autoComplete() {
 		if (!isInAutoCompleteMode()) {
 			String ruleText = getRuleText();
-			int textPosition = this.ruleTextTextArea.getCaretPosition();
+			int textPosition = this.ruleTextTextPane.getCaretPosition();
 			int i = SWRLParser.findSplittingPoint(ruleText.substring(0, textPosition));
 			String prefix = ruleText.substring(i, textPosition);
 			if (!prefix.equals("")) {
@@ -382,7 +389,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		String expansionTail = expansion.substring(prefix.length());
 
 		try {
-			Document document = this.ruleTextTextArea.getDocument();
+			Document document = this.ruleTextTextPane.getDocument();
 			if (document != null)
 				document.insertString(textPosition, expansionTail, SimpleAttributeSet.EMPTY);
 			else
@@ -399,10 +406,10 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 		try {
 			if (!currentExpansionTail.isEmpty())
-				this.ruleTextTextArea.getDocument().remove(textPosition, currentExpansionTail.length());
+				this.ruleTextTextPane.getDocument().remove(textPosition, currentExpansionTail.length());
 
 			if (!nextExpansionTail.isEmpty())
-				this.ruleTextTextArea.getDocument().insertString(textPosition, nextExpansionTail,
+				this.ruleTextTextPane.getDocument().insertString(textPosition, nextExpansionTail,
 						SimpleAttributeSet.EMPTY);
 		} catch (BadLocationException e) {
 			disableAutoCompleteMode();
@@ -470,7 +477,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	@NonNull
 	private String getRuleText() { // We replace the Unicode characters when
 									// parsing
-		return this.ruleTextTextArea.getText().replaceAll(Character.toString(SWRLParser.RING_CHAR), ".");
+		return this.ruleTextTextPane.getText().replaceAll(Character.toString(SWRLParser.RING_CHAR), ".");
 	}
 
 	@NonNull
@@ -514,7 +521,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 		this.ruleNameTextField.setText(""); //
 		this.ruleNameTextField.setCaretPosition(this.ruleNameTextField.getText().length());
-		this.ruleTextTextArea.setText("");
+		this.ruleTextTextPane.setText("");
 		this.commentTextField.setText("");
 		this.statusTextField.setText("");
 		updateStatus();
@@ -544,6 +551,8 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		@Override
 		public void keyReleased(@NonNull KeyEvent event) {
 			updateStatus();
+			
+			updateSuggestion();
 		}
 	}
 
