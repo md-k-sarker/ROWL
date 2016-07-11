@@ -564,24 +564,27 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		String errorText = this.statusTextField.getText();
 
 		if (!errorText.contains("cannot use name of existing OWL class")) {
+			
+			
+			
 			if (errorText.contains("Invalid SWRL atom predicate")) {
 				// class
 				// add(bind("add as Class", new AddClassAction("Class"), ""));
 				// object property
 				// data property
-
+				this.statusTextField.setText(errorText+" (Right click to Declare)");
 				this.suggestionPopup = new SuggestionPopup(this, this.engine, errorText);
 				this.suggestionPopup.show(this.statusTextField, (int) event.getX(), (int) event.getY());
 
 			} else if (errorText.contains("Invalid OWL individual name")) {
 				// namedindividual
-
+				this.statusTextField.setText(errorText+" (Right click to Declare)");
 				this.suggestionPopup = new SuggestionPopup(this, this.engine, errorText);
 				this.suggestionPopup.show(this.statusTextField, (int) event.getX(), (int) event.getY());
 
 			} else if (errorText.contains("invalid datatype name")) {
 				// datatype
-
+				this.statusTextField.setText(errorText+" (Right click to Declare)");
 				this.suggestionPopup = new SuggestionPopup(this, this.engine, errorText);
 				this.suggestionPopup.show(this.statusTextField, (int) event.getX(), (int) event.getY());
 

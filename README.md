@@ -25,7 +25,7 @@ See the video <a href="https://github.com/md-k-sarker/OWLAx/blob/master/plugin/d
 3. Start Using OWLAx Plugin
 
 ###How to Use
-
+1. Write SWRL 
 
 
 ###Capabilities of ROWL
