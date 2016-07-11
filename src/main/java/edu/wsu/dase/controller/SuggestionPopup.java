@@ -10,6 +10,7 @@ import java.awt.Graphics;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Optional;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -36,6 +37,22 @@ import javax.swing.text.StyledEditorKit;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.PrefixManager;
+import org.swrlapi.core.IRIResolver;
+import org.swrlapi.parser.SWRLParser;
+
 /**
  * @author sarker
  *
@@ -43,12 +60,32 @@ import javax.swing.text.ViewFactory;
 public class SuggestionPopup extends JPopupMenu {
 
 	JPanel suggestionPanel;
+	private String errorText;
+	private IRIResolver iriResolver;
+	private OWLOntology activeOntology;
+	private OWLDataFactory owlDataFactory;
+	private OWLOntologyManager owlOntologyManager;
+	private Engine engine;
+	
+	
 
 	/**
 	 * 
 	 */
-	public SuggestionPopup() {
+	public SuggestionPopup(Engine engine, String errorText) {
 		// TODO Auto-generated constructor stub
+
+		this.errorText = errorText;
+		this.owlDataFactory = engine.getOwlDataFactory();
+		this.activeOntology = engine.getActiveOntology();
+		this.iriResolver = engine.getIriResolver();
+		this.owlOntologyManager = engine.getOwlOntologyManager();
+
+		createUserInterface();
+
+	}
+
+	private void createUserInterface() {
 		suggestionPanel = new JPanel();
 		suggestionPanel.setLayout(new BorderLayout());
 		suggestionPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -57,44 +94,102 @@ public class SuggestionPopup extends JPopupMenu {
 		suggestionPanel.add(lbl, BorderLayout.CENTER);
 
 		add(suggestionPanel);
-
 	}
 
-	
-	//for testing purpose only
-	public void create() {
-		JFrame frame = new JFrame();
+	private int createOWLObjectProperty(String ObjectPropertyName) {
 
-		frame.setSize(400, 500);
+		Optional<@NonNull IRI> iri = this.iriResolver.prefixedName2IRI(ObjectPropertyName);
+		if (iri.isPresent()) {
 
-		JTextPane textPane = new JTextPane();
-		StyledDocument doc = textPane.getStyledDocument();
+			OWLObjectProperty newOWLObjectProperty = this.owlDataFactory.getOWLObjectProperty(iri.get());
 
-		JButton btn = new JButton("btn");
-		btn.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				SuggestionPopup sg = new SuggestionPopup();
-				sg.show(textPane, 40, 30);
-			}
-		});
-		
-		frame.add(btn, BorderLayout.NORTH);
-		
-		frame.add(textPane, BorderLayout.CENTER);
-
-		frame.setVisible(true);
-		
-		
+			OWLAxiom declareaxiom = this.owlDataFactory.getOWLDeclarationAxiom(newOWLObjectProperty);
+			AddAxiom addAxiom = new AddAxiom(this.activeOntology, declareaxiom);
+			this.owlOntologyManager.applyChange(addAxiom);
+			return 0;
+		}
+		return -1;
 	}
 
-	//for testing purpose only
-	public static void main(String[] args) {
-		SuggestionPopup sg = new SuggestionPopup();
-		sg.create();
+	private int createOWLDataProperty(String DataPropertyName) {
+
+		Optional<@NonNull IRI> iri = this.iriResolver.prefixedName2IRI(DataPropertyName);
+		if (iri.isPresent()) {
+
+			OWLDataProperty newOWLDataProperty = owlDataFactory.getOWLDataProperty(iri.get());
+
+			OWLAxiom declareaxiom = owlDataFactory.getOWLDeclarationAxiom(newOWLDataProperty);
+			AddAxiom addAxiom = new AddAxiom(activeOntology, declareaxiom);
+			owlOntologyManager.applyChange(addAxiom);
+			return 0;
+		}
+		return -1;
 	}
+
+	private int createOWLIndividual(String OWLIndividualName) {
+
+		Optional<@NonNull IRI> iri = this.iriResolver.prefixedName2IRI(OWLIndividualName);
+		if (iri.isPresent()) {
+
+			OWLNamedIndividual newOWLIndividual = owlDataFactory.getOWLNamedIndividual(iri.get());
+
+			OWLAxiom declareaxiom = owlDataFactory.getOWLDeclarationAxiom(newOWLIndividual);
+			AddAxiom addAxiom = new AddAxiom(activeOntology, declareaxiom);
+			owlOntologyManager.applyChange(addAxiom);
+			return 0;
+		}
+		return -1;
+	}
+
+	private int createOWLClass(String className) {
+
+		Optional<@NonNull IRI> iri = this.iriResolver.prefixedName2IRI(className);
+		if (iri.isPresent()) {
+
+			OWLClass newClass = owlDataFactory.getOWLClass(iri.get());
+
+			OWLAxiom declareaxiom = owlDataFactory.getOWLDeclarationAxiom(newClass);
+			AddAxiom addAxiom = new AddAxiom(activeOntology, declareaxiom);
+			owlOntologyManager.applyChange(addAxiom);
+			return 0;
+		}
+		return -1;
+	}
+
+	// for testing purpose only
+	// public void create() {
+	// JFrame frame = new JFrame();
+	//
+	// frame.setSize(400, 500);
+	//
+	// JTextPane textPane = new JTextPane();
+	// StyledDocument doc = textPane.getStyledDocument();
+	//
+	// JButton btn = new JButton("btn");
+	// btn.addActionListener(new ActionListener() {
+	//
+	// @Override
+	// public void actionPerformed(ActionEvent e) {
+	// // TODO Auto-generated method stub
+	// SuggestionPopup sg = new SuggestionPopup();
+	// sg.show(textPane, 40, 30);
+	// }
+	// });
+	//
+	// frame.add(btn, BorderLayout.NORTH);
+	//
+	// frame.add(textPane, BorderLayout.CENTER);
+	//
+	// frame.setVisible(true);
+	//
+	//
+	// }
+	//
+	// //for testing purpose only
+	// public static void main(String[] args) {
+	// SuggestionPopup sg = new SuggestionPopup();
+	// sg.create();
+	// }
 
 	// class NewEditorKit extends StyledEditorKit {
 	// public ViewFactory getViewFactory() {

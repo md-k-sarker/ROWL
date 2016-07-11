@@ -17,6 +17,8 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.PrefixManager;
 import org.semanticweb.owlapi.util.DefaultPrefixManager;
+import org.swrlapi.core.IRIResolver;
+import org.swrltab.ui.ProtegeIRIResolver;
 
 import edu.wsu.dase.model.Constants;
 import edu.wsu.dase.model.RuleModel;
@@ -30,15 +32,94 @@ public class Engine {
 	private TreeMap<String, Set<OWLAxiom>> axiomsWithID;
 	private TreeMap<String, RuleModel> rulesWithID;
 	private PrefixManager prefixManager;
-	private OWLOntologyManager owlOntologyManager;
-	private OWLDataFactory owlDataFactory;
 	private OWLAnnotationProperty fixedAnnotationProperty;
-	
+
 	private RuleTableModel ruleTableModel;
-	
+
 	private RuleTablePanel ruleTablePanel;
-	
+
 	private RuleEditorPanel ruleEditorPanel;
+
+	private IRIResolver iriResolver;
+
+	/**
+	 * @return the prefixManager
+	 */
+	public PrefixManager getPrefixManager() {
+		return prefixManager;
+	}
+
+	/**
+	 * @param prefixManager
+	 *            the prefixManager to set
+	 */
+	public void setPrefixManager(PrefixManager prefixManager) {
+		this.prefixManager = prefixManager;
+	}
+
+	private OWLOntologyManager owlOntologyManager;
+
+	/**
+	 * @return the activeOntology
+	 */
+	public OWLOntology getActiveOntology() {
+		return activeOntology;
+	}
+
+	/**
+	 * @param activeOntology
+	 *            the activeOntology to set
+	 */
+	public void setActiveOntology(OWLOntology activeOntology) {
+		this.activeOntology = activeOntology;
+	}
+
+	/**
+	 * @return the owlOntologyManager
+	 */
+	public OWLOntologyManager getOwlOntologyManager() {
+		return owlOntologyManager;
+	}
+
+	/**
+	 * @param owlOntologyManager
+	 *            the owlOntologyManager to set
+	 */
+	public void setOwlOntologyManager(OWLOntologyManager owlOntologyManager) {
+		this.owlOntologyManager = owlOntologyManager;
+	}
+
+	private OWLDataFactory owlDataFactory;
+
+	/**
+	 * @return the owlDataFactory
+	 */
+	public OWLDataFactory getOwlDataFactory() {
+		return owlDataFactory;
+	}
+
+	/**
+	 * @param owlDataFactory
+	 *            the owlDataFactory to set
+	 */
+	public void setOwlDataFactory(OWLDataFactory owlDataFactory) {
+		this.owlDataFactory = owlDataFactory;
+	}
+
+	/**
+	 * @return the iriResolver
+	 */
+	public IRIResolver getIriResolver() {
+		return iriResolver;
+	}
+
+	/**
+	 * @param iriResolver
+	 *            the iriResolver to set
+	 */
+	public void setIriResolver(IRIResolver iriResolver) {
+		this.iriResolver = iriResolver;
+	}
 
 	/**
 	 * @return the ruleEditorPanel
@@ -48,7 +129,8 @@ public class Engine {
 	}
 
 	/**
-	 * @param ruleEditorPanel the ruleEditorPanel to set
+	 * @param ruleEditorPanel
+	 *            the ruleEditorPanel to set
 	 */
 	public void setRuleEditorPanel(RuleEditorPanel ruleEditorPanel) {
 		this.ruleEditorPanel = ruleEditorPanel;
@@ -62,7 +144,8 @@ public class Engine {
 	}
 
 	/**
-	 * @param ruleTablePanel the ruleTablePanel to set
+	 * @param ruleTablePanel
+	 *            the ruleTablePanel to set
 	 */
 	public void setRuleTablePanel(RuleTablePanel ruleTablePanel) {
 		this.ruleTablePanel = ruleTablePanel;
@@ -76,16 +159,18 @@ public class Engine {
 	}
 
 	/**
-	 * @param ruleTableModel the ruleTableModel to set
+	 * @param ruleTableModel
+	 *            the ruleTableModel to set
 	 */
 	public void setRuleTableModel(RuleTableModel ruleTableModel) {
 		this.ruleTableModel = ruleTableModel;
 	}
 
-	public Engine(OWLOntology activeOntology) {
+	public Engine(OWLOntology activeOntology, IRIResolver iriResolver) {
 		this.activeOntology = activeOntology;
 		this.owlOntologyManager = this.activeOntology.getOWLOntologyManager();
 		this.owlDataFactory = this.owlOntologyManager.getOWLDataFactory();
+		this.iriResolver = iriResolver;
 
 		this.prefixManager = PrefixUtilities.getPrefixOWLOntologyFormat(activeOntology);
 		fixedAnnotationProperty = activeOntology.getOWLOntologyManager().getOWLDataFactory()
@@ -136,9 +221,8 @@ public class Engine {
 	 * 
 	 * has to be sure from Adila.
 	 * 
-	 * Possible option 1. also remove corresponding
-	 * axioms from ontology or 2. only remove corresponding annotations from
-	 * those axioms
+	 * Possible option 1. also remove corresponding axioms from ontology or 2.
+	 * only remove corresponding annotations from those axioms
 	 * 
 	 * Current implementation remove corresponding axioms from ontology
 	 * 
@@ -199,7 +283,8 @@ public class Engine {
 			for (OWLAnnotation ann : ax.getAnnotations()) {
 				for (OWLAnnotationProperty anp : ann.getAnnotationPropertiesInSignature()) {
 					if (anp.equals(fixedAnnotationProperty)) {
-						//System.out.println("\n\naxiom before parse: " + ax.toString() + "\n\n");
+						// System.out.println("\n\naxiom before parse: " +
+						// ax.toString() + "\n\n");
 						String val = ann.getValue().asLiteral().get().getLiteral();
 						String[] values = val.split("___", 3);
 
@@ -212,9 +297,11 @@ public class Engine {
 								// add to rulewith ID
 								rulesWithID.put(ruleID, new RuleModel(ruleID, ruleText, ruleComment));
 
-								//System.out.println("axiomsWithID length before: " + axiomsWithID.size());
+								// System.out.println("axiomsWithID length
+								// before: " + axiomsWithID.size());
 								// add to axioms with ID
-								//System.out.println("equal or not:  " + tmpRuleID + "  " + ruleID);
+								// System.out.println("equal or not: " +
+								// tmpRuleID + " " + ruleID);
 
 								if (axiomsWithID.containsKey(ruleID)) {
 									axiomsWithID.get(ruleID).add(ax);
@@ -224,44 +311,6 @@ public class Engine {
 									axiomsWithID.put(ruleID, tmpAxioms);
 								}
 
-								// if (tmpRuleID != ruleID) {
-								// tmpAxioms.clear();
-								// }
-								//
-								// tmpRuleID = ruleID;
-								// tmpAxioms.add(ax);
-								// System.out.println("tmpAxioms Size: "+
-								// tmpAxioms.size());
-								// axiomsWithID.put(ruleID, tmpAxioms);
-
-								// if (i == 0) { // initial case
-								// tmpAxioms.add(ax);
-								// axiomsWithID.put(values[0], tmpAxioms);
-								// tmpRuleID = values[0];
-								// i++;
-								// } else { // latter case
-								// if (tmpRuleID == values[0]) {
-								// /**
-								// * this rule-id has this axiom and may
-								// * contain more axiom
-								// */
-								// tmpAxioms.add(ax);
-								// axiomsWithID.put(values[0], tmpAxioms);
-								// } else {
-								// /**
-								// * now this rule-id is saturated and
-								// * tmpAxioms is filled with all Axioms
-								// * binded to this rule-id
-								// */
-								//
-								// axiomsWithID.put(values[0], tmpAxioms);
-								//
-								// tmpAxioms.clear();
-								// tmpAxioms.add(ax);
-								// tmpRuleID = values[0];
-								// }
-								// }
-								//System.out.println("axiomsWithID length after: " + axiomsWithID.size());
 							}
 						} else {
 							System.out.println("Cannot retrieve annotation. Annotation doesn't have 3 parts");

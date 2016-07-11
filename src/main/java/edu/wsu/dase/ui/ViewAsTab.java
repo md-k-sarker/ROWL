@@ -137,7 +137,7 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 
 	private void updateROWLTab() {
 		// Create the custom tab View
-		this.engine = new Engine(this.activeOntology);
+		this.engine = new Engine(this.activeOntology, this.iriResolver);
 
 		this.rulesView = new RulesViewMain(this.swrlRuleEngineModel, this.engine, this.dialogManager,
 				this.activeOntology, tabbedPane);

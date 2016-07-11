@@ -138,6 +138,8 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 	private Rectangle invalidTextRectangle;
 
+	private SuggestionPopup suggestionPopup;
+
 	@NonNull
 	private SWRLRuleEngineModel swrlRuleEngineModel;
 	@NonNull
@@ -223,7 +225,8 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		initializeComponents();
 
 		this.ruleTextTextPane.addKeyListener(new SWRLRuleEditorKeyAdapter());
-		this.statusTextField.addMouseMotionListener(new RuleTextPaneMouseAdapter());
+		this.statusTextField.addMouseMotionListener(new StatusTextFieldMouseMotionAdapter());
+		this.statusTextField.addMouseListener(new StatusTextFieldMouseAdapter());
 		this.cancelButton.addActionListener(new CancelSWRLRuleEditActionListener());
 		this.convertToOWLButton.addActionListener(new ConvertSWRLRuleActionListener(this));
 	}
@@ -267,68 +270,56 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	}
 
 	private void showSuggestionPopup() {
-		SuggestionPopup suggestionPopup = new SuggestionPopup();
+
 		System.out.println("showSuggestionPopup called");
-		// Rectangle startTextRectangle, endTextRectangle;
-		// Rectangle paneRectangle;
-		// int x;
-		// int y;
-		//
-		// try {
-		// startTextRectangle = this.ruleTextTextPane.modelToView(firstIndex);
-		// endTextRectangle = this.ruleTextTextPane.modelToView(lastIndex);
-		// invalidTextRectangle = new Rectangle(startTextRectangle.x ,
-		// startTextRectangle.y,
-		// endTextRectangle.x - startTextRectangle.x + 10, endTextRectangle.y -
-		// startTextRectangle.y + 10);
-		// } catch (Exception e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// invalidTextRectangle = new Rectangle(50, 50, 50, 50);
-		// }
-		//
-		// paneRectangle = ruleTextTextPane.getBounds();
-
-		// if (textRectangle.x >= (paneRectangle.getWidth() - 30)) {
-		// x = (int) (paneRectangle.getWidth() - 50);
-		// } else {
-		// x = textRectangle.x + 10;
-		// }
-		//
-		// if (textRectangle.y >= (paneRectangle.getHeight() - 30)) {
-		// y = (int) (paneRectangle.getHeight() - 50);
-		// } else {
-		// y = textRectangle.y + 30;
-		// }
-
-		// System.out.println(invalidTextRectangle.x + "\t" +
-		// invalidTextRectangle.y + "\t" + invalidTextRectangle.width
-		// + "\t" + invalidTextRectangle.height);
-
-		if (! suggestionPopup.isVisible()) {
-			suggestionPopup.show(this.statusTextField, (int) this.statusTextField.getBounds().getCenterX(),
+		if (this.suggestionPopup != null) {
+			
+			System.out.println("showSuggestionPopup non null");
+			if(! this.suggestionPopup.isVisible()){
+				System.out.println("showSuggestionPopup non not visble");
+			this.suggestionPopup.show(this.statusTextField, (int) this.statusTextField.getBounds().getCenterX(),
 					(int) this.statusTextField.getBounds().getCenterY());
+			}else{
+				//already shown
+				System.out.println("showSuggestionPopup visible");
+			}
+
+		} else {
+			System.out.println("showSuggestionPopup null");
+			createSuggestionPopup();
 		}
 	}
 
-	private void createSuggestion(String errorText) {
-
-		String atom = getAtom(errorText);
-		if (atom.length() > 0) {
-			String ruleText = getRuleText();
-
-			int firstIndex = ruleText.indexOf(atom);
-			int lastIndex = firstIndex + atom.length();
-
-			int argumentNo = noOfArgument(ruleText, atom);
-
-			// showSuggestionPopup(firstIndex, lastIndex, argumentNo);
-
-			// System.out.println("inside: " + firstIndex + "\t " + lastIndex +
-			// "\t" + atom);
-		} else {
-			// System.out.println("nothing to show");
+	private void removeSuggestionPopup() {
+		if (this.suggestionPopup != null) {
+			if (this.suggestionPopup.isVisible()) {
+				this.suggestionPopup.setVisible(false);
+			}
 		}
+	}
+
+	private void createSuggestionPopup() {
+
+		String errorText = this.statusTextField.getText();
+		
+		 this.suggestionPopup = new SuggestionPopup(this.engine,errorText);
+
+		// String atom = getAtom(errorText);
+		// if (atom.length() > 0) {
+		// String ruleText = getRuleText();
+		//
+		// int firstIndex = ruleText.indexOf(atom);
+		// int lastIndex = firstIndex + atom.length();
+		//
+		// int argumentNo = noOfArgument(ruleText, atom);
+		//
+		// // showSuggestionPopup(firstIndex, lastIndex, argumentNo);
+		//
+		// // System.out.println("inside: " + firstIndex + "\t " + lastIndex +
+		// // "\t" + atom);
+		// } else {
+		// // System.out.println("nothing to show");
+		// }
 
 	}
 
@@ -383,16 +374,16 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 				if (e.getMessage() != null) {
 					// System.out.println("incomplete State");
-					showColor(e.getMessage());
-					createSuggestion(e.getMessage());
+					// showColor(e.getMessage());
+					// createSuggestion();
 				}
 			} catch (SWRLParseException e) {
 				setErrorStatusText(e.getMessage() == null ? "" : e.getMessage());
 				disableSave();
 				if (e.getMessage() != null) {
 					// System.out.println("parseException State");
-					showColor(e.getMessage());
-					createSuggestion(e.getMessage());
+					// showColor(e.getMessage());
+					// createSuggestion();
 				}
 			} catch (RuntimeException e) {
 				setInformationalStatusText(e.getMessage() == null ? "" : e.getMessage());
@@ -679,7 +670,25 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 	}
 
-	private class RuleTextPaneMouseAdapter extends MouseMotionAdapter {
+	private class StatusTextFieldMouseAdapter extends MouseAdapter {
+
+		@Override
+		public void mouseEntered(MouseEvent event) {
+			System.out.println("mouseEntered called");
+			createSuggestionPopup();
+			event.consume();
+		}
+
+		@Override
+		public void mouseExited(MouseEvent event) {
+			System.out.println("mouseExited called");
+			removeSuggestionPopup();
+			event.consume();
+		}
+
+	}
+
+	private class StatusTextFieldMouseMotionAdapter extends MouseMotionAdapter {
 
 		@Override
 		public void mouseMoved(MouseEvent event) {
@@ -728,34 +737,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		}
 	}
 
-	/*
-	 * public static SWRLAtom createObjectPropertyAtom(String roleStr, String
-	 * arg0Str, String arg1Str) { SWRLIArgument arg0; if
-	 * (arg0Str.startsWith("v")) /// variable arg0 =
-	 * factory.getSWRLVariable(IRI.create(arg0Str)); else /// namedinstance arg0
-	 * = factory.getSWRLIndividualArgument(factory.getOWLNamedIndividual(IRI.
-	 * create(arg0Str)));
-	 * 
-	 * SWRLIArgument arg1; if (arg1Str.startsWith("v")) arg1 =
-	 * factory.getSWRLVariable(IRI.create(arg1Str)); else arg1 =
-	 * factory.getSWRLIndividualArgument(factory.getOWLNamedIndividual(IRI.
-	 * create(arg1Str))); return
-	 * factory.getSWRLObjectPropertyAtom(factory.getOWLObjectProperty(IRI.create
-	 * (roleStr)), arg0, arg1); }
-	 * 
-	 * public static SWRLAtom createAtom(String conceptStr, String argStr) {
-	 * SWRLArgument arg; if (argStr.startsWith("v")) arg =
-	 * factory.getSWRLVariable(IRI.create(argStr)); else arg =
-	 * factory.getSWRLIndividualArgument(factory.getOWLNamedIndividual(IRI.
-	 * create(argStr))); return
-	 * factory.getSWRLClassAtom(factory.getOWLClass(IRI.create(conceptStr)),
-	 * (SWRLIArgument) arg); }
-	 * 
-	 * public Set<OWLAxiom> getEquivalentAxiom() {
-	 * 
-	 * this.equivalentAxioms = Transformer.ruleToAxioms(testRules); return
-	 * this.equivalentAxioms; }
-	 */
+	
 
 	private int noOfArgument(String ruleText, String Atom) {
 		try {
@@ -774,38 +756,9 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		}
 	}
 
-	private int createNewClass(String className) {
-		SWRLParser parser = createSWRLParser();
-		Optional<@NonNull IRI> iri = swrlRuleEngineModel.getSWRLRuleEngine().getSWRLAPIOWLOntology().getIRIResolver()
-				.prefixedName2IRI(className);
-		if (iri.isPresent()) {
+	
 
-			OWLClass newClass = owlDataFactory.getOWLClass(iri.get());
 
-			OWLAxiom declareaxiom = owlDataFactory.getOWLDeclarationAxiom(newClass);
-			AddAxiom addAxiom = new AddAxiom(activeOntology, declareaxiom);
-			owlOntologyManager.applyChange(addAxiom);
-			return 0;
-		}
-		return -1;
-	}
-
-	private int createNewRole(String RoleName) {
-		SWRLParser parser = createSWRLParser();
-		Optional<@NonNull IRI> iri = swrlRuleEngineModel.getSWRLRuleEngine().getSWRLAPIOWLOntology().getIRIResolver()
-				.prefixedName2IRI(RoleName);
-		if (iri.isPresent()) {
-
-			OWLObjectProperty objprop = owlDataFactory.getOWLObjectProperty(iri.get());
-			OWLAxiom declareaxiom = owlDataFactory.getOWLDeclarationAxiom(objprop);
-
-			AddAxiom addaxiom = new AddAxiom(activeOntology, declareaxiom);
-
-			owlOntologyManager.applyChange(addaxiom);
-			return 0;
-		}
-		return -1;
-	}
 
 	private JPanel getPnlForCreateNewEntity(String message, String type) {
 		JPanel pnl = new JPanel();
