@@ -225,8 +225,11 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		initializeComponents();
 
 		this.ruleTextTextPane.addKeyListener(new SWRLRuleEditorKeyAdapter());
-		this.statusTextField.addMouseMotionListener(new StatusTextFieldMouseMotionAdapter());
-		this.statusTextField.addMouseListener(new StatusTextFieldMouseAdapter());
+		this.ruleTextTextPane.addMouseListener(new StatusTextFieldMouseAdapter());
+		// this.statusTextField.addMouseMotionListener(new
+		// StatusTextFieldMouseMotionAdapter());
+		// this.statusTextField.addMouseListener(new
+		// StatusTextFieldMouseAdapter());
 		this.cancelButton.addActionListener(new CancelSWRLRuleEditActionListener());
 		this.convertToOWLButton.addActionListener(new ConvertSWRLRuleActionListener(this));
 	}
@@ -252,76 +255,90 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	 * 
 	 */
 
-	private String getAtom(String errorText) {
-		if (errorText.contains("'")) {
-			int firstIndex = errorText.indexOf("'");
-			int lastIndex = errorText.lastIndexOf("'");
 
-			String atom = errorText.substring(firstIndex + 1, lastIndex);
-
-			// System.out.println("inside: " + firstIndex + "\t " + lastIndex +
-			// "\t" + atom);
-
-			return atom;
-		} else {
-			// System.out.println("not found");
-			return "";
-		}
-	}
-
-	private void showSuggestionPopup() {
-
-		//System.out.println("showSuggestionPopup called");
-		if (this.suggestionPopup != null) {
-			
-			//System.out.println("showSuggestionPopup non null");
-			if(! this.suggestionPopup.isVisible()){
-				//System.out.println("showSuggestionPopup non not visble");
-			this.suggestionPopup.show(this.statusTextField, (int) this.statusTextField.getBounds().getCenterX(),
-					(int) this.statusTextField.getBounds().getCenterY());
-			}else{
-				//already shown
-				//System.out.println("showSuggestionPopup visible");
-			}
-
-		} else {
-			//System.out.println("showSuggestionPopup null");
-			createSuggestionPopup();
-		}
-	}
-
-	private void removeSuggestionPopup() {
-		if (this.suggestionPopup != null) {
-			if (this.suggestionPopup.isVisible()) {
-				this.suggestionPopup.setVisible(false);
-			}
-		}
-	}
-
-	private void createSuggestionPopup() {
+	private void showSuggestionPopup(MouseEvent event) {
 
 		String errorText = this.statusTextField.getText();
-		
-		 this.suggestionPopup = new SuggestionPopup(this.engine,errorText);
 
-		// String atom = getAtom(errorText);
-		// if (atom.length() > 0) {
-		// String ruleText = getRuleText();
+		if (!errorText.contains("cannot use name of existing OWL class")) {
+			if (errorText.contains("Invalid SWRL atom predicate")) {
+				// class
+				// add(bind("add as Class", new AddClassAction("Class"), ""));
+				// object property
+				// data property
+
+				this.suggestionPopup = new SuggestionPopup(this,this.engine, errorText);
+				this.suggestionPopup.show(this.statusTextField, (int) event.getX(), (int) event.getY());
+
+			} else if (errorText.contains("Invalid OWL individual name")) {
+				// namedindividual
+
+				this.suggestionPopup = new SuggestionPopup(this,this.engine, errorText);
+				this.suggestionPopup.show(this.statusTextField, (int) event.getX(), (int) event.getY());
+
+			} else if (errorText.contains("invalid datatype name")) {
+				// datatype
+
+				this.suggestionPopup = new SuggestionPopup(this, this.engine, errorText);
+				this.suggestionPopup.show(this.statusTextField, (int) event.getX(), (int) event.getY());
+
+			} else {
+				// there is no error
+				// popup will not be shown
+			}
+		}
+
+		// System.out.println("showSuggestionPopup called");
+		// if (this.suggestionPopup != null) {
 		//
-		// int firstIndex = ruleText.indexOf(atom);
-		// int lastIndex = firstIndex + atom.length();
-		//
-		// int argumentNo = noOfArgument(ruleText, atom);
-		//
-		// // showSuggestionPopup(firstIndex, lastIndex, argumentNo);
-		//
-		// // System.out.println("inside: " + firstIndex + "\t " + lastIndex +
-		// // "\t" + atom);
+		// // System.out.println("showSuggestionPopup non null");
+		// if (!this.suggestionPopup.isVisible()) {
+		// // System.out.println("showSuggestionPopup non not visble");
+		// this.suggestionPopup.show(this.statusTextField, (int) event.getX(),
+		// (int) event.getY());
 		// } else {
-		// // System.out.println("nothing to show");
+		// // already shown
+		// // System.out.println("showSuggestionPopup visible");
 		// }
-
+		//
+		// } else {
+		// // System.out.println("showSuggestionPopup null");
+		// createSuggestionPopup();
+		// }
 	}
+
+	// private void removeSuggestionPopup() {
+	// if (this.suggestionPopup != null) {
+	// if (this.suggestionPopup.isVisible()) {
+	// this.suggestionPopup.setVisible(false);
+	// }
+	// }
+	// }
+	//
+	// private void createSuggestionPopup() {
+	//
+	// String errorText = this.statusTextField.getText();
+	//
+	// this.suggestionPopup = new SuggestionPopup(this.engine, errorText);
+	//
+	// // String atom = getAtom(errorText);
+	// // if (atom.length() > 0) {
+	// // String ruleText = getRuleText();
+	// //
+	// // int firstIndex = ruleText.indexOf(atom);
+	// // int lastIndex = firstIndex + atom.length();
+	// //
+	// // int argumentNo = noOfArgument(ruleText, atom);
+	// //
+	// // // showSuggestionPopup(firstIndex, lastIndex, argumentNo);
+	// //
+	// // // System.out.println("inside: " + firstIndex + "\t " + lastIndex +
+	// // // "\t" + atom);
+	// // } else {
+	// // // System.out.println("nothing to show");
+	// // }
+	//
+	// }
 
 	private void showColor(String errorText) {
 		// String atom = getAtom(errorText);
@@ -673,18 +690,27 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	private class StatusTextFieldMouseAdapter extends MouseAdapter {
 
 		@Override
-		public void mouseEntered(MouseEvent event) {
-			//System.out.println("mouseEntered called");
-			createSuggestionPopup();
-			event.consume();
+		public void mouseClicked(MouseEvent e) {
+			// TODO Auto-generated method stub
+			if (SwingUtilities.isRightMouseButton(e)) {
+				showSuggestionPopup(e);
+			}
+			e.consume();
 		}
 
-		@Override
-		public void mouseExited(MouseEvent event) {
-			//System.out.println("mouseExited called");
-			removeSuggestionPopup();
-			event.consume();
-		}
+		// @Override
+		// public void mouseEntered(MouseEvent event) {
+		// // System.out.println("mouseEntered called");
+		// createSuggestionPopup();
+		// event.consume();
+		// }
+		//
+		// @Override
+		// public void mouseExited(MouseEvent event) {
+		// // System.out.println("mouseExited called");
+		// removeSuggestionPopup();
+		// event.consume();
+		// }
 
 	}
 
@@ -692,8 +718,8 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 		@Override
 		public void mouseMoved(MouseEvent event) {
-			//System.out.println("mouseMoved called");
-			showSuggestionPopup();
+			// System.out.println("mouseMoved called");
+			showSuggestionPopup(event);
 			event.consume();
 		}
 
@@ -737,8 +763,6 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		}
 	}
 
-	
-
 	private int noOfArgument(String ruleText, String Atom) {
 		try {
 			String tmp = ruleText.substring(ruleText.lastIndexOf(Atom) + 1);
@@ -755,10 +779,6 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 			return -1;
 		}
 	}
-
-	
-
-
 
 	private JPanel getPnlForCreateNewEntity(String message, String type) {
 		JPanel pnl = new JPanel();
@@ -797,7 +817,8 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		rule = parser.parseSWRLRule(ruleText, false, getRuleName(), "comment");
 
 		if (rule.isPresent()) {
-			//System.out.println("rule, body: " + rule.get().getBody() + " head:" + rule.get().getHead());
+			// System.out.println("rule, body: " + rule.get().getBody() + "
+			// head:" + rule.get().getHead());
 			return rule.get();
 		}
 
@@ -942,7 +963,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 			SWRLRuleEditorDialog dialog = (SWRLRuleEditorDialog) this.dialogManager.getSWRLRuleEditorDialog(this,
 					ruleName, ruleText, ruleComment);
 			dialog.setVisible(true);
-			//System.out.println("Clicked to switch to swrltab");
+			// System.out.println("Clicked to switch to swrltab");
 
 		}
 	}
