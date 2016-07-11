@@ -474,7 +474,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		this.statusTextField.setBorder(loweredBevelBorder);
 		this.statusTextField.setDisabledTextColor(Color.BLACK);
 		this.statusTextField.setText(status);
-
+		augmentAndSetStatusText();
 	}
 
 	private void setIncompleteStatusText(@NonNull String status) {
@@ -482,14 +482,42 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		this.statusTextField.setBorder(yellowBorder);
 		this.statusTextField.setDisabledTextColor(Color.BLACK);
 		this.statusTextField.setText(status);
-
+		augmentAndSetStatusText();
 	}
 
 	private void setErrorStatusText(@NonNull String status) {
 
 		this.statusTextField.setDisabledTextColor(Color.RED);
 		this.statusTextField.setText(status);
+		augmentAndSetStatusText();
+	}
 
+	private void augmentAndSetStatusText() {
+
+		String errorText = this.statusTextField.getText();
+
+		if (!errorText.contains("cannot use name of existing OWL class")) {
+
+			if (errorText.contains("Invalid SWRL atom predicate")) {
+				// class
+				// add(bind("add as Class", new AddClassAction("Class"), ""));
+				// object property
+				// data property
+				this.statusTextField.setText(errorText + " (Right click to Declare)");
+
+			} else if (errorText.contains("Invalid OWL individual name")) {
+				// namedindividual
+				this.statusTextField.setText(errorText + " (Right click to Declare)");
+
+			} else if (errorText.contains("invalid datatype name")) {
+				// datatype
+				this.statusTextField.setText(errorText + " (Right click to Declare)");
+
+			} else {
+				// there is no error
+				// popup will not be shown
+			}
+		}
 	}
 
 	@NonNull
@@ -556,35 +584,28 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		this.statusTextField.setText("");
 		updateStatus();
 	}
-	
-	
 
 	private void showSuggestionPopup(MouseEvent event) {
 
 		String errorText = this.statusTextField.getText();
 
 		if (!errorText.contains("cannot use name of existing OWL class")) {
-			
-			
-			
+
 			if (errorText.contains("Invalid SWRL atom predicate")) {
 				// class
 				// add(bind("add as Class", new AddClassAction("Class"), ""));
 				// object property
 				// data property
-				this.statusTextField.setText(errorText+" (Right click to Declare)");
 				this.suggestionPopup = new SuggestionPopup(this, this.engine, errorText);
 				this.suggestionPopup.show(this.statusTextField, (int) event.getX(), (int) event.getY());
 
 			} else if (errorText.contains("Invalid OWL individual name")) {
 				// namedindividual
-				this.statusTextField.setText(errorText+" (Right click to Declare)");
 				this.suggestionPopup = new SuggestionPopup(this, this.engine, errorText);
 				this.suggestionPopup.show(this.statusTextField, (int) event.getX(), (int) event.getY());
 
 			} else if (errorText.contains("invalid datatype name")) {
 				// datatype
-				this.statusTextField.setText(errorText+" (Right click to Declare)");
 				this.suggestionPopup = new SuggestionPopup(this, this.engine, errorText);
 				this.suggestionPopup.show(this.statusTextField, (int) event.getX(), (int) event.getY());
 
@@ -819,13 +840,14 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		}
 	}
 
-	private void setApplyChangeStatus(){
+	private void setApplyChangeStatus() {
 		this.ruleNameTextField.setText("");
 		this.ruleNameTextField.setCaretPosition(this.ruleNameTextField.getText().length());
 		this.ruleTextTextPane.setText("");
 		this.commentTextField.setText("");
-		
+
 	}
+
 	private void switchToSWRLTab(String ruleName, String ruleText, String ruleComment) {
 
 		if (JOptionPane.OK_OPTION == JOptionPane.showOptionDialog(this, getPnlForSwitchToSWRLTab(ruleText),
@@ -874,11 +896,11 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 					SWRLRule swrlRule = getSWRLRule(ruleText);
 
 					if (swrlRule != null) {
-						
-						//try to convert rule to OWL
+
+						// try to convert rule to OWL
 						Translator translator = new Translator(swrlRule);
 						translator.ruleToAxioms();
-						if (!translator.resultingAxioms.isEmpty()){
+						if (!translator.resultingAxioms.isEmpty()) {
 
 							generatedAxioms.clear();
 							generatedAxioms.addAll(translator.resultingAxioms);
