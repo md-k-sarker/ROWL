@@ -4,7 +4,7 @@ For details please visit http://dase.cs.wright.edu/content/modeling-owl-rules
 
 
 
-##Installation
+###Installation
 1. Download ROWL-0.x.x.jar from <a href="https://github.com/md-k-sarker/ROWL/blob/master/plugin/binary/ROWL-0.0.1-beta.jar?raw=true" title="plugin"> plugin/binary</a> folder of this repository
 2. Put the jar file inside plugins folder of Protege.
 
@@ -15,7 +15,7 @@ See the video <a href="https://github.com/md-k-sarker/OWLAx/blob/master/plugin/d
 See the video <a href="https://github.com/md-k-sarker/OWLAx/blob/master/plugin/docs/Video/windowsPluginFolder.webm?raw=true" title="plugin"> Find Plugin Folder in Protege Windows OS Version</a>
 
 
-##Usage
+###How to activate Plugin
 1. Start Protege
 2. Select ROWL Tab from
 	 Window -> Tabs -> ROWL
@@ -28,12 +28,24 @@ See the video <a href="https://github.com/md-k-sarker/OWLAx/blob/master/plugin/d
 
 
 
-##Capabilities of ROWL
+###Capabilities of ROWL
+<ol>
+<li> Gives user way to enter OWL axioms by writing rules rather than creating axioms in protege. 
+<br>
+<li> If a rule is successfully converted to OWL Axiom User will get the option to choose which axioms he want to integrate.
+<li> If a rule is not successfully converted to OWL Axiom it gives the option to switch to SWRL tab(Existing to SWRLTab Plugin)
+<li> It can save and reload the rules(Which rules is converted to OWL Axioms and at-least 1 axiom is integrated with ontology from that rule.
+<li> It checks syntax of the rule. It supports SWRL Rule Syntax.
+<li> It can create new OWL Entity on the fly. That means user can create new OWL Entity like Class, ObjectProperty etc from this plugin.
 
+</ol>
 
-####Sample
      
-##Current Limitations:
+###Current Limitations:
+<ul>
+<li> It checks the syntax of the rule, not semantics. It is possible to insert meaningless rule which is syntactically correct.
+<li> It doesn't support DataLog Syntax.
+</ul>
 
 
 ###Acknowledgement
