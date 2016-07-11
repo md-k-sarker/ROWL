@@ -6,10 +6,14 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -80,6 +84,7 @@ import org.swrlapi.parser.SWRLParseException;
 import org.swrlapi.parser.SWRLParser;
 
 import edu.wsu.dase.controller.Engine;
+import edu.wsu.dase.controller.SuggestionPopup;
 import edu.wsu.dase.model.Constants;
 import edu.wsu.dase.model.RuleModel;
 import edu.wsu.dase.model.RuleTableModel;
@@ -130,6 +135,8 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	private AttributeSet clearUnderLine = styleContext.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Underline,
 			false);
 	private StyledDocument styledDoc;
+
+	private Rectangle invalidTextRectangle;
 
 	@NonNull
 	private SWRLRuleEngineModel swrlRuleEngineModel;
@@ -194,6 +201,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		this.yellowBorder = BorderFactory.createLineBorder(Color.YELLOW);
 		this.ruleTextTextPane = new JTextPane();
 		this.styledDoc = this.ruleTextTextPane.getStyledDocument();
+		this.invalidTextRectangle = new Rectangle(0, 0, 0, 0);
 		this.tabbedPane = tabbedPane;
 		this.convertToOWLButton = new JButton(CONVERT_TO_OWL_BUTTON_TITLE);
 		this.cancelButton = new JButton(CANCEL_BUTTON_TITLE);
@@ -215,6 +223,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		initializeComponents();
 
 		this.ruleTextTextPane.addKeyListener(new SWRLRuleEditorKeyAdapter());
+		this.statusTextField.addMouseMotionListener(new RuleTextPaneMouseAdapter());
 		this.cancelButton.addActionListener(new CancelSWRLRuleEditActionListener());
 		this.convertToOWLButton.addActionListener(new ConvertSWRLRuleActionListener(this));
 	}
@@ -257,7 +266,52 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		}
 	}
 
-	private void showSuggestion(String errorText) {
+	private void showSuggestionPopup() {
+		SuggestionPopup suggestionPopup = new SuggestionPopup();
+		System.out.println("showSuggestionPopup called");
+		// Rectangle startTextRectangle, endTextRectangle;
+		// Rectangle paneRectangle;
+		// int x;
+		// int y;
+		//
+		// try {
+		// startTextRectangle = this.ruleTextTextPane.modelToView(firstIndex);
+		// endTextRectangle = this.ruleTextTextPane.modelToView(lastIndex);
+		// invalidTextRectangle = new Rectangle(startTextRectangle.x ,
+		// startTextRectangle.y,
+		// endTextRectangle.x - startTextRectangle.x + 10, endTextRectangle.y -
+		// startTextRectangle.y + 10);
+		// } catch (Exception e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// invalidTextRectangle = new Rectangle(50, 50, 50, 50);
+		// }
+		//
+		// paneRectangle = ruleTextTextPane.getBounds();
+
+		// if (textRectangle.x >= (paneRectangle.getWidth() - 30)) {
+		// x = (int) (paneRectangle.getWidth() - 50);
+		// } else {
+		// x = textRectangle.x + 10;
+		// }
+		//
+		// if (textRectangle.y >= (paneRectangle.getHeight() - 30)) {
+		// y = (int) (paneRectangle.getHeight() - 50);
+		// } else {
+		// y = textRectangle.y + 30;
+		// }
+
+		// System.out.println(invalidTextRectangle.x + "\t" +
+		// invalidTextRectangle.y + "\t" + invalidTextRectangle.width
+		// + "\t" + invalidTextRectangle.height);
+
+		if (! suggestionPopup.isVisible()) {
+			suggestionPopup.show(this.statusTextField, (int) this.statusTextField.getBounds().getCenterX(),
+					(int) this.statusTextField.getBounds().getCenterY());
+		}
+	}
+
+	private void createSuggestion(String errorText) {
 
 		String atom = getAtom(errorText);
 		if (atom.length() > 0) {
@@ -268,6 +322,8 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 			int argumentNo = noOfArgument(ruleText, atom);
 
+			// showSuggestionPopup(firstIndex, lastIndex, argumentNo);
+
 			// System.out.println("inside: " + firstIndex + "\t " + lastIndex +
 			// "\t" + atom);
 		} else {
@@ -277,29 +333,34 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	}
 
 	private void showColor(String errorText) {
-		String atom = getAtom(errorText);
-		if (atom.length() > 0) {
-			String ruleText = getRuleText();
-
-			int firstIndex = ruleText.indexOf(atom);
-			int lastIndex = firstIndex + atom.length();
-
-			styledDoc.setCharacterAttributes(firstIndex, lastIndex, setUnderLine, true);
-			styledDoc.setCharacterAttributes(firstIndex, lastIndex, redColor, false);
-
-			System.out.println("color set at : " + firstIndex + "\t " + lastIndex + "\t of " + atom);
-
-		} else {
-			System.out.println("not invalid. means incomplete state");
-			removeColor();
-		}
+		// String atom = getAtom(errorText);
+		// if (atom.length() > 0) {
+		// String ruleText = getRuleText();
+		//
+		// int firstIndex = ruleText.indexOf(atom);
+		// int lastIndex = firstIndex + atom.length();
+		//
+		// styledDoc.setCharacterAttributes(firstIndex, lastIndex, setUnderLine,
+		// true);
+		// styledDoc.setCharacterAttributes(firstIndex, lastIndex, redColor,
+		// false);
+		//
+		// //System.out.println("color set at : " + firstIndex + "\t " +
+		// lastIndex + "\t of " + atom);
+		//
+		// } else {
+		// //System.out.println("not invalid. means incomplete state");
+		// removeColor();
+		// }
 
 	}
 
 	private void removeColor() {
-		styledDoc.setCharacterAttributes(0, styledDoc.getLength(), clearUnderLine, true);
-		styledDoc.setCharacterAttributes(0, styledDoc.getLength(), blackColor, true);
-		System.out.println("cleared color");
+		// styledDoc.setCharacterAttributes(0, styledDoc.getLength(),
+		// clearUnderLine, true);
+		// styledDoc.setCharacterAttributes(0, styledDoc.getLength(),
+		// blackColor, true);
+		// //System.out.println("cleared color");
 	}
 
 	private void updateStatus() {
@@ -321,22 +382,22 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 				disableSave();
 
 				if (e.getMessage() != null) {
-					System.out.println("incomplete State");
+					// System.out.println("incomplete State");
 					showColor(e.getMessage());
-					showSuggestion(e.getMessage());
+					createSuggestion(e.getMessage());
 				}
 			} catch (SWRLParseException e) {
 				setErrorStatusText(e.getMessage() == null ? "" : e.getMessage());
 				disableSave();
 				if (e.getMessage() != null) {
-					System.out.println("parseException State");
+					// System.out.println("parseException State");
 					showColor(e.getMessage());
-					showSuggestion(e.getMessage());
+					createSuggestion(e.getMessage());
 				}
 			} catch (RuntimeException e) {
 				setInformationalStatusText(e.getMessage() == null ? "" : e.getMessage());
 				disableSave();
-				System.out.println("runtime: " + e.getMessage());
+				// System.out.println("runtime: " + e.getMessage());
 			}
 		}
 	}
@@ -618,12 +679,22 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 	}
 
+	private class RuleTextPaneMouseAdapter extends MouseMotionAdapter {
+
+		@Override
+		public void mouseMoved(MouseEvent event) {
+			System.out.println("mouseMoved called");
+			showSuggestionPopup();
+			event.consume();
+		}
+
+	}
+
 	private class SWRLRuleEditorKeyAdapter extends KeyAdapter {
 		@Override
 		public void keyPressed(@NonNull KeyEvent event) {
 			int code = event.getKeyCode();
 			if ((code == KeyEvent.VK_TAB) || (code == KeyEvent.VK_SPACE && event.isControlDown())) {
-
 				autoComplete();
 				event.consume();
 			} else if (code == KeyEvent.VK_ESCAPE) {
