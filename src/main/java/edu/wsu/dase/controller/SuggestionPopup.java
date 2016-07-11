@@ -80,36 +80,36 @@ public class SuggestionPopup extends JPopupMenu {
 
 				if (noOfArgument(ruleText, entityName) == 1) {
 					// class
-					add(bind("Add " + entityName + " as OWLClass", new AddClassAction(entityName), "/class.add.png"));
+					add(bind("Add '" + entityName + "' as OWLClass", new AddClassAction(entityName), "/class.add.png"));
 				} else if (noOfArgument(ruleText, entityName) == 2) {
 					// object property
-					add(bind("Add " + entityName + " as OWLObjectProperty", new AddObjPropAction(entityName),
+					add(bind("Add '" + entityName + "' as OWLObjectProperty", new AddObjPropAction(entityName),
 							"/objprop.add.png"));
 					addSeparator();
 					// data property
-					add(bind("Add " + entityName + " as OWLDataProperty", new AddDataPropAction(entityName),
+					add(bind("Add '" + entityName + "' as OWLDataProperty", new AddDataPropAction(entityName),
 							"/dataprop.add.png"));
 				} else {
 					// class
-					add(bind("Add " + entityName + " as OWLClass", new AddClassAction(entityName), "/class.add.png"));
+					add(bind("Add '" + entityName + "' as OWLClass", new AddClassAction(entityName), "/class.add.png"));
 					addSeparator();
 					// object property
-					add(bind("Add " + entityName + " as OWLObjectProperty", new AddObjPropAction(entityName),
+					add(bind("Add '" + entityName + "' as OWLObjectProperty", new AddObjPropAction(entityName),
 							"/objprop.add.png"));
 					addSeparator();
 					// data property
-					add(bind("Add " + entityName + " as OWLDataProperty", new AddDataPropAction(entityName),
+					add(bind("Add '" + entityName + "' as OWLDataProperty", new AddDataPropAction(entityName),
 							"/dataprop.add.png"));
 				}
 
 			} else if (this.errorText.contains("Invalid OWL individual name")) {
 				// namedindividual
-				add(bind("Add " + entityName + " as OWLNamedIndividual", new AddNamedIndVAction(entityName),
+				add(bind("Add '" + entityName + "' as OWLNamedIndividual", new AddNamedIndVAction(entityName),
 						"/individual.add.png"));
 
 			} else if (this.errorText.contains("invalid datatype name")) {
 				// datatype
-				add(bind("Add " + entityName + " as OWLDataType", new AddDataTypeAction(entityName),
+				add(bind("Add '" + entityName + "' as OWLDataType", new AddDataTypeAction(entityName),
 						"/datatype.add.png"));
 
 			}

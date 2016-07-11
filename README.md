@@ -44,6 +44,14 @@ See the video <a href="https://github.com/md-k-sarker/OWLAx/blob/master/plugin/d
 2. Click on Delete
 3. Then the rule will be deleted.
 
+####Create New OWLEntity
+If an atom not found in the active Ontology then user can create new OWLEntity on the fly
+1. Right Click to see the possible suggestion to create OWL Entity
+
+![Alt Right Click to see the possible suggestion](https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/SeeSuggestion.png)
+
+2. Click on the popup menu to create new OWL Entity
+
 
 
 ###Capabilities of ROWL
