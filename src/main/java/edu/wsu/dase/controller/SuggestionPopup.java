@@ -3,62 +3,27 @@
  */
 package edu.wsu.dase.controller;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Shape;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JTextPane;
-import javax.swing.border.EmptyBorder;
-import javax.swing.text.AbstractDocument;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.BoxView;
-import javax.swing.text.ComponentView;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.Element;
-import javax.swing.text.IconView;
-import javax.swing.text.LabelView;
-import javax.swing.text.ParagraphView;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
-import javax.swing.text.StyledDocument;
-import javax.swing.text.StyledEditorKit;
-import javax.swing.text.View;
-import javax.swing.text.ViewFactory;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.semanticweb.owlapi.model.AddAxiom;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDatatype;
-import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.PrefixManager;
 import org.swrlapi.core.IRIResolver;
-import org.swrlapi.parser.SWRLParser;
 
 import edu.wsu.dase.view.RuleEditorPanel;
 
@@ -105,38 +70,50 @@ public class SuggestionPopup extends JPopupMenu {
 	}
 
 	private void createUserInterface() {
-		// suggestionPanel = new JPanel();
-		// suggestionPanel.setLayout(new BorderLayout());
-		// suggestionPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		//
-		// JLabel lbl = new JLabel("Text");
-		// suggestionPanel.add(lbl, BorderLayout.CENTER);
 
 		String entityName = getNameFromErrorText(this.errorText);
+		String ruleText = this.ruleEditorPanel.getRuleText();
 
 		if (!this.errorText.contains("cannot use name of existing OWL class")) {
+
 			if (this.errorText.contains("Invalid SWRL atom predicate")) {
-				// class
-				add(bind("Add " + entityName + " as OWLClass", new AddClassAction(entityName), ""));
 
-				// object property
-				add(bind("Add " + entityName + " as OWLObjectProperty", new AddObjPropAction(entityName), ""));
+				if (noOfArgument(ruleText, entityName) == 1) {
+					// class
+					add(bind("Add " + entityName + " as OWLClass", new AddClassAction(entityName), "/class.add.png"));
+				} else if (noOfArgument(ruleText, entityName) == 2) {
+					// object property
+					add(bind("Add " + entityName + " as OWLObjectProperty", new AddObjPropAction(entityName),
+							"/objprop.add.png"));
 
-				// data property
-				add(bind("Add " + entityName + " as OWLDataProperty", new AddDataPropAction(entityName), ""));
+					// data property
+					add(bind("Add " + entityName + " as OWLDataProperty", new AddDataPropAction(entityName),
+							"/dataprop.add.png"));
+				} else {
+					// class
+					add(bind("Add " + entityName + " as OWLClass", new AddClassAction(entityName), "/class.add.png"));
+
+					// object property
+					add(bind("Add " + entityName + " as OWLObjectProperty", new AddObjPropAction(entityName),
+							"/objprop.add.png"));
+
+					// data property
+					add(bind("Add " + entityName + " as OWLDataProperty", new AddDataPropAction(entityName),
+							"/dataprop.add.png"));
+				}
 
 			} else if (this.errorText.contains("Invalid OWL individual name")) {
 				// namedindividual
-				add(bind("Add " + entityName + " as OWLNamedIndividual", new AddNamedIndVAction(entityName), ""));
+				add(bind("Add " + entityName + " as OWLNamedIndividual", new AddNamedIndVAction(entityName),
+						"/individual.add.png"));
 
 			} else if (this.errorText.contains("invalid datatype name")) {
 				// datatype
-				add(bind("Add " + entityName + " as OWLDataType", new AddDataTypeAction(entityName), ""));
+				add(bind("Add " + entityName + " as OWLDataType", new AddDataTypeAction(entityName),
+						"/datatype.add.png"));
 
 			}
 		}
-
-		// add(suggestionPanel);
 	}
 
 	private String getNameFromErrorText(String errorText) {
@@ -145,9 +122,6 @@ public class SuggestionPopup extends JPopupMenu {
 			int lastIndex = errorText.lastIndexOf("'");
 
 			String atom = errorText.substring(firstIndex + 1, lastIndex);
-
-			// System.out.println("inside: " + firstIndex + "\t " + lastIndex +
-			// "\t" + atom);
 
 			return atom;
 		} else {
@@ -177,6 +151,28 @@ public class SuggestionPopup extends JPopupMenu {
 		}
 	}
 
+	private int noOfArgument(String ruleText, String Atom) {
+		try {
+
+			String tmp = ruleText.substring(ruleText.lastIndexOf(Atom) + 1);
+			if (tmp.length() > 0) {
+				tmp = tmp.substring(1, tmp.indexOf(")"));
+				if (tmp.length() > 0) {
+					String[] ss = tmp.split(",");
+					return ss.length;
+				} else
+					return -1;
+			} else
+				return -1;
+		} catch (IndexOutOfBoundsException e) {
+			return -1;
+		}
+	}
+
+	private String getentityNameWithHTMLCosmetics(String name) {
+		return name;
+	}
+
 	private int createOWLObjectProperty(String Name) {
 
 		OWLObjectProperty newOWLObjectProperty = this.owlDataFactory.getOWLObjectProperty(Name, prefixManager);
@@ -184,7 +180,7 @@ public class SuggestionPopup extends JPopupMenu {
 		OWLAxiom declareaxiom = this.owlDataFactory.getOWLDeclarationAxiom(newOWLObjectProperty);
 		AddAxiom addAxiom = new AddAxiom(this.activeOntology, declareaxiom);
 		this.owlOntologyManager.applyChange(addAxiom);
-		
+
 		this.ruleEditorPanel.update();
 		return 0;
 	}
@@ -196,7 +192,7 @@ public class SuggestionPopup extends JPopupMenu {
 		OWLAxiom declareaxiom = owlDataFactory.getOWLDeclarationAxiom(newOWLDataProperty);
 		AddAxiom addAxiom = new AddAxiom(activeOntology, declareaxiom);
 		owlOntologyManager.applyChange(addAxiom);
-		
+
 		this.ruleEditorPanel.update();
 		return 0;
 
@@ -209,7 +205,7 @@ public class SuggestionPopup extends JPopupMenu {
 		OWLAxiom declareaxiom = owlDataFactory.getOWLDeclarationAxiom(newOWLIndividual);
 		AddAxiom addAxiom = new AddAxiom(activeOntology, declareaxiom);
 		owlOntologyManager.applyChange(addAxiom);
-		
+
 		this.ruleEditorPanel.update();
 		return 0;
 
@@ -222,7 +218,7 @@ public class SuggestionPopup extends JPopupMenu {
 		OWLAxiom declareaxiom = owlDataFactory.getOWLDeclarationAxiom(newClass);
 		AddAxiom addAxiom = new AddAxiom(activeOntology, declareaxiom);
 		owlOntologyManager.applyChange(addAxiom);
-		
+
 		this.ruleEditorPanel.update();
 		return 0;
 
@@ -236,7 +232,7 @@ public class SuggestionPopup extends JPopupMenu {
 
 		AddAxiom addAxiom = new AddAxiom(activeOntology, declareaxiom);
 		owlOntologyManager.applyChange(addAxiom);
-	
+
 		this.ruleEditorPanel.update();
 		return 0;
 	}
@@ -365,7 +361,7 @@ public class SuggestionPopup extends JPopupMenu {
 				action.actionPerformed(new ActionEvent(e.getSource(), e.getID(), e.getActionCommand()));
 			}
 		};
-		// System.out.println(name+ " iconurl: "+iconUrl);
+
 		newAction.putValue(Action.SHORT_DESCRIPTION, action.getValue(Action.SHORT_DESCRIPTION));
 
 		return newAction;

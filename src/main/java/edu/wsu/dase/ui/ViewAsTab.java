@@ -9,16 +9,7 @@ import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.protege.editor.owl.ui.OWLWorkspaceViewsTab;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAnnotationProperty;
-import org.semanticweb.owlapi.model.OWLAnnotationValue;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.util.DefaultPrefixManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.swrlapi.core.IRIResolver;
@@ -30,7 +21,6 @@ import org.swrlapi.ui.view.rules.SWRLRulesView;
 import org.swrltab.ui.ProtegeIRIResolver;
 
 import edu.wsu.dase.controller.Engine;
-import edu.wsu.dase.model.RuleTableModel;
 import edu.wsu.dase.view.RulesViewMain;
 
 public class ViewAsTab extends OWLWorkspaceViewsTab {

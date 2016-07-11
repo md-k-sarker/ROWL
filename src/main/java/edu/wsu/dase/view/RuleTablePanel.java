@@ -1,26 +1,35 @@
 package edu.wsu.dase.view;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.swrlapi.ui.action.DisableAllRulesAction;
-import org.swrlapi.ui.action.EnableAllRulesAction;
-import org.swrlapi.ui.dialog.SWRLRuleEngineDialogManager;
-import org.swrlapi.ui.model.SWRLRuleEngineModel;
-import org.swrlapi.ui.model.SWRLRulesAndSQWRLQueriesTableModel;
-import org.swrlapi.ui.view.SWRLAPIView;
-
-import edu.wsu.dase.controller.Engine;
-import edu.wsu.dase.model.RuleTableModel;
-
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.TableColumnModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Optional;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JViewport;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumnModel;
+
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.swrlapi.ui.action.DisableAllRulesAction;
+import org.swrlapi.ui.action.EnableAllRulesAction;
+import org.swrlapi.ui.model.SWRLRulesAndSQWRLQueriesTableModel;
+import org.swrlapi.ui.view.SWRLAPIView;
+
+import edu.wsu.dase.controller.Engine;
+import edu.wsu.dase.model.RuleTableModel;
 
 /**
  * Provides a model for graphical display of SWRL rules
@@ -33,7 +42,6 @@ public class RuleTablePanel extends JPanel implements SWRLAPIView {
 	private static final String EDIT_BUTTON_TITLE = "Edit";
 	private static final String DELETE_BUTTON_TITLE = "Delete";
 
-	private static final int ACTIVE_COLUMN_MAX_WIDTH = 50;
 	private static final int RULE_NAME_COLUMN_PREFERRED_WIDTH = 150;
 	private static final int RULE_NAME_COLUMN_MAX_WIDTH = 200;
 	private static final int RULE_TEXT_COLUMN_PREFERRED_WIDTH = 500;

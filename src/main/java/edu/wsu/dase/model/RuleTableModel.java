@@ -1,7 +1,6 @@
 package edu.wsu.dase.model;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
@@ -10,9 +9,6 @@ import java.util.TreeMap;
 import javax.swing.table.AbstractTableModel;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.dataflow.qual.SideEffectFree;
-import org.swrlapi.core.SWRLAPIRule;
-import org.swrlapi.core.SWRLRuleEngine;
 import org.swrlapi.ui.view.SWRLAPIView;
 
 import edu.wsu.dase.controller.Engine;

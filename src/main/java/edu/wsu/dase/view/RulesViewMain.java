@@ -1,11 +1,7 @@
 package edu.wsu.dase.view;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.table.DefaultTableModel;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -13,8 +9,6 @@ import org.swrlapi.exceptions.SWRLAPIException;
 import org.swrlapi.ui.dialog.SWRLRuleEngineDialogManager;
 import org.swrlapi.ui.model.SWRLRuleEngineModel;
 import org.swrlapi.ui.view.SWRLAPIView;
-import org.swrlapi.ui.view.SWRLRulesTableView;
-import org.swrlapi.ui.view.queries.SQWRLQueriesView;
 
 import edu.wsu.dase.controller.Engine;
 import edu.wsu.dase.model.RuleTableModel;
