@@ -49,7 +49,7 @@ See the video <a href="https://github.com/md-k-sarker/OWLAx/blob/master/plugin/d
 
 1. Right Click to see the possible suggestion to create OWL Entity
 
-![Alt Right Click to see the possible suggestion](https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/SeeSuggestion.png)
+	![Alt Right Click to see the possible suggestion](https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/SeeSuggestion.png)
 
 2. Click on the popup menu to create new OWL Entity
 
