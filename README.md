@@ -46,6 +46,7 @@ See the video <a href="https://github.com/md-k-sarker/OWLAx/blob/master/plugin/d
 
 ####Create New OWLEntity
 <p>If an atom not found in the active Ontology then user can create new OWLEntity on the fly</p>
+
 1. Right Click to see the possible suggestion to create OWL Entity
 
 ![Alt Right Click to see the possible suggestion](https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/SeeSuggestion.png)
