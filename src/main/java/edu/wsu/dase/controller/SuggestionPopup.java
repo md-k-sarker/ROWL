@@ -85,18 +85,18 @@ public class SuggestionPopup extends JPopupMenu {
 					// object property
 					add(bind("Add " + entityName + " as OWLObjectProperty", new AddObjPropAction(entityName),
 							"/objprop.add.png"));
-
+					addSeparator();
 					// data property
 					add(bind("Add " + entityName + " as OWLDataProperty", new AddDataPropAction(entityName),
 							"/dataprop.add.png"));
 				} else {
 					// class
 					add(bind("Add " + entityName + " as OWLClass", new AddClassAction(entityName), "/class.add.png"));
-
+					addSeparator();
 					// object property
 					add(bind("Add " + entityName + " as OWLObjectProperty", new AddObjPropAction(entityName),
 							"/objprop.add.png"));
-
+					addSeparator();
 					// data property
 					add(bind("Add " + entityName + " as OWLDataProperty", new AddDataPropAction(entityName),
 							"/dataprop.add.png"));

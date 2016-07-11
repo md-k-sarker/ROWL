@@ -75,7 +75,7 @@ import edu.wsu.dase.controller.SuggestionPopup;
 import edu.wsu.dase.model.Constants;
 import edu.wsu.dase.model.RuleModel;
 import edu.wsu.dase.model.RuleTableModel;
-import edu.wsu.dase.model.ruletoaxiom.Transformer;
+import edu.wsu.dase.model.ruletoaxiom.Translator;
 import edu.wsu.dase.view.axiomManchesterDialog.AxiomsDialog;
 
 /**
@@ -555,8 +555,9 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		this.commentTextField.setText("");
 		this.statusTextField.setText("");
 		updateStatus();
-
 	}
+	
+	
 
 	private void showSuggestionPopup(MouseEvent event) {
 
@@ -810,11 +811,18 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 				getRuleTableModel().updateView();
 
 				// clear the rule textarea
-				clearIfOk();
+				setApplyChangeStatus();
 			}
 		}
 	}
 
+	private void setApplyChangeStatus(){
+		this.ruleNameTextField.setText("");
+		this.ruleNameTextField.setCaretPosition(this.ruleNameTextField.getText().length());
+		this.ruleTextTextPane.setText("");
+		this.commentTextField.setText("");
+		
+	}
 	private void switchToSWRLTab(String ruleName, String ruleText, String ruleComment) {
 
 		if (JOptionPane.OK_OPTION == JOptionPane.showOptionDialog(this, getPnlForSwitchToSWRLTab(ruleText),
@@ -860,15 +868,17 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 			} else {
 				try {
 
-					SWRLRule swrlRules = getSWRLRule(ruleText);
+					SWRLRule swrlRule = getSWRLRule(ruleText);
 
-					if (swrlRules != null) {
-						Set<OWLAxiom> owlAxioms = Transformer.ruleToAxioms(swrlRules);
-
-						if (Transformer.isTransferred) {
+					if (swrlRule != null) {
+						
+						//try to convert rule to OWL
+						Translator translator = new Translator(swrlRule);
+						translator.ruleToAxioms();
+						if (!translator.resultingAxioms.isEmpty()){
 
 							generatedAxioms.clear();
-							generatedAxioms.addAll(owlAxioms);
+							generatedAxioms.addAll(translator.resultingAxioms);
 
 							// show axioms dialog and take decisons
 							showAxiomsDialog();

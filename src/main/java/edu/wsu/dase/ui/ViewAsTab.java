@@ -138,7 +138,8 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 		@Override
 		public void handleChange(@NonNull OWLModelManagerChangeEvent event) {
 			if (!ViewAsTab.this.updating) {
-				if (event.getType() == EventType.ACTIVE_ONTOLOGY_CHANGED) {
+				if ((event.getType() == EventType.ACTIVE_ONTOLOGY_CHANGED) || (event.isType(EventType.ONTOLOGY_LOADED))
+						|| (event.isType(EventType.ONTOLOGY_RELOADED))) {
 					update();
 				}
 			} else

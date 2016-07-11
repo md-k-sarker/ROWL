@@ -37,7 +37,6 @@ See the video <a href="https://github.com/md-k-sarker/OWLAx/blob/master/plugin/d
 <li> It can save and reload the rules(Which rules is converted to OWL Axioms and at-least 1 axiom is integrated with ontology from that rule.
 <li> It checks syntax of the rule. It supports SWRL Rule Syntax.
 <li> It can create new OWL Entity on the fly. That means user can create new OWL Entity like Class, ObjectProperty etc from this plugin.
-
 </ol>
 
      
