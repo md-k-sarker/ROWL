@@ -15,6 +15,7 @@ import java.util.Optional;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextPane;
@@ -65,9 +66,9 @@ public class SuggestionPopup extends JPopupMenu {
 	private OWLOntology activeOntology;
 	private OWLDataFactory owlDataFactory;
 	private OWLOntologyManager owlOntologyManager;
+	private PrefixManager prefixManager;
 	private Engine engine;
-	
-	
+	private String defaultPrefix;
 
 	/**
 	 * 
@@ -80,6 +81,8 @@ public class SuggestionPopup extends JPopupMenu {
 		this.activeOntology = engine.getActiveOntology();
 		this.iriResolver = engine.getIriResolver();
 		this.owlOntologyManager = engine.getOwlOntologyManager();
+		this.prefixManager = engine.getPrefixManager();
+		this.defaultPrefix = engine.getDefaultPrefix();
 
 		createUserInterface();
 
@@ -94,66 +97,73 @@ public class SuggestionPopup extends JPopupMenu {
 		suggestionPanel.add(lbl, BorderLayout.CENTER);
 
 		add(suggestionPanel);
+
+		createOWLObjectProperty(getValueAsOWLCompatibleName("Text"));
 	}
 
-	private int createOWLObjectProperty(String ObjectPropertyName) {
+	private String getValueAsOWLCompatibleName(String name) {
 
-		Optional<@NonNull IRI> iri = this.iriResolver.prefixedName2IRI(ObjectPropertyName);
-		if (iri.isPresent()) {
-
-			OWLObjectProperty newOWLObjectProperty = this.owlDataFactory.getOWLObjectProperty(iri.get());
-
-			OWLAxiom declareaxiom = this.owlDataFactory.getOWLDeclarationAxiom(newOWLObjectProperty);
-			AddAxiom addAxiom = new AddAxiom(this.activeOntology, declareaxiom);
-			this.owlOntologyManager.applyChange(addAxiom);
-			return 0;
+		if (name.contains(":")) {
+			String[] subParts = name.split(":");
+			if (subParts.length == 2) {
+				if (prefixManager.containsPrefixMapping(subParts[0] + ":")) {
+					return name;
+				} else {
+					return null;
+				}
+			} else
+				return null;
+		} else {
+			if (defaultPrefix.length() > 0) {
+				return defaultPrefix + name;
+			} else {
+				return null;
+			}
 		}
-		return -1;
+
 	}
 
-	private int createOWLDataProperty(String DataPropertyName) {
+	private int createOWLObjectProperty(String Name) {
 
-		Optional<@NonNull IRI> iri = this.iriResolver.prefixedName2IRI(DataPropertyName);
-		if (iri.isPresent()) {
+		OWLObjectProperty newOWLObjectProperty = this.owlDataFactory.getOWLObjectProperty(Name, prefixManager);
 
-			OWLDataProperty newOWLDataProperty = owlDataFactory.getOWLDataProperty(iri.get());
-
-			OWLAxiom declareaxiom = owlDataFactory.getOWLDeclarationAxiom(newOWLDataProperty);
-			AddAxiom addAxiom = new AddAxiom(activeOntology, declareaxiom);
-			owlOntologyManager.applyChange(addAxiom);
-			return 0;
-		}
-		return -1;
+		OWLAxiom declareaxiom = this.owlDataFactory.getOWLDeclarationAxiom(newOWLObjectProperty);
+		AddAxiom addAxiom = new AddAxiom(this.activeOntology, declareaxiom);
+		this.owlOntologyManager.applyChange(addAxiom);
+		return 0;
 	}
 
-	private int createOWLIndividual(String OWLIndividualName) {
+	private int createOWLDataProperty(String Name) {
 
-		Optional<@NonNull IRI> iri = this.iriResolver.prefixedName2IRI(OWLIndividualName);
-		if (iri.isPresent()) {
+		OWLDataProperty newOWLDataProperty = owlDataFactory.getOWLDataProperty(Name, prefixManager);
 
-			OWLNamedIndividual newOWLIndividual = owlDataFactory.getOWLNamedIndividual(iri.get());
+		OWLAxiom declareaxiom = owlDataFactory.getOWLDeclarationAxiom(newOWLDataProperty);
+		AddAxiom addAxiom = new AddAxiom(activeOntology, declareaxiom);
+		owlOntologyManager.applyChange(addAxiom);
+		return 0;
 
-			OWLAxiom declareaxiom = owlDataFactory.getOWLDeclarationAxiom(newOWLIndividual);
-			AddAxiom addAxiom = new AddAxiom(activeOntology, declareaxiom);
-			owlOntologyManager.applyChange(addAxiom);
-			return 0;
-		}
-		return -1;
 	}
 
-	private int createOWLClass(String className) {
+	private int createOWLIndividual(String Name) {
 
-		Optional<@NonNull IRI> iri = this.iriResolver.prefixedName2IRI(className);
-		if (iri.isPresent()) {
+		OWLNamedIndividual newOWLIndividual = owlDataFactory.getOWLNamedIndividual(Name, prefixManager);
 
-			OWLClass newClass = owlDataFactory.getOWLClass(iri.get());
+		OWLAxiom declareaxiom = owlDataFactory.getOWLDeclarationAxiom(newOWLIndividual);
+		AddAxiom addAxiom = new AddAxiom(activeOntology, declareaxiom);
+		owlOntologyManager.applyChange(addAxiom);
+		return 0;
 
-			OWLAxiom declareaxiom = owlDataFactory.getOWLDeclarationAxiom(newClass);
-			AddAxiom addAxiom = new AddAxiom(activeOntology, declareaxiom);
-			owlOntologyManager.applyChange(addAxiom);
-			return 0;
-		}
-		return -1;
+	}
+
+	private int createOWLClass(String Name) {
+
+		OWLClass newClass = owlDataFactory.getOWLClass(Name, prefixManager);
+
+		OWLAxiom declareaxiom = owlDataFactory.getOWLDeclarationAxiom(newClass);
+		AddAxiom addAxiom = new AddAxiom(activeOntology, declareaxiom);
+		owlOntologyManager.applyChange(addAxiom);
+		return 0;
+
 	}
 
 	// for testing purpose only

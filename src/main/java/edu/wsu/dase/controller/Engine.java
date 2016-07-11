@@ -3,17 +3,22 @@ package edu.wsu.dase.controller;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeMap;
+
+import javax.swing.JOptionPane;
+
 import java.util.Set;
 import java.util.SortedMap;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.protege.editor.owl.ui.prefix.PrefixUtilities;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.PrefixManager;
 import org.semanticweb.owlapi.util.DefaultPrefixManager;
@@ -41,6 +46,22 @@ public class Engine {
 	private RuleEditorPanel ruleEditorPanel;
 
 	private IRIResolver iriResolver;
+	
+	private String defaultPrefix;
+
+	/**
+	 * @return the defaultPrefix
+	 */
+	public String getDefaultPrefix() {
+		return defaultPrefix;
+	}
+
+	/**
+	 * @param defaultPrefix the defaultPrefix to set
+	 */
+	public void setDefaultPrefix(String defaultPrefix) {
+		this.defaultPrefix = defaultPrefix;
+	}
 
 	/**
 	 * @return the prefixManager
@@ -173,6 +194,11 @@ public class Engine {
 		this.iriResolver = iriResolver;
 
 		this.prefixManager = PrefixUtilities.getPrefixOWLOntologyFormat(activeOntology);
+		
+		if(! addPrefix()){
+			defaultPrefix = "";
+		}
+		
 		fixedAnnotationProperty = activeOntology.getOWLOntologyManager().getOWLDataFactory()
 				.getOWLAnnotationProperty(Constants.FIXED_ANNOTATION_NAME, prefixManager);
 
@@ -182,6 +208,59 @@ public class Engine {
 
 	}
 
+
+	public boolean addPrefix() {
+		try {
+			
+			OWLOntologyID ontoID = activeOntology.getOntologyID();
+
+			if (ontoID == null) {
+				return false;
+			}
+			// ontoID can contain anonymous.
+			// need more checking
+
+			com.google.common.base.Optional<IRI> iri = ontoID.getDefaultDocumentIRI();
+			if (!iri.isPresent()) {
+				return false;
+			}
+
+			String uriString = iri.get().toString();
+			if (uriString == null) {
+				return false;
+			}
+			String prefix;
+			if (uriString.endsWith("/")) {
+				String sub = uriString.substring(0, uriString.length() - 1);
+				prefix = sub.substring(sub.lastIndexOf("/") + 1, sub.length());
+			} else {
+				prefix = uriString.substring(uriString.lastIndexOf('/') + 1, uriString.length());
+			}
+			if (prefix.endsWith(".owl")) {
+				prefix = prefix.substring(0, prefix.length() - 4);
+			}
+			prefix = prefix.toLowerCase();
+			if (!uriString.endsWith("#") && !uriString.endsWith("/")) {
+				uriString = uriString + "#";
+			}
+
+			if (prefix.length() < 1) {
+
+				return false;
+			}
+			prefixManager.setPrefix(prefix, uriString);
+			defaultPrefix = prefix + ":";
+			return true;
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+			return false;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	
 	private void initializeDataStructure() {
 		rulesWithID = new TreeMap<String, RuleModel>();
 		axiomsWithID = new TreeMap<String, Set<OWLAxiom>>();

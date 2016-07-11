@@ -53,10 +53,12 @@ public class ProtegeIRIResolver extends DefaultIRIResolver {
 	public Optional<@NonNull IRI> prefixedName2IRI(@NonNull String prefixedName) {
 		OWLEntity owlEntity = this.entityFinder.getOWLEntity(prefixedName);
 		
-		if (owlEntity != null)
+		if (owlEntity != null){
+			System.out.println("else: ");
 			return Optional.of(owlEntity.getIRI());
+		}
 		else {
-			
+			System.out.println("else: ");
 			return super.prefixedName2IRI(prefixedName);
 		}
 	}

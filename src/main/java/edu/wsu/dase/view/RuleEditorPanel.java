@@ -271,21 +271,21 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 	private void showSuggestionPopup() {
 
-		System.out.println("showSuggestionPopup called");
+		//System.out.println("showSuggestionPopup called");
 		if (this.suggestionPopup != null) {
 			
-			System.out.println("showSuggestionPopup non null");
+			//System.out.println("showSuggestionPopup non null");
 			if(! this.suggestionPopup.isVisible()){
-				System.out.println("showSuggestionPopup non not visble");
+				//System.out.println("showSuggestionPopup non not visble");
 			this.suggestionPopup.show(this.statusTextField, (int) this.statusTextField.getBounds().getCenterX(),
 					(int) this.statusTextField.getBounds().getCenterY());
 			}else{
 				//already shown
-				System.out.println("showSuggestionPopup visible");
+				//System.out.println("showSuggestionPopup visible");
 			}
 
 		} else {
-			System.out.println("showSuggestionPopup null");
+			//System.out.println("showSuggestionPopup null");
 			createSuggestionPopup();
 		}
 	}
@@ -674,14 +674,14 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 		@Override
 		public void mouseEntered(MouseEvent event) {
-			System.out.println("mouseEntered called");
+			//System.out.println("mouseEntered called");
 			createSuggestionPopup();
 			event.consume();
 		}
 
 		@Override
 		public void mouseExited(MouseEvent event) {
-			System.out.println("mouseExited called");
+			//System.out.println("mouseExited called");
 			removeSuggestionPopup();
 			event.consume();
 		}
@@ -692,7 +692,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 		@Override
 		public void mouseMoved(MouseEvent event) {
-			System.out.println("mouseMoved called");
+			//System.out.println("mouseMoved called");
 			showSuggestionPopup();
 			event.consume();
 		}
@@ -797,7 +797,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		rule = parser.parseSWRLRule(ruleText, false, getRuleName(), "comment");
 
 		if (rule.isPresent()) {
-			System.out.println("rule, body: " + rule.get().getBody() + " head:" + rule.get().getHead());
+			//System.out.println("rule, body: " + rule.get().getBody() + " head:" + rule.get().getHead());
 			return rule.get();
 		}
 
@@ -942,7 +942,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 			SWRLRuleEditorDialog dialog = (SWRLRuleEditorDialog) this.dialogManager.getSWRLRuleEditorDialog(this,
 					ruleName, ruleText, ruleComment);
 			dialog.setVisible(true);
-			System.out.println("Clicked to switch to swrltab");
+			//System.out.println("Clicked to switch to swrltab");
 
 		}
 	}
