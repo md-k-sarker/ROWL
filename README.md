@@ -25,7 +25,25 @@ See the video <a href="https://github.com/md-k-sarker/OWLAx/blob/master/plugin/d
 3. Start Using OWLAx Plugin
 
 ###How to Use
-1. Write SWRL 
+####Create New Rule
+1. Write SWRL Rule
+2. Click on Convert to OWL Axiom Button
+3. If the rule is convertible to OWL Axiom the it will show the generated axioms
+4. Select those(or single) axioms to Ontology and click Integrate Button
+5. The Axioms will be integrated with Ontology
+6. The Rule will also be saved in the Ontology as annotation.
+7. If the rule is not convertible to OWL Axiom then it gives the facility to switch to SWRLTab Plugin with this rule.
+
+####Edit Existing Rule
+1. Select a rule from the Table.
+2. Click on Edit
+3. Then the rule will appear in rule edit field and user can modify the rule.
+
+####Delete Existing Rule
+1. Select a rule from the Table.
+2. Click on Delete
+3. Then the rule will be deleted.
+
 
 
 ###Capabilities of ROWL
