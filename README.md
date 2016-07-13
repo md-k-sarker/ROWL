@@ -5,7 +5,7 @@ For details please visit http://dase.cs.wright.edu/content/modeling-owl-rules
 
 
 ###Installation
-1. Download ROWL-0.x.x.jar from <a href="https://github.com/md-k-sarker/ROWL/blob/master/plugin/binary/ROWL-0.0.1-beta.jar?raw=true" title="plugin"> plugin/binary</a> folder of this repository
+1. Download ROWL plugin jar from <a href="https://github.com/md-k-sarker/ROWL/blob/master/plugin/binary/ROWL-0.0.1.jar?raw=true" title="plugin"> plugin/binary</a> folder of git repository
 2. Put the jar file inside plugins folder of Protege.
 
 ###How to find plugin folder of protege 

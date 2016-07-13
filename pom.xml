@@ -10,7 +10,7 @@
 
 	<groupId>edu.wright.dase</groupId>
 	<artifactId>ROWL</artifactId>
-	<version>0.0.1-beta</version>
+	<version>0.0.1</version>
 	<name>ROWL Protege 5.0+ Plugin</name>
 	<packaging>bundle</packaging>
 
