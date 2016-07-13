@@ -12,6 +12,7 @@
 	<artifactId>ROWL</artifactId>
 	<version>0.0.1</version>
 	<name>ROWL Protege 5.0+ Plugin</name>
+	<description>ROWL Plugin for Desktop Protege 5.0+</description>
 	<packaging>bundle</packaging>
 
 	<properties>
