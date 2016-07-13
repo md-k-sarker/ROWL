@@ -6,7 +6,7 @@
 	<extension id="daseView"
 		point="org.protege.editor.core.application.WorkspaceTab">
 		<label value="ROWLTab" />
-		<class value="edu.wsu.dase.ui.ViewAsTab" />
+		<class value="edu.wright.dase.ui.ViewAsTab" />
 		<index value="X" />
 		<editorKitId value="OWLEditorKit" />
 	</extension>

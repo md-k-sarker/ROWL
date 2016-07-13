@@ -8,9 +8,10 @@
 		<version>1.0.8</version>
 	</parent>
 
-	<groupId>edu.wsu.dase</groupId>
+	<groupId>edu.wright.dase</groupId>
 	<artifactId>ROWL</artifactId>
 	<version>0.0.1-beta</version>
+	<name>ROWL Protege 5.0+ Plugin</name>
 	<packaging>bundle</packaging>
 
 	<properties>
@@ -22,6 +23,10 @@
 		<developer>
 			<name>Md Kamruzzaman Sarker</name>
 			<email>mdkamruzzamansarker@gmail.com</email>
+		</developer>
+		<developer>
+			<name>David Carral</name>
+			<email>dcarralma@gmail.com</email>
 		</developer>
 	</developers>
 
