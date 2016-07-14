@@ -3,16 +3,25 @@ Protege 5.0+ Plugin for Rule to OWL Axiom Conversion
 For details please visit http://dase.cs.wright.edu/content/modeling-owl-rules
 
 
-
 ###Installation
-1. Download ROWL plugin jar from <a href="https://github.com/md-k-sarker/ROWL/blob/master/plugin/binary/ROWL-0.0.1.jar?raw=true" title="plugin"> plugin/binary</a> folder of git repository
-2. Put the jar file inside plugins folder of Protege.
+<ol>
+<li>Click <b>Check for plugins</b> from <b>File</b> Menu
+		
+		![Alt Click on ROWLTab to Select](https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/ProtegeFileMenu.png)
+		</li>
+You will a see list of plugin.
 
-###How to find plugin folder of protege 
-####MAC OS
-See the video <a href="https://github.com/md-k-sarker/OWLAx/blob/master/plugin/docs/Video/macPluginFolder.mov?raw=true" title="plugin"> Find Plugin Folder in Protege Mac OS Version</a>
-####Windows OS
-See the video <a href="https://github.com/md-k-sarker/OWLAx/blob/master/plugin/docs/Video/windowsPluginFolder.webm?raw=true" title="plugin"> Find Plugin Folder in Protege Windows OS Version</a>
+		![Alt Click on ROWLTab to Select](https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/ProtegePluginsList.png)
+
+<li>Select ROWL: SWRL Rule to OWL Axiom Converter </li>
+</br>
+<li>Click <b>Install</b>
+
+		![Alt Click on ROWLTab to Select](https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/InstallROWL.png)
+		
+ </li>
+
+</ol>
 
 
 ###How to activate Plugin
