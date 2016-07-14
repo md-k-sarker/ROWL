@@ -5,14 +5,14 @@ For details please visit http://dase.cs.wright.edu/content/modeling-owl-rules
 
 ###Installation
 <ol>
-<li>Click <b>Check for plugins</b> from <b>File</b> Menu
+<li>Click <b>Check for plugins</b> from <b>File</b> Menu </li>
 		
-		![Alt Click on ROWLTab to Select](https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/ProtegeFileMenu.png)
-		</li>
+		<a href="https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/ProtegeFileMenu.png"></a> 
+		
 You will a see list of plugin.
 
 		![Alt Click on ROWLTab to Select](https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/ProtegePluginsList.png)
-
+</br>
 <li>Select ROWL: SWRL Rule to OWL Axiom Converter </li>
 </br>
 <li>Click <b>Install</b>
