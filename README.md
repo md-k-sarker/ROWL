@@ -6,20 +6,20 @@ For details please visit http://dase.cs.wright.edu/content/modeling-owl-rules
 ###Installation
 <ol>
 <li>Click <b>Check for plugins</b> from <b>File</b> Menu </li>
-		
+	</br>
 		<img src="https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/ProtegeFileMenu.png"></img> 
-		
-You will a see list of plugin.
+	
+<p>You will a see list of plugin. </p>
 
-		![Alt Click on ROWLTab to Select](https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/ProtegePluginsList.png)
+<img src="https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/ProtegePluginsList.png"></img>
 </br>
 <li>Select ROWL: SWRL Rule to OWL Axiom Converter </li>
 </br>
-<li>Click <b>Install</b>
-
-		![Alt Click on ROWLTab to Select](https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/InstallROWL.png)
+<li>Click <b>Install</b>  </li>
+<br>
+		<img src="https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/InstallROWL.png"></img>
 		
- </li>
+<br>
 
 </ol>
 
