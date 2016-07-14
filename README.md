@@ -7,7 +7,7 @@ For details please visit http://dase.cs.wright.edu/content/modeling-owl-rules
 <ol>
 <li>Click <b>Check for plugins</b> from <b>File</b> Menu </li>
 		
-		<a href="https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/ProtegeFileMenu.png"></a> 
+		<img src="https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/ProtegeFileMenu.png"></img> 
 		
 You will a see list of plugin.
 
