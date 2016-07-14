@@ -11,12 +11,12 @@ For details please visit http://dase.cs.wright.edu/content/modeling-owl-rules
 	
 <p>You will a see list of plugin. </p>
 
+</br>
 <img src="https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/ProtegePluginsList.png"></img>
 </br>
-<li>Select ROWL: SWRL Rule to OWL Axiom Converter </li>
+<li>Select ROWL: SWRL Rule to OWL Axiom Converter and Click <b>Install</b></li>
 </br>
-<li>Click <b>Install</b>  </li>
-<br>
+
 		<img src="https://github.com/md-k-sarker/ROWL/blob/master/plugin/doc/screenshot/InstallROWL.png"></img>
 		
 <br>
