@@ -37,7 +37,7 @@ public class Engine {
 	private RuleEditorPanel ruleEditorPanel;
 
 	private IRIResolver iriResolver;
-	
+
 	private String defaultPrefix;
 
 	/**
@@ -48,7 +48,8 @@ public class Engine {
 	}
 
 	/**
-	 * @param defaultPrefix the defaultPrefix to set
+	 * @param defaultPrefix
+	 *            the defaultPrefix to set
 	 */
 	public void setDefaultPrefix(String defaultPrefix) {
 		this.defaultPrefix = defaultPrefix;
@@ -185,11 +186,11 @@ public class Engine {
 		this.iriResolver = iriResolver;
 
 		this.prefixManager = PrefixUtilities.getPrefixOWLOntologyFormat(activeOntology);
-		
-		if(! addPrefix()){
-			defaultPrefix = "";
+
+		if (!addPrefix()) {
+			defaultPrefix = ":";
 		}
-		
+
 		fixedAnnotationProperty = activeOntology.getOWLOntologyManager().getOWLDataFactory()
 				.getOWLAnnotationProperty(Constants.FIXED_ANNOTATION_NAME, prefixManager);
 
@@ -199,10 +200,9 @@ public class Engine {
 
 	}
 
-
 	public boolean addPrefix() {
 		try {
-			
+
 			OWLOntologyID ontoID = activeOntology.getOntologyID();
 
 			if (ontoID == null) {
@@ -239,8 +239,15 @@ public class Engine {
 
 				return false;
 			}
+
+			String _defaultPrefix = prefixManager.getDefaultPrefix();
+			if (_defaultPrefix != null) {
+				defaultPrefix = ":";
+			} else {
+				defaultPrefix = prefix + ":";
+			}
 			prefixManager.setPrefix(prefix, uriString);
-			defaultPrefix = prefix + ":";
+
 			return true;
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
@@ -251,7 +258,6 @@ public class Engine {
 		}
 	}
 
-	
 	private void initializeDataStructure() {
 		rulesWithID = new TreeMap<String, RuleModel>();
 		axiomsWithID = new TreeMap<String, Set<OWLAxiom>>();
