@@ -81,8 +81,10 @@ public class TranslatorForObjPropAtomSplits {
 			}
 
 			if (!classExpressions.isEmpty()) {
-				OWLObjectProperty freshRole = Srd.factory.getOWLObjectProperty(engine.getNextFreshProp(),
-						engine.getPrefixManager());
+				String freshPropName = engine.getNextFreshObjProp();
+				OWLObjectProperty freshRole = engine.createOWLObjectProperty(freshPropName);
+//				OWLObjectProperty freshRole = Srd.factory.getOWLObjectProperty(engine.getNextFreshProp(),
+//						engine.getPrefixManager());
 				if (classExpressions.size() == 1)
 					resultingAxioms.add(new OWLSubClassOfAxiomImpl(classExpressions.iterator().next(),
 							Srd.factory.getOWLObjectHasSelf(freshRole), new HashSet<OWLAnnotation>()));

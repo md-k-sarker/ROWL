@@ -462,7 +462,7 @@ public class RuleEditorPanel extends JPanel {
 	}
 
 	private void disableSave() {
-		// this.convertToOWLButton.setEnabled(false);
+		this.convertToOWLButton.setEnabled(false);
 	}
 
 	private void enableSave() {
@@ -596,8 +596,7 @@ public class RuleEditorPanel extends JPanel {
 				// add(bind("add as Class", new AddClassAction("Class"), ""));
 				// object property
 				// data property
-				System.out.println(
-						"when calling showSuggestionPopup: " + Constants.engineAsStaticReference + "\t" + getEngine());
+
 				this.suggestionPopup = new SuggestionPopup(this, Constants.engineAsStaticReference, errorText);
 				this.suggestionPopup.show(this.statusTextField, (int) event.getX(), (int) event.getY());
 
@@ -710,6 +709,9 @@ public class RuleEditorPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(@NonNull ActionEvent e) {
+			String name = Constants.engineAsStaticReference.getNextFreshObjProp();
+			Constants.engineAsStaticReference.createOWLObjectProperty(name);
+			System.out.println(name);
 			clearIfOk();
 		}
 	}
@@ -867,7 +869,7 @@ public class RuleEditorPanel extends JPanel {
 	}
 
 	private Engine getEngine() {
-		System.out.println("freshProp:" + Constants.engineAsStaticReference.getNextFreshProp());
+
 		return Constants.engineAsStaticReference;
 	}
 

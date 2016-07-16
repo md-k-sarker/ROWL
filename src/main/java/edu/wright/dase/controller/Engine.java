@@ -9,12 +9,14 @@ import java.util.TreeMap;
 import javax.swing.JOptionPane;
 
 import org.protege.editor.owl.ui.prefix.PrefixUtilities;
+import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -216,7 +218,7 @@ public class Engine {
 			System.out.println("add prefix returned false");
 		}
 		System.out.println(this);
-		System.out.println("inside Engine constructor() default prefix: " + this.defaultPrefix);
+		//System.out.println("inside Engine constructor() default prefix: " + this.defaultPrefix);
 		// Map<String, String> namesMap =
 		// prefixManager.getPrefixName2PrefixMap();
 		// //System.out.println("defaultPrefix: " + defaultPrefix);
@@ -235,7 +237,7 @@ public class Engine {
 		Constants.engineAsStaticReference = this;
 	}
 
-	public String getNextFreshProp() {
+	public String getNextFreshObjProp() {
 		int counter = 0;
 
 		OWLEntity owlEntity;
@@ -251,6 +253,18 @@ public class Engine {
 		freshPropName = getValueAsOWLCompatibleName(freshPropName);
 		System.out.println("freshPropName: " + freshPropName);
 		return freshPropName;
+	}
+	
+	public OWLObjectProperty createOWLObjectProperty(String Name) {
+
+		OWLObjectProperty newOWLObjectProperty = this.owlDataFactory.getOWLObjectProperty(Name, prefixManager);
+
+		OWLAxiom declareaxiom = this.owlDataFactory.getOWLDeclarationAxiom(newOWLObjectProperty);
+		AddAxiom addAxiom = new AddAxiom(this.activeOntology, declareaxiom);
+		this.owlOntologyManager.applyChange(addAxiom);
+
+		//this.ruleEditorPanel.update();
+		return newOWLObjectProperty;
 	}
 
 	public String getValueAsOWLCompatibleName(String name) {
@@ -342,7 +356,7 @@ public class Engine {
 			} else {
 				defaultPrefix = prefix + ":";
 			}
-			System.out.println("inside addPrefix() defaultPrefix: " + this.defaultPrefix);
+			//System.out.println("inside addPrefix() defaultPrefix: " + this.defaultPrefix);
 			// System.out.println("before setting: prefix: "+prefix+".
 			// uriString: "+uriString);
 			prefixManager.setPrefix(prefix, uriString);
