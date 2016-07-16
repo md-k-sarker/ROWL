@@ -251,7 +251,7 @@ public class Engine {
 		// System.out.println("name: "+ freshPropName);
 
 		freshPropName = getValueAsOWLCompatibleName(freshPropName);
-		System.out.println("freshPropName: " + freshPropName);
+		//System.out.println("freshPropName: " + freshPropName);
 		return freshPropName;
 	}
 	

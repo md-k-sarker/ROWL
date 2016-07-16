@@ -709,9 +709,7 @@ public class RuleEditorPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(@NonNull ActionEvent e) {
-			String name = Constants.engineAsStaticReference.getNextFreshObjProp();
-			Constants.engineAsStaticReference.createOWLObjectProperty(name);
-			System.out.println(name);
+			
 			clearIfOk();
 		}
 	}
