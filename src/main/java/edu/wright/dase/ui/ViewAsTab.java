@@ -150,7 +150,7 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 				if ((event.getType() == EventType.ACTIVE_ONTOLOGY_CHANGED) || (event.isType(EventType.ONTOLOGY_LOADED))
 						|| (event.isType(EventType.ONTOLOGY_RELOADED))) {
 
-					System.out.println("Ontology changed: " + event.getType().name());
+					//System.out.println("Ontology changed: " + event.getType().name());
 
 					update();
 				}

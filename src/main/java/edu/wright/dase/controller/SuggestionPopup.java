@@ -179,7 +179,7 @@ public class SuggestionPopup extends JPopupMenu {
 	}
 
 	private Engine getEngine() {
-		System.out.println(this.engine);
+		//System.out.println(this.engine);
 		return this.engine;
 	}
 
@@ -227,7 +227,7 @@ public class SuggestionPopup extends JPopupMenu {
 
 	private int createOWLClass(String Name) {
 
-		System.out.println("New Class Name: " + Name + "\t" + prefixManager.getDefaultPrefix());
+		//System.out.println("New Class Name: " + Name + "\t" + prefixManager.getDefaultPrefix());
 		OWLClass newClass = owlDataFactory.getOWLClass(Name, prefixManager);
 
 		OWLAxiom declareaxiom = owlDataFactory.getOWLDeclarationAxiom(newClass);
@@ -281,7 +281,7 @@ public class SuggestionPopup extends JPopupMenu {
 		public void actionPerformed(ActionEvent e) {
 			Engine ee = getEngine();
 			String owlCompatibleName = ee.getValueAsOWLCompatibleName(this.name);
-			System.out.println("inside actionPerformed to createOWLClass() in showSuggestionPopup: " + ee);
+			//System.out.println("inside actionPerformed to createOWLClass() in showSuggestionPopup: " + ee);
 			createOWLClass(owlCompatibleName);
 		}
 	}

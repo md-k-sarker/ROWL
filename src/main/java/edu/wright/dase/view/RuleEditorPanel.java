@@ -51,6 +51,7 @@ import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -709,7 +710,7 @@ public class RuleEditorPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(@NonNull ActionEvent e) {
-			
+
 			clearIfOk();
 		}
 	}
@@ -786,7 +787,17 @@ public class RuleEditorPanel extends JPanel {
 		fixedAnnotationProperty = owlDataFactory.getOWLAnnotationProperty(Constants.FIXED_ANNOTATION_NAME,
 				PrefixUtilities.getPrefixOWLOntologyFormat(activeOntology));
 
-		String value = getRuleName() + "___" + getRuleText() + "___" + getComment();
+		String value;
+
+		if (newlyCreatedObjectProperitesList != null && newlyCreatedObjectProperitesList.size() > 0) {
+			value = getRuleName() + "___" + getRuleText() + "___" + getComment();
+			for (OWLObjectProperty owlObjectProperty : newlyCreatedObjectProperitesList) {
+				value = value + "___" + owlObjectProperty.getIRI();
+				// System.out.println("value: "+ value);
+			}
+		} else {
+			value = getRuleName() + "___" + getRuleText() + "___" + getComment();
+		}
 
 		OWLAnnotationValue owlLiteral = owlDataFactory.getOWLLiteral(value);
 		OWLAnnotation annotation = owlDataFactory.getOWLAnnotation(fixedAnnotationProperty, owlLiteral);
@@ -805,7 +816,47 @@ public class RuleEditorPanel extends JPanel {
 		return annotatedAxiom;
 	}
 
-	public void showAxiomsDialog() {
+	Set<OWLObjectProperty> newlyCreatedObjectProperitesList;
+	Set<OWLObjectProperty> newlyCreatedButNotUsedObjectProperitesList;
+
+	private void createListOfNewlyCreatedObjectProperties(Set<OWLObjectProperty> objectProperitesBeforeConverting,
+			Set<OWLObjectProperty> objectProperitesAfterConverting) {
+
+		this.newlyCreatedObjectProperitesList = new HashSet<OWLObjectProperty>();
+
+		for (OWLObjectProperty owlObjectProperty : objectProperitesAfterConverting) {
+			if (!objectProperitesBeforeConverting.contains(owlObjectProperty)) {
+				this.newlyCreatedObjectProperitesList.add(owlObjectProperty);
+			}
+		}
+	}
+
+	private void createListOfNewlyCreatedButNotUsedObjectProperites(
+			Set<OWLObjectProperty> objectProperitesAfterConverting,
+			Set<OWLObjectProperty> newlyCreatedObjectProperitesList,
+			Set<OWLObjectProperty> objectProperitesAfterAxiomSelection) {
+
+		this.newlyCreatedButNotUsedObjectProperitesList = new HashSet<OWLObjectProperty>();
+
+		for (OWLObjectProperty owlObjectProperty : objectProperitesAfterConverting) {
+			if (newlyCreatedObjectProperitesList.contains(owlObjectProperty)) {
+				if (!objectProperitesAfterAxiomSelection.contains(owlObjectProperty)) {
+					//System.out.println("owlObjectProperty: " + owlObjectProperty);
+					this.newlyCreatedButNotUsedObjectProperitesList.add(owlObjectProperty);
+				}
+			}
+		}
+	}
+
+	public void showAxiomsDialog(Set<OWLObjectProperty> objectProperitesBeforeConverting,
+			Set<OWLObjectProperty> objectProperitesAfterConverting) {
+
+		/**
+		 * creates a list of newly created OWLObjectProperties
+		 */
+		createListOfNewlyCreatedObjectProperties(objectProperitesBeforeConverting, objectProperitesAfterConverting);
+
+		Set<OWLObjectProperty> objectProperitesAfterAxiomSelection = new HashSet<OWLObjectProperty>();
 
 		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
 		// show the dialog
@@ -820,12 +871,23 @@ public class RuleEditorPanel extends JPanel {
 		if (axiomDialog.isClickedOK()) {
 			Set<OWLAxiom> selectedAxioms = axiomDialog.getSelectedAxioms();
 			if (!selectedAxioms.isEmpty()) {
+
+				/// create list of newly created obj-properties from selected
+				/// axiom
+				for (OWLAxiom owlAxiom : selectedAxioms) {
+					objectProperitesAfterAxiomSelection.addAll(owlAxiom.getObjectPropertiesInSignature());
+				}
+
+				createListOfNewlyCreatedButNotUsedObjectProperites(objectProperitesAfterConverting,
+						this.newlyCreatedObjectProperitesList, objectProperitesAfterAxiomSelection);
+
 				for (OWLAxiom axiom : selectedAxioms) {
 					axiomWithAnnotations.add(addAxiomAnnotation(axiom, getOWLAnnotation()));
 				}
 
 				// if the ruleID exist then remove the corresponding axioms
 				// first
+				// this is implemented instead of replace Rule
 				Constants.engineAsStaticReference.deleteRule(getRuleName());
 
 				// save changes in the ontology.
@@ -838,7 +900,39 @@ public class RuleEditorPanel extends JPanel {
 
 				// clear the rule textarea
 				setApplyChangeStatus();
+
+				// delete those objectproperties which is not used
+				if (newlyCreatedButNotUsedObjectProperitesList != null
+						&& newlyCreatedButNotUsedObjectProperitesList.size() > 0) {
+					deleteNewlyCreatedButNotUsedObjProps();
+				}
+
+			} else {
+				// try to delete the newly created opjectproperties
+				if (newlyCreatedObjectProperitesList != null && newlyCreatedObjectProperitesList.size() > 0) {
+					deleteNewlyCreatedObjProps();
+				}
 			}
+		} else {
+			// try to delete the newly created opjectproperties
+			if (newlyCreatedObjectProperitesList != null && newlyCreatedObjectProperitesList.size() > 0) {
+				deleteNewlyCreatedObjProps();
+			}
+		}
+	}
+
+	private void deleteNewlyCreatedObjProps() {
+
+		if (newlyCreatedObjectProperitesList != null && newlyCreatedObjectProperitesList.size() > 0) {
+			Constants.engineAsStaticReference.deleteNewlyCreatedObjProperties(newlyCreatedObjectProperitesList);
+		}
+	}
+	private void deleteNewlyCreatedButNotUsedObjProps() {
+		//selection axiom can be lower than generated axioms
+		if (newlyCreatedButNotUsedObjectProperitesList != null
+				&& newlyCreatedButNotUsedObjectProperitesList.size() > 0) {
+			Constants.engineAsStaticReference
+					.deleteNewlyCreatedObjProperties(newlyCreatedButNotUsedObjectProperitesList);
 		}
 	}
 
@@ -883,10 +977,6 @@ public class RuleEditorPanel extends JPanel {
 		@Override
 		public void actionPerformed(@NonNull ActionEvent e) {
 
-			/**
-			 * for testing
-			 */
-
 			String ruleName = getRuleName();
 			String ruleText = getRuleText();
 			String comment = getComment();
@@ -905,7 +995,8 @@ public class RuleEditorPanel extends JPanel {
 				try {
 
 					SWRLRule swrlRule = getSWRLRule(ruleText);
-
+					Set<OWLObjectProperty> objectProperitesBeforeConverting = swrlRule.getObjectPropertiesInSignature();
+					Set<OWLObjectProperty> objectProperitesAfterConverting = new HashSet<OWLObjectProperty>();
 					if (swrlRule != null) {
 
 						// try to convert rule to OWL
@@ -915,9 +1006,11 @@ public class RuleEditorPanel extends JPanel {
 
 							generatedAxioms.clear();
 							generatedAxioms.addAll(translator.resultingAxioms);
-
+							for (OWLAxiom owlAxiom : translator.resultingAxioms) {
+								objectProperitesAfterConverting.addAll(owlAxiom.getObjectPropertiesInSignature());
+							}
 							// show axioms dialog and take decisons
-							showAxiomsDialog();
+							showAxiomsDialog(objectProperitesBeforeConverting, objectProperitesAfterConverting);
 
 						} else {
 							// can not transfer to axioms need to switch

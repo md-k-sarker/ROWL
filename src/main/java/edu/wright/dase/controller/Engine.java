@@ -1,5 +1,6 @@
 package edu.wright.dase.controller;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -21,6 +22,8 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.PrefixManager;
+import org.semanticweb.owlapi.model.parameters.ChangeApplied;
+import org.semanticweb.owlapi.util.OWLEntityRemover;
 import org.swrlapi.core.IRIResolver;
 import org.swrltab.ui.ProtegeIRIResolver;
 
@@ -34,6 +37,7 @@ public class Engine {
 
 	private OWLOntology activeOntology;
 	private TreeMap<String, Set<OWLAxiom>> axiomsWithID;
+	private TreeMap<String, Set<OWLObjectProperty>> newlyCreatedObjectPropertiesWithID;
 	private TreeMap<String, RuleModel> rulesWithID;
 	private PrefixManager prefixManager;
 	private OWLAnnotationProperty fixedAnnotationProperty;
@@ -215,10 +219,11 @@ public class Engine {
 			if (defaultPrefix == null) {
 				defaultPrefix = "";
 			}
-			System.out.println("add prefix returned false");
+			//System.out.println("add prefix returned false");
 		}
-		System.out.println(this);
-		//System.out.println("inside Engine constructor() default prefix: " + this.defaultPrefix);
+		//System.out.println(this);
+		// System.out.println("inside Engine constructor() default prefix: " +
+		// this.defaultPrefix);
 		// Map<String, String> namesMap =
 		// prefixManager.getPrefixName2PrefixMap();
 		// //System.out.println("defaultPrefix: " + defaultPrefix);
@@ -251,10 +256,10 @@ public class Engine {
 		// System.out.println("name: "+ freshPropName);
 
 		freshPropName = getValueAsOWLCompatibleName(freshPropName);
-		//System.out.println("freshPropName: " + freshPropName);
+		// System.out.println("freshPropName: " + freshPropName);
 		return freshPropName;
 	}
-	
+
 	public OWLObjectProperty createOWLObjectProperty(String Name) {
 
 		OWLObjectProperty newOWLObjectProperty = this.owlDataFactory.getOWLObjectProperty(Name, prefixManager);
@@ -263,7 +268,7 @@ public class Engine {
 		AddAxiom addAxiom = new AddAxiom(this.activeOntology, declareaxiom);
 		this.owlOntologyManager.applyChange(addAxiom);
 
-		//this.ruleEditorPanel.update();
+		// this.ruleEditorPanel.update();
 		return newOWLObjectProperty;
 	}
 
@@ -294,7 +299,7 @@ public class Engine {
 				return null;
 			}
 		} else {
-			System.out.println("inside getValueAsOWLCompatibleName() defaultPrefix: " + this.defaultPrefix);
+			//System.out.println("inside getValueAsOWLCompatibleName() defaultPrefix: " + this.defaultPrefix);
 			String val = this.defaultPrefix + name;
 			// System.out.println("defaultPrefix with val: "+val);
 			return this.defaultPrefix + name;
@@ -356,7 +361,8 @@ public class Engine {
 			} else {
 				defaultPrefix = prefix + ":";
 			}
-			//System.out.println("inside addPrefix() defaultPrefix: " + this.defaultPrefix);
+			// System.out.println("inside addPrefix() defaultPrefix: " +
+			// this.defaultPrefix);
 			// System.out.println("before setting: prefix: "+prefix+".
 			// uriString: "+uriString);
 			prefixManager.setPrefix(prefix, uriString);
@@ -377,6 +383,7 @@ public class Engine {
 	private void initializeDataStructure() {
 		rulesWithID = new TreeMap<String, RuleModel>();
 		axiomsWithID = new TreeMap<String, Set<OWLAxiom>>();
+		newlyCreatedObjectPropertiesWithID = new TreeMap<String, Set<OWLObjectProperty>>();
 	}
 
 	public TreeMap<String, RuleModel> getRules() {
@@ -425,10 +432,40 @@ public class Engine {
 			rulesWithID.remove(ruleName);
 		}
 
+		// remove the corresponding axioms
 		if (axiomsWithID.containsKey(ruleName)) {
 			owlOntologyManager.removeAxioms(activeOntology, axiomsWithID.get(ruleName));
 			axiomsWithID.remove(ruleName);
 		}
+
+		// remove the corresponding newly created Object Properties
+		if (newlyCreatedObjectPropertiesWithID.containsKey(ruleName)) {
+			OWLEntityRemover remover = new OWLEntityRemover(Collections.singleton(activeOntology));
+
+			for (OWLObjectProperty op : newlyCreatedObjectPropertiesWithID.get(ruleName)) {
+				op.accept(remover);
+			}
+
+			ChangeApplied CA = owlOntologyManager.applyChanges(remover.getChanges());
+			//System.out.println("changeApplied result: " + CA.name());
+			
+			// remove from map also
+			newlyCreatedObjectPropertiesWithID.remove(ruleName);
+		}
+	}
+	
+	/**
+	 * this method is called only when new objprops is created but the rule is not integrated into the system
+	 */
+	public void deleteNewlyCreatedObjProperties(Set<OWLObjectProperty> owlObjectProperties){
+		OWLEntityRemover remover = new OWLEntityRemover(Collections.singleton(activeOntology));
+
+		for (OWLObjectProperty op : owlObjectProperties) {
+			op.accept(remover);
+		}
+
+		ChangeApplied CA = owlOntologyManager.applyChanges(remover.getChanges());
+		//System.out.println("inside deleteNewlyCreatedObjProperties changeApplied result: " + CA.name());
 	}
 
 	public void OntologyChanged() {
@@ -478,9 +515,9 @@ public class Engine {
 						// System.out.println("\n\naxiom before parse: " +
 						// ax.toString() + "\n\n");
 						String val = ann.getValue().asLiteral().get().getLiteral();
-						String[] values = val.split("___", 3);
-
-						if (values.length == 3) {
+						String[] values = val.split("___");
+						//System.out.println("values.length while retrieving: " + values.length);
+						if (values.length >= 3) {
 							String ruleID = values[0];
 							String ruleText = values[1];
 							String ruleComment = values[2];
@@ -495,6 +532,7 @@ public class Engine {
 								// System.out.println("equal or not: " +
 								// tmpRuleID + " " + ruleID);
 
+								// add into axiomsWithID
 								if (axiomsWithID.containsKey(ruleID)) {
 									axiomsWithID.get(ruleID).add(ax);
 								} else {
@@ -502,10 +540,33 @@ public class Engine {
 									tmpAxioms.add(ax);
 									axiomsWithID.put(ruleID, tmpAxioms);
 								}
+								if (values.length > 3) {
+									// add into
+									// newlyCreatedObjectPropertiesWithID
+									OWLObjectProperty owlObjectProperty;
+									for (int counter = values.length; counter > 3; counter--) {
+										String iriString = values[counter-1];
+										IRI iri = IRI.create(iriString);
+										owlObjectProperty = owlDataFactory.getOWLObjectProperty(iri);
 
+										//System.out.println("objprop while retrieving: " + owlObjectProperty.getIRI());
+
+										if (newlyCreatedObjectPropertiesWithID.containsKey(ruleID)) {
+
+											// create objectProperty from String
+											// IRI
+											newlyCreatedObjectPropertiesWithID.get(ruleID).add(owlObjectProperty);
+										} else {
+											Set<OWLObjectProperty> tmpOWLObjecProperties = new HashSet<OWLObjectProperty>();
+											tmpOWLObjecProperties.add(owlObjectProperty);
+											newlyCreatedObjectPropertiesWithID.put(ruleID, tmpOWLObjecProperties);
+										}
+
+									}
+								}
 							}
 						} else {
-							System.out.println("Cannot retrieve annotation. Annotation doesn't have 3 parts");
+							System.out.println("Cannot retrieve annotation. Annotation doesn't have proper Syntax");
 						}
 					}
 				}
