@@ -14,6 +14,7 @@ import org.semanticweb.owlapi.model.SWRLRule;
 import org.semanticweb.owlapi.model.SWRLSameIndividualAtom;
 import org.semanticweb.owlapi.model.SWRLVariable;
 
+import edu.wright.dase.controller.Engine;
 import uk.ac.manchester.cs.owl.owlapi.SWRLClassAtomImpl;
 import uk.ac.manchester.cs.owl.owlapi.SWRLDataPropertyAtomImpl;
 import uk.ac.manchester.cs.owl.owlapi.SWRLObjectPropertyAtomImpl;
@@ -23,9 +24,12 @@ public class Translator {
 
 	public SWRLRule rule;
 	public Set<OWLAxiom> resultingAxioms;
+	
+	public Engine engine;
 
-	public Translator(SWRLRule r) {
+	public Translator(SWRLRule r, Engine engine) {
 		rule = r;
+		this.engine = engine;
 		resultingAxioms = new HashSet<OWLAxiom>();
 	}
 
@@ -75,7 +79,7 @@ public class Translator {
 				SWRLObjectPropertyAtom headObjPropAtom = (SWRLObjectPropertyAtom) head.iterator().next();
 				SWRLVariable firstObjVar = (SWRLVariable) headObjPropAtom.getFirstArgument();
 				SWRLVariable secondObjVar = (SWRLVariable) headObjPropAtom.getSecondArgument();
-				resultingAxioms.addAll(TranslatorForObjPropAtomSplits.translate(firstObjVar, secondObjVar, headObjPropAtom, body));
+				resultingAxioms.addAll(TranslatorForObjPropAtomSplits.translate(firstObjVar, secondObjVar, headObjPropAtom, body, this.engine));
 			} else if (singleHeadAtom instanceof SWRLDataPropertyAtom) {
 				SWRLDataPropertyAtom headDataPropAtom = (SWRLDataPropertyAtom) head.iterator().next();
 				SWRLVariable firstDataVar = (SWRLVariable) headDataPropAtom.getFirstArgument();

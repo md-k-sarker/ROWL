@@ -462,7 +462,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	}
 
 	private void disableSave() {
-		this.convertToOWLButton.setEnabled(false);
+		//this.convertToOWLButton.setEnabled(false);
 	}
 
 	private void enableSave() {
@@ -864,6 +864,12 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		}
 	}
 
+	private Engine getEngine() {
+		System.out.println("freshProp:" +this.engine.getNextFreshProp());
+		return this.engine;
+	}
+
+	
 	private class ConvertSWRLRuleActionListener implements ActionListener {
 
 		@NonNull
@@ -875,6 +881,11 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 		@Override
 		public void actionPerformed(@NonNull ActionEvent e) {
+
+			/**
+			 * for testing
+			 */
+
 
 			String ruleName = getRuleName();
 			String ruleText = getRuleText();
@@ -898,7 +909,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 					if (swrlRule != null) {
 
 						// try to convert rule to OWL
-						Translator translator = new Translator(swrlRule);
+						Translator translator = new Translator(swrlRule, getEngine() );
 						translator.ruleToAxioms();
 						if (!translator.resultingAxioms.isEmpty()) {
 

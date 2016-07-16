@@ -59,4 +59,17 @@ public class ProtegeIRIResolver extends DefaultIRIResolver {
 			return super.prefixedName2IRI(prefixedName);
 		}
 	}
+	
+	public OWLEntity getOWLEntityToFindNextName(String name){
+		OWLEntity owlEntity = this.entityFinder.getOWLEntity(name);
+		
+		if (owlEntity != null) {
+			System.out.println("not null: "+owlEntity.getIRI());
+		} else {
+			System.out.println(" null: ");
+		}
+		
+		
+		return owlEntity;
+	}
 }

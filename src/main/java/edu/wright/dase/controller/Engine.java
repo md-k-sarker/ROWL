@@ -1,6 +1,7 @@
 package edu.wright.dase.controller;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -10,11 +11,13 @@ import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.PrefixManager;
 import org.swrlapi.core.IRIResolver;
+import org.swrltab.ui.ProtegeIRIResolver;
 
 import edu.wright.dase.model.Constants;
 import edu.wright.dase.model.RuleModel;
@@ -36,9 +39,11 @@ public class Engine {
 
 	private RuleEditorPanel ruleEditorPanel;
 
-	private IRIResolver iriResolver;
+	private ProtegeIRIResolver iriResolver;
 
 	private String defaultPrefix;
+
+	private int freshCounter;
 
 	/**
 	 * @return the defaultPrefix
@@ -130,7 +135,7 @@ public class Engine {
 	 * @param iriResolver
 	 *            the iriResolver to set
 	 */
-	public void setIriResolver(IRIResolver iriResolver) {
+	public void setIriResolver(ProtegeIRIResolver iriResolver) {
 		this.iriResolver = iriResolver;
 	}
 
@@ -179,7 +184,7 @@ public class Engine {
 		this.ruleTableModel = ruleTableModel;
 	}
 
-	public Engine(OWLOntology activeOntology, IRIResolver iriResolver) {
+	public Engine(OWLOntology activeOntology, ProtegeIRIResolver iriResolver) {
 		this.activeOntology = activeOntology;
 		this.owlOntologyManager = this.activeOntology.getOWLOntologyManager();
 		this.owlDataFactory = this.owlOntologyManager.getOWLDataFactory();
@@ -188,7 +193,9 @@ public class Engine {
 		this.prefixManager = PrefixUtilities.getPrefixOWLOntologyFormat(activeOntology);
 
 		if (!addPrefix()) {
-			defaultPrefix = ":";
+			// prefixManager.setPrefix("", Constants.ANONYMOUS_DEFUALT_ID);
+			// defaultPrefix = Constants.ANONYMOUS_DEFUALT_ID;
+			defaultPrefix = "";
 		}
 
 		fixedAnnotationProperty = activeOntology.getOWLOntologyManager().getOWLDataFactory()
@@ -200,12 +207,52 @@ public class Engine {
 
 	}
 
+	public String getNextFreshProp() {
+		int counter = 0;
+
+		OWLEntity owlEntity;
+		do {
+			++counter;
+			owlEntity = this.iriResolver.getOWLEntityToFindNextName(Constants.FRESH_PROP_NAME + counter);
+		} while (owlEntity != null);
+
+		String freshPropName = Constants.FRESH_PROP_NAME + counter;
+
+		// System.out.println("name: "+ freshPropName);
+
+		freshPropName = getValueAsOWLCompatibleName(freshPropName);
+
+		return freshPropName;
+	}
+
+	public String getValueAsOWLCompatibleName(String name) {
+
+		if (name.contains(":")) {
+			String[] subParts = name.split(":");
+			if (subParts.length == 2) {
+				if (prefixManager.containsPrefixMapping(subParts[0] + ":")) {
+					return name;
+				} else {
+					return name;
+				}
+			} else
+				return name;
+		} else {
+			if (defaultPrefix.length() > 0) {
+				return defaultPrefix + name;
+			} else {
+				return name;
+			}
+		}
+	}
+
 	public boolean addPrefix() {
 		try {
 
 			OWLOntologyID ontoID = activeOntology.getOntologyID();
 
 			if (ontoID == null) {
+
 				return false;
 			}
 			// ontoID can contain anonymous.
@@ -247,7 +294,6 @@ public class Engine {
 				defaultPrefix = prefix + ":";
 			}
 			prefixManager.setPrefix(prefix, uriString);
-
 			return true;
 		} catch (IllegalStateException e) {
 			e.printStackTrace();

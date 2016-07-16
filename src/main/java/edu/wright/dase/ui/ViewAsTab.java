@@ -34,7 +34,7 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 	private RulesViewMain rulesView;
 	private SWRLRuleEngineDialogManager dialogManager;
 	private SWRLRulesView swrlRulesView;
-	private IRIResolver iriResolver;
+	private ProtegeIRIResolver iriResolver;
 	private OWLOntology activeOntology;
 
 	private JTabbedPane tabbedPane;
@@ -135,15 +135,23 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 	}
 
 	public class ViewAsTabListener implements OWLModelManagerListener {
+		
+		
+		
 		@Override
 		public void handleChange(@NonNull OWLModelManagerChangeEvent event) {
 			if (!ViewAsTab.this.updating) {
 				if ((event.getType() == EventType.ACTIVE_ONTOLOGY_CHANGED) || (event.isType(EventType.ONTOLOGY_LOADED))
 						|| (event.isType(EventType.ONTOLOGY_RELOADED))) {
+					
+					//System.out.println("Ontology changed");
+					
 					update();
 				}
-			} else
-				log.warn("SWRLTab ignoring ontology change - still processing old change");
+			} else{
+				//System.out.println("ROWLLTab ignoring ontology change - still processing old change");
+				log.warn("ROWLLTab ignoring ontology change - still processing old change");
+			}
 		}
 	}
 

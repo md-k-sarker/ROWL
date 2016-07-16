@@ -3,12 +3,14 @@
  */
 package edu.wright.dase.controller;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
@@ -21,8 +23,10 @@ import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.PrefixManager;
+import org.semanticweb.owlapi.model.parameters.ChangeApplied;
 import org.swrlapi.core.IRIResolver;
 
 import edu.wright.dase.view.RuleEditorPanel;
@@ -69,6 +73,26 @@ public class SuggestionPopup extends JPopupMenu {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.swing.JPopupMenu#show(java.awt.Component, int, int)
+	 */
+	@Override
+	public void show(Component invoker, int x, int y) {
+		// TODO Auto-generated method stub
+
+		// OWLOntologyID ontoID = this.activeOntology.getOntologyID();
+		//
+		// if (ontoID == null) {
+		// JOptionPane.showMessageDialog(invoker, "Please Specify Ontology
+		// ID(Ontology IRI) first.");
+		// return;
+		// }
+
+		super.show(invoker, x, y);
+	}
+
 	private void createUserInterface() {
 
 		String entityName = getNameFromErrorText(this.errorText);
@@ -78,18 +102,22 @@ public class SuggestionPopup extends JPopupMenu {
 
 			if (this.errorText.contains("Invalid SWRL atom predicate")) {
 
-				if (noOfArgument(ruleText, entityName) == 1) {
-					// class
-					add(bind("Add '" + entityName + "' as OWLClass", new AddClassAction(entityName), "/class.add.png"));
-				} else if (noOfArgument(ruleText, entityName) == 2) {
-					// object property
-					add(bind("Add '" + entityName + "' as OWLObjectProperty", new AddObjPropAction(entityName),
-							"/objprop.add.png"));
-					addSeparator();
-					// data property
-					add(bind("Add '" + entityName + "' as OWLDataProperty", new AddDataPropAction(entityName),
-							"/dataprop.add.png"));
-				} else {
+				// if (noOfArgument(ruleText, entityName) == 1) {
+				// // class
+				// add(bind("Add '" + entityName + "' as OWLClass", new
+				// AddClassAction(entityName), "/class.add.png"));
+				// } else if (noOfArgument(ruleText, entityName) == 2) {
+				// // object property
+				// add(bind("Add '" + entityName + "' as OWLObjectProperty", new
+				// AddObjPropAction(entityName),
+				// "/objprop.add.png"));
+				// addSeparator();
+				// // data property
+				// add(bind("Add '" + entityName + "' as OWLDataProperty", new
+				// AddDataPropAction(entityName),
+				// "/dataprop.add.png"));
+				// } else
+				{
 					// class
 					add(bind("Add '" + entityName + "' as OWLClass", new AddClassAction(entityName), "/class.add.png"));
 					addSeparator();
@@ -130,35 +158,18 @@ public class SuggestionPopup extends JPopupMenu {
 		}
 	}
 
-	private String getValueAsOWLCompatibleName(String name) {
-
-		if (name.contains(":")) {
-			String[] subParts = name.split(":");
-			if (subParts.length == 2) {
-				if (prefixManager.containsPrefixMapping(subParts[0] + ":")) {
-					return name;
-				} else {
-					return null;
-				}
-			} else
-				return null;
-		} else {
-			if (defaultPrefix.length() > 0) {
-				return defaultPrefix + name;
-			} else {
-				return null;
-			}
-		}
-	}
-
 	private int noOfArgument(String ruleText, String Atom) {
 		try {
 
-			String tmp = ruleText.substring(ruleText.lastIndexOf(Atom) + 1);
+			String tmp = ruleText.substring(ruleText.indexOf(Atom) + Atom.length());
+			// System.out.println("tmp 0: "+tmp);
 			if (tmp.length() > 0) {
 				tmp = tmp.substring(1, tmp.indexOf(")"));
+				// System.out.println("tmp 1: "+tmp);
 				if (tmp.length() > 0) {
+
 					String[] ss = tmp.split(",");
+					// System.out.println("ss length: "+ss.length);
 					return ss.length;
 				} else
 					return -1;
@@ -167,6 +178,10 @@ public class SuggestionPopup extends JPopupMenu {
 		} catch (IndexOutOfBoundsException e) {
 			return -1;
 		}
+	}
+
+	private Engine getEngine() {
+		return this.engine;
 	}
 
 	private String getentityNameWithHTMLCosmetics(String name) {
@@ -212,13 +227,21 @@ public class SuggestionPopup extends JPopupMenu {
 	}
 
 	private int createOWLClass(String Name) {
-
+		System.out.println("Name: " + Name + "\t" + prefixManager.getDefaultPrefix());
 		OWLClass newClass = owlDataFactory.getOWLClass(Name, prefixManager);
 
 		OWLAxiom declareaxiom = owlDataFactory.getOWLDeclarationAxiom(newClass);
 		AddAxiom addAxiom = new AddAxiom(activeOntology, declareaxiom);
-		owlOntologyManager.applyChange(addAxiom);
-
+		ChangeApplied cA = owlOntologyManager.applyChange(addAxiom);
+		if (cA == ChangeApplied.SUCCESSFULLY) {
+			System.out.println("Successfull");
+		}
+		if (cA == ChangeApplied.UNSUCCESSFULLY) {
+			System.out.println("Unsuccessfull");
+		}
+		if (cA == ChangeApplied.NO_OPERATION) {
+			System.out.println("No op");
+		}
 		this.ruleEditorPanel.update();
 		return 0;
 
@@ -255,7 +278,7 @@ public class SuggestionPopup extends JPopupMenu {
 		 * 
 		 */
 		public void actionPerformed(ActionEvent e) {
-			String owlCompatibleName = getValueAsOWLCompatibleName(this.name);
+			String owlCompatibleName = getEngine().getValueAsOWLCompatibleName(this.name);
 			createOWLClass(owlCompatibleName);
 		}
 	}
@@ -278,7 +301,7 @@ public class SuggestionPopup extends JPopupMenu {
 		 * 
 		 */
 		public void actionPerformed(ActionEvent e) {
-			String owlCompatibleName = getValueAsOWLCompatibleName(this.name);
+			String owlCompatibleName = getEngine().getValueAsOWLCompatibleName(this.name);
 
 			createOWLObjectProperty(owlCompatibleName);
 		}
@@ -302,7 +325,7 @@ public class SuggestionPopup extends JPopupMenu {
 		 * 
 		 */
 		public void actionPerformed(ActionEvent e) {
-			String owlCompatibleName = getValueAsOWLCompatibleName(this.name);
+			String owlCompatibleName = getEngine().getValueAsOWLCompatibleName(this.name);
 			createOWLDataProperty(owlCompatibleName);
 		}
 	}
@@ -325,7 +348,7 @@ public class SuggestionPopup extends JPopupMenu {
 		 * 
 		 */
 		public void actionPerformed(ActionEvent e) {
-			String owlCompatibleName = getValueAsOWLCompatibleName(this.name);
+			String owlCompatibleName = getEngine().getValueAsOWLCompatibleName(this.name);
 			createOWLDataType(owlCompatibleName);
 		}
 	}
@@ -348,7 +371,7 @@ public class SuggestionPopup extends JPopupMenu {
 		 * 
 		 */
 		public void actionPerformed(ActionEvent e) {
-			String owlCompatibleName = getValueAsOWLCompatibleName(this.name);
+			String owlCompatibleName = getEngine().getValueAsOWLCompatibleName(this.name);
 			createOWLNamedIndividual(owlCompatibleName);
 		}
 	}

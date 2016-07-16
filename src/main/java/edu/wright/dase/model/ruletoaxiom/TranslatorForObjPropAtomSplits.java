@@ -15,12 +15,14 @@ import org.semanticweb.owlapi.model.SWRLClassAtom;
 import org.semanticweb.owlapi.model.SWRLObjectPropertyAtom;
 import org.semanticweb.owlapi.model.SWRLVariable;
 
+import edu.wright.dase.controller.Engine;
 import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
 import uk.ac.manchester.cs.owl.owlapi.SWRLClassAtomImpl;
 
 public class TranslatorForObjPropAtomSplits {
 
-	public static Set<OWLAxiom> translate(SWRLVariable root1, SWRLVariable root2, SWRLObjectPropertyAtom objPropAtomHead, Set<SWRLAtom> bodyAtoms) {
+	public static Set<OWLAxiom> translate(SWRLVariable root1, SWRLVariable root2,
+			SWRLObjectPropertyAtom objPropAtomHead, Set<SWRLAtom> bodyAtoms, Engine engine) {
 		Set<OWLAxiom> resultingAxioms = new HashSet<OWLAxiom>();
 
 		// Initializing Body Split
@@ -79,13 +81,15 @@ public class TranslatorForObjPropAtomSplits {
 			}
 
 			if (!classExpressions.isEmpty()) {
-				OWLObjectProperty freshRole = Srd.factory.getOWLObjectProperty(IRI.create("freshProp" + ++Srd.freshCounter));
+				OWLObjectProperty freshRole = Srd.factory.getOWLObjectProperty(engine.getNextFreshProp(),
+						engine.getPrefixManager());
 				if (classExpressions.size() == 1)
-					resultingAxioms.add(
-							new OWLSubClassOfAxiomImpl(classExpressions.iterator().next(), Srd.factory.getOWLObjectHasSelf(freshRole), new HashSet<OWLAnnotation>()));
+					resultingAxioms.add(new OWLSubClassOfAxiomImpl(classExpressions.iterator().next(),
+							Srd.factory.getOWLObjectHasSelf(freshRole), new HashSet<OWLAnnotation>()));
 				else
-					resultingAxioms.add(new OWLSubClassOfAxiomImpl(Srd.factory.getOWLObjectIntersectionOf(classExpressions), Srd.factory.getOWLObjectHasSelf(freshRole),
-							new HashSet<OWLAnnotation>()));
+					resultingAxioms
+							.add(new OWLSubClassOfAxiomImpl(Srd.factory.getOWLObjectIntersectionOf(classExpressions),
+									Srd.factory.getOWLObjectHasSelf(freshRole), new HashSet<OWLAnnotation>()));
 				roleChainExpr.add(freshRole);
 			}
 
@@ -102,9 +106,11 @@ public class TranslatorForObjPropAtomSplits {
 			return new HashSet<OWLAxiom>();
 
 		if (roleChainExpr.size() == 1)
-			resultingAxioms.add(Srd.factory.getOWLSubObjectPropertyOfAxiom(roleChainExpr.get(0), objPropAtomHead.getPredicate()));
+			resultingAxioms.add(
+					Srd.factory.getOWLSubObjectPropertyOfAxiom(roleChainExpr.get(0), objPropAtomHead.getPredicate()));
 		else
-			resultingAxioms.add(Srd.factory.getOWLSubPropertyChainOfAxiom(roleChainExpr, objPropAtomHead.getPredicate()));
+			resultingAxioms
+					.add(Srd.factory.getOWLSubPropertyChainOfAxiom(roleChainExpr, objPropAtomHead.getPredicate()));
 
 		return resultingAxioms;
 	}
