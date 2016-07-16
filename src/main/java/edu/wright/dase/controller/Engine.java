@@ -1,9 +1,12 @@
 package edu.wright.dase.controller;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+
+import javax.swing.JOptionPane;
 
 import org.protege.editor.owl.ui.prefix.PrefixUtilities;
 import org.semanticweb.owlapi.model.IRI;
@@ -45,26 +48,26 @@ public class Engine {
 
 	private int freshCounter;
 
-	/**
-	 * @return the defaultPrefix
-	 */
-	public String getDefaultPrefix() {
-		return defaultPrefix;
-	}
-
-	/**
-	 * @param defaultPrefix
-	 *            the defaultPrefix to set
-	 */
-	public void setDefaultPrefix(String defaultPrefix) {
-		this.defaultPrefix = defaultPrefix;
-	}
+	// /**
+	// * @return the defaultPrefix
+	// */
+	// public String getDefaultPrefix() {
+	// return defaultPrefix;
+	// }
+	//
+	// /**
+	// * @param defaultPrefix
+	// * the defaultPrefix to set
+	// */
+	// public void setDefaultPrefix(String defaultPrefix) {
+	// this.defaultPrefix = defaultPrefix;
+	// }
 
 	/**
 	 * @return the prefixManager
 	 */
 	public PrefixManager getPrefixManager() {
-		return prefixManager;
+		return this.prefixManager;
 	}
 
 	/**
@@ -184,20 +187,44 @@ public class Engine {
 		this.ruleTableModel = ruleTableModel;
 	}
 
+	// public static Engine getEngineasStaticValue() {
+	//
+	// return engineThisPointer;
+	// }
+	//
+	// public Engine getEngine() {
+	// return this;
+	// }
+
+	private Engine engineThisPointer;
+
 	public Engine(OWLOntology activeOntology, ProtegeIRIResolver iriResolver) {
 		this.activeOntology = activeOntology;
 		this.owlOntologyManager = this.activeOntology.getOWLOntologyManager();
 		this.owlDataFactory = this.owlOntologyManager.getOWLDataFactory();
 		this.iriResolver = iriResolver;
 
-		this.prefixManager = PrefixUtilities.getPrefixOWLOntologyFormat(activeOntology);
+		this.prefixManager = PrefixUtilities.getPrefixOWLOntologyFormat(this.activeOntology);
 
 		if (!addPrefix()) {
 			// prefixManager.setPrefix("", Constants.ANONYMOUS_DEFUALT_ID);
 			// defaultPrefix = Constants.ANONYMOUS_DEFUALT_ID;
-			defaultPrefix = "";
+			// defaultPrefix = "";
+			if (defaultPrefix == null) {
+				defaultPrefix = "";
+			}
+			System.out.println("add prefix returned false");
 		}
-
+		System.out.println(this);
+		System.out.println("inside Engine constructor() default prefix: " + this.defaultPrefix);
+		// Map<String, String> namesMap =
+		// prefixManager.getPrefixName2PrefixMap();
+		// //System.out.println("defaultPrefix: " + defaultPrefix);
+		// System.out.println("prefixMaps------------");
+		// for (String key : namesMap.keySet()) {
+		// System.out.println(key + "\t" + namesMap.get(key));
+		// }
+		// System.out.println("prefixMaps------------");
 		fixedAnnotationProperty = activeOntology.getOWLOntologyManager().getOWLDataFactory()
 				.getOWLAnnotationProperty(Constants.FIXED_ANNOTATION_NAME, prefixManager);
 
@@ -205,6 +232,7 @@ public class Engine {
 
 		reloadRulesAndAxiomsFromOntology();
 
+		Constants.engineAsStaticReference = this;
 	}
 
 	public String getNextFreshProp() {
@@ -221,38 +249,53 @@ public class Engine {
 		// System.out.println("name: "+ freshPropName);
 
 		freshPropName = getValueAsOWLCompatibleName(freshPropName);
-
+		System.out.println("freshPropName: " + freshPropName);
 		return freshPropName;
 	}
 
 	public String getValueAsOWLCompatibleName(String name) {
-
+		boolean shouldContinue;
 		if (name.contains(":")) {
 			String[] subParts = name.split(":");
 			if (subParts.length == 2) {
 				if (prefixManager.containsPrefixMapping(subParts[0] + ":")) {
 					return name;
 				} else {
-					return name;
+					// it can occur only when validation is executing.
+					// After validation it should not occur here.
+					// print error here
+					return null;
 				}
-			} else
-				return name;
-		} else {
-			if (defaultPrefix.length() > 0) {
-				return defaultPrefix + name;
 			} else {
-				return name;
+
+				// it can occur only when validation is executing.
+				// After validation it should not occur here.
+				// print error here
+				String time = " time.";
+				if (subParts.length > 2) {
+					time = " times.";
+				}
+
+				shouldContinue = false;
+				return null;
 			}
+		} else {
+			System.out.println("inside getValueAsOWLCompatibleName() defaultPrefix: " + this.defaultPrefix);
+			String val = this.defaultPrefix + name;
+			// System.out.println("defaultPrefix with val: "+val);
+			return this.defaultPrefix + name;
 		}
+
 	}
 
 	public boolean addPrefix() {
 		try {
-
 			OWLOntologyID ontoID = activeOntology.getOntologyID();
 
 			if (ontoID == null) {
 
+				// JOptionPane.showMessageDialog(editor, "Please Specify
+				// Ontology ID(Ontology IRI) first.");
 				return false;
 			}
 			// ontoID can contain anonymous.
@@ -260,11 +303,17 @@ public class Engine {
 
 			com.google.common.base.Optional<IRI> iri = ontoID.getDefaultDocumentIRI();
 			if (!iri.isPresent()) {
+
+				// JOptionPane.showMessageDialog(editor, "Please Specify
+				// Ontology ID(Ontology IRI) first.");
 				return false;
 			}
 
 			String uriString = iri.get().toString();
 			if (uriString == null) {
+
+				// JOptionPane.showMessageDialog(editor, "Please Specify
+				// Ontology ID(Ontology IRI) first.");
 				return false;
 			}
 			String prefix;
@@ -284,21 +333,28 @@ public class Engine {
 
 			if (prefix.length() < 1) {
 
+				// editor.status("Error with Ontology ID. Operation aborted.");
 				return false;
 			}
-
 			String _defaultPrefix = prefixManager.getDefaultPrefix();
 			if (_defaultPrefix != null) {
 				defaultPrefix = ":";
 			} else {
 				defaultPrefix = prefix + ":";
 			}
+			System.out.println("inside addPrefix() defaultPrefix: " + this.defaultPrefix);
+			// System.out.println("before setting: prefix: "+prefix+".
+			// uriString: "+uriString);
 			prefixManager.setPrefix(prefix, uriString);
+			// System.out.println("after setting: prefix: "+prefix+". uriString:
+			// "+prefixManager.getPrefix(prefix+":"));
 			return true;
 		} catch (IllegalStateException e) {
+
 			e.printStackTrace();
 			return false;
 		} catch (Exception e) {
+
 			e.printStackTrace();
 			return false;
 		}

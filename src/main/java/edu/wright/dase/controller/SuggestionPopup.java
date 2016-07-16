@@ -46,7 +46,6 @@ public class SuggestionPopup extends JPopupMenu {
 	private PrefixManager prefixManager;
 	private Engine engine;
 	private RuleEditorPanel ruleEditorPanel;
-	private String defaultPrefix;
 	private JButton addClassButton;
 	private JButton addIndVButton;
 	private JButton addObjPropButton;
@@ -67,7 +66,6 @@ public class SuggestionPopup extends JPopupMenu {
 		this.iriResolver = this.engine.getIriResolver();
 		this.owlOntologyManager = this.engine.getOwlOntologyManager();
 		this.prefixManager = this.engine.getPrefixManager();
-		this.defaultPrefix = this.engine.getDefaultPrefix();
 
 		createUserInterface();
 
@@ -181,6 +179,7 @@ public class SuggestionPopup extends JPopupMenu {
 	}
 
 	private Engine getEngine() {
+		System.out.println(this.engine);
 		return this.engine;
 	}
 
@@ -227,20 +226,22 @@ public class SuggestionPopup extends JPopupMenu {
 	}
 
 	private int createOWLClass(String Name) {
-		System.out.println("Name: " + Name + "\t" + prefixManager.getDefaultPrefix());
+
+		System.out.println("New Class Name: " + Name + "\t" + prefixManager.getDefaultPrefix());
 		OWLClass newClass = owlDataFactory.getOWLClass(Name, prefixManager);
 
 		OWLAxiom declareaxiom = owlDataFactory.getOWLDeclarationAxiom(newClass);
 		AddAxiom addAxiom = new AddAxiom(activeOntology, declareaxiom);
 		ChangeApplied cA = owlOntologyManager.applyChange(addAxiom);
 		if (cA == ChangeApplied.SUCCESSFULLY) {
-			System.out.println("Successfull");
+			// System.out.println("Successfull: " +
+			// newClass.getIRI().toString());
 		}
 		if (cA == ChangeApplied.UNSUCCESSFULLY) {
-			System.out.println("Unsuccessfull");
+			// System.out.println("Unsuccessfull");
 		}
 		if (cA == ChangeApplied.NO_OPERATION) {
-			System.out.println("No op");
+			// System.out.println("No op");
 		}
 		this.ruleEditorPanel.update();
 		return 0;
@@ -278,7 +279,9 @@ public class SuggestionPopup extends JPopupMenu {
 		 * 
 		 */
 		public void actionPerformed(ActionEvent e) {
-			String owlCompatibleName = getEngine().getValueAsOWLCompatibleName(this.name);
+			Engine ee = getEngine();
+			String owlCompatibleName = ee.getValueAsOWLCompatibleName(this.name);
+			System.out.println("inside actionPerformed to createOWLClass() in showSuggestionPopup: " + ee);
 			createOWLClass(owlCompatibleName);
 		}
 	}

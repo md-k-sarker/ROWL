@@ -30,7 +30,6 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 	private static final Logger log = LoggerFactory.getLogger(ViewAsTab.class);
 
 	private SWRLRuleEngineModel swrlRuleEngineModel;
-	private Engine engine;
 	private RulesViewMain rulesView;
 	private SWRLRuleEngineDialogManager dialogManager;
 	private SWRLRulesView swrlRulesView;
@@ -50,6 +49,7 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 		setToolTipText("ROWL");
 
 		if (getOWLModelManager() != null) {
+
 			getOWLModelManager().addListener(this.listener);
 
 			setLayout(new BorderLayout());
@@ -72,6 +72,8 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 		try {
 
 			this.activeOntology = getOWLModelManager().getActiveOntology();
+			// System.out.println("ontology id:
+			// "+this.activeOntology.getOntologyID().toString());
 
 			if (this.activeOntology != null) {
 				// first initilize the tabbedPane
@@ -118,6 +120,9 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 		// Create the rule engine dialog manager
 		this.dialogManager = SWRLAPIFactory.createSWRLRuleEngineDialogManager(this.swrlRuleEngineModel);
 
+		if (this.swrlRulesView != null)
+			remove(this.swrlRulesView);
+
 		// Create the existing SWRL tab View
 		this.swrlRulesView = new SWRLRulesView(this.swrlRuleEngineModel, this.dialogManager);
 		this.swrlRulesView.initialize();
@@ -127,30 +132,32 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 
 	private void updateROWLTab() {
 		// Create the custom tab View
-		this.engine = new Engine(this.activeOntology, this.iriResolver);
+		Engine engine = new Engine(this.activeOntology, this.iriResolver);
 
-		this.rulesView = new RulesViewMain(this.swrlRuleEngineModel, this.engine, this.dialogManager,
-				this.activeOntology, tabbedPane);
+		if (this.rulesView != null)
+			remove(this.rulesView);
+
+		this.rulesView = new RulesViewMain(this.swrlRuleEngineModel, engine, this.dialogManager, this.activeOntology,
+				tabbedPane);
 		this.rulesView.initialize();
 	}
 
 	public class ViewAsTabListener implements OWLModelManagerListener {
-		
-		
-		
+
 		@Override
 		public void handleChange(@NonNull OWLModelManagerChangeEvent event) {
 			if (!ViewAsTab.this.updating) {
 				if ((event.getType() == EventType.ACTIVE_ONTOLOGY_CHANGED) || (event.isType(EventType.ONTOLOGY_LOADED))
 						|| (event.isType(EventType.ONTOLOGY_RELOADED))) {
-					
-					//System.out.println("Ontology changed");
-					
+
+					System.out.println("Ontology changed: " + event.getType().name());
+
 					update();
 				}
-			} else{
-				//System.out.println("ROWLLTab ignoring ontology change - still processing old change");
-				log.warn("ROWLLTab ignoring ontology change - still processing old change");
+			} else {
+				// System.out.println("ROWLLTab ignoring ontology change - still
+				// processing old change");
+				log.warn("ROWLTab ignoring ontology change - still processing old change");
 			}
 		}
 	}

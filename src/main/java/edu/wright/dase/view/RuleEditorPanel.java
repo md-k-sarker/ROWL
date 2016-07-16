@@ -82,7 +82,7 @@ import edu.wright.dase.view.axiomManchesterDialog.AxiomsDialog;
  * developed by sarker.3 JPanel providing a SWRL rule
  *
  */
-public class RuleEditorPanel extends JPanel implements SWRLAPIView {
+public class RuleEditorPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger log = LoggerFactory.getLogger(RuleEditorPanel.class);
@@ -132,8 +132,8 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	@NonNull
 	private SWRLRuleEngineDialogManager dialogManager;
 
-	@NonNull
-	private Engine engine;
+	// @NonNull
+	// private Engine engine;
 
 	@NonNull
 	private final SWRLRuleEditorInitialDialogState initialDialogState = new SWRLRuleEditorInitialDialogState();
@@ -163,21 +163,21 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	private OWLOntologyManager owlOntologyManager;
 	JPanel pnlForCreateNewEntity;
 
-	// for test purpose only
-	private RuleEditorPanel() {
-
-		// this.dialogManager = dialogManager;
-		this.loweredBevelBorder = BorderFactory.createLoweredBevelBorder();
-		this.yellowBorder = BorderFactory.createLineBorder(Color.YELLOW);
-
-		this.ruleTextTextPane = new JTextPane();
-		this.convertToOWLButton = new JButton(CONVERT_TO_OWL_BUTTON_TITLE);
-		this.cancelButton = new JButton(CANCEL_BUTTON_TITLE);
-		this.ruleNameTextField = new JTextField("");
-		this.commentTextField = new JTextField("");
-		this.statusTextField = new JTextField(STATUS_NO_RULE_TEXT);
-		initialize();
-	}
+	// // for test purpose only
+	// private RuleEditorPanel() {
+	//
+	// // this.dialogManager = dialogManager;
+	// this.loweredBevelBorder = BorderFactory.createLoweredBevelBorder();
+	// this.yellowBorder = BorderFactory.createLineBorder(Color.YELLOW);
+	//
+	// this.ruleTextTextPane = new JTextPane();
+	// this.convertToOWLButton = new JButton(CONVERT_TO_OWL_BUTTON_TITLE);
+	// this.cancelButton = new JButton(CANCEL_BUTTON_TITLE);
+	// this.ruleNameTextField = new JTextField("");
+	// this.commentTextField = new JTextField("");
+	// this.statusTextField = new JTextField(STATUS_NO_RULE_TEXT);
+	// initialize();
+	// }
 
 	public RuleEditorPanel(@NonNull SWRLRuleEngineModel swrlRuleEngineModel, @NonNull Engine engine,
 			@NonNull OWLOntology activeOntology, @NonNull SWRLRuleEngineDialogManager dialogManager,
@@ -185,7 +185,9 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 		this.swrlRuleEngineModel = swrlRuleEngineModel;
 		this.dialogManager = dialogManager;
-		this.engine = engine;
+		// this.engine = engine;
+		// System.out.println("inside RuleEditorPanel() constructor: "+
+		// this.engine);
 		this.loweredBevelBorder = BorderFactory.createLoweredBevelBorder();
 		this.yellowBorder = BorderFactory.createLineBorder(Color.YELLOW);
 		this.ruleTextTextPane = new JTextPane();
@@ -205,7 +207,6 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		initialize();
 	}
 
-	@Override
 	public void initialize() {
 		// Container contentPane = getContentPane();
 
@@ -233,7 +234,6 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		this.editMode = true;
 	}
 
-	@Override
 	public void update() {
 		updateStatus();
 	}
@@ -462,7 +462,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	}
 
 	private void disableSave() {
-		//this.convertToOWLButton.setEnabled(false);
+		// this.convertToOWLButton.setEnabled(false);
 	}
 
 	private void enableSave() {
@@ -559,7 +559,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 	private @NonNull RuleTableModel getRuleTableModel() {
 
-		return this.engine.getRuleTableModel();
+		return Constants.engineAsStaticReference.getRuleTableModel();
 	}
 
 	@NonNull
@@ -596,17 +596,19 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 				// add(bind("add as Class", new AddClassAction("Class"), ""));
 				// object property
 				// data property
-				this.suggestionPopup = new SuggestionPopup(this, this.engine, errorText);
+				System.out.println(
+						"when calling showSuggestionPopup: " + Constants.engineAsStaticReference + "\t" + getEngine());
+				this.suggestionPopup = new SuggestionPopup(this, Constants.engineAsStaticReference, errorText);
 				this.suggestionPopup.show(this.statusTextField, (int) event.getX(), (int) event.getY());
 
 			} else if (errorText.contains("Invalid OWL individual name")) {
 				// namedindividual
-				this.suggestionPopup = new SuggestionPopup(this, this.engine, errorText);
+				this.suggestionPopup = new SuggestionPopup(this, Constants.engineAsStaticReference, errorText);
 				this.suggestionPopup.show(this.statusTextField, (int) event.getX(), (int) event.getY());
 
 			} else if (errorText.contains("invalid datatype name")) {
 				// datatype
-				this.suggestionPopup = new SuggestionPopup(this, this.engine, errorText);
+				this.suggestionPopup = new SuggestionPopup(this, Constants.engineAsStaticReference, errorText);
 				this.suggestionPopup.show(this.statusTextField, (int) event.getX(), (int) event.getY());
 
 			} else {
@@ -824,14 +826,14 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 
 				// if the ruleID exist then remove the corresponding axioms
 				// first
-				this.engine.deleteRule(getRuleName());
+				Constants.engineAsStaticReference.deleteRule(getRuleName());
 
 				// save changes in the ontology.
 				applyChangetoOntology(axiomWithAnnotations);
 
 				// show the rule in the table
 				RuleModel rule = new RuleModel(getRuleName(), getRuleText(), getComment());
-				this.engine.addARulesWithID(getRuleName(), rule);
+				Constants.engineAsStaticReference.addARulesWithID(getRuleName(), rule);
 				getRuleTableModel().updateView();
 
 				// clear the rule textarea
@@ -865,11 +867,10 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 	}
 
 	private Engine getEngine() {
-		System.out.println("freshProp:" +this.engine.getNextFreshProp());
-		return this.engine;
+		System.out.println("freshProp:" + Constants.engineAsStaticReference.getNextFreshProp());
+		return Constants.engineAsStaticReference;
 	}
 
-	
 	private class ConvertSWRLRuleActionListener implements ActionListener {
 
 		@NonNull
@@ -885,7 +886,6 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 			/**
 			 * for testing
 			 */
-
 
 			String ruleName = getRuleName();
 			String ruleText = getRuleText();
@@ -909,7 +909,7 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 					if (swrlRule != null) {
 
 						// try to convert rule to OWL
-						Translator translator = new Translator(swrlRule, getEngine() );
+						Translator translator = new Translator(swrlRule, getEngine());
 						translator.ruleToAxioms();
 						if (!translator.resultingAxioms.isEmpty()) {
 
@@ -953,11 +953,11 @@ public class RuleEditorPanel extends JPanel implements SWRLAPIView {
 		}
 	}
 
-	public static void main(String[] arg) {
-		JFrame frame = new JFrame();
-		frame.add(new RuleEditorPanel());
-		frame.setSize(500, 500);
-		frame.setVisible(true);
-	}
+	// public static void main(String[] arg) {
+	// JFrame frame = new JFrame();
+	// frame.add(new RuleEditorPanel());
+	// frame.setSize(500, 500);
+	// frame.setVisible(true);
+	// }
 
 }
