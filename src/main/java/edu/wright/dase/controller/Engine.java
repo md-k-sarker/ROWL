@@ -493,7 +493,6 @@ public class Engine {
 
 	private void reloadRulesAndAxiomsFromOntology() {
 
-		// JPopupMenu
 		if (rulesWithID != null)
 			rulesWithID.clear();
 		if (axiomsWithID != null)
