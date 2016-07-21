@@ -50,8 +50,8 @@ public class RuleTablePanel extends JPanel implements SWRLAPIView {
 	private static final int COMMENT_COLUMN_PREFERRED_WIDTH = 200;
 	private static final int COMMENT_COLUMN_MAX_WIDTH = 300;
 
-	//@NonNull
-	//private final Engine engine;
+	// @NonNull
+	// private final Engine engine;
 	@NonNull
 	private final RuleEditorPanel ruleEditorPanel;
 	@NonNull
@@ -63,8 +63,7 @@ public class RuleTablePanel extends JPanel implements SWRLAPIView {
 	@NonNull
 	private final Component parent;
 
-	public RuleTablePanel( @NonNull RuleTableModel ruleTableModel,
-			@NonNull RuleEditorPanel ruleEditorPanel) {
+	public RuleTablePanel(@NonNull RuleTableModel ruleTableModel, @NonNull RuleEditorPanel ruleEditorPanel) {
 
 		this.rulesTableModel = ruleTableModel;
 		this.ruleEditorPanel = ruleEditorPanel;
@@ -72,7 +71,7 @@ public class RuleTablePanel extends JPanel implements SWRLAPIView {
 		this.parent = (JFrame) SwingUtilities.getWindowAncestor(this);
 
 		this.rulesTable = new JTable(this.rulesTableModel);
-		
+
 		this.rulesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.deleteButton = new JButton(DELETE_BUTTON_TITLE);
 		this.editButton = new JButton(EDIT_BUTTON_TITLE);
@@ -90,7 +89,7 @@ public class RuleTablePanel extends JPanel implements SWRLAPIView {
 
 		createComponents();
 
-		createPopupMenu();
+		// createPopupMenu();
 	}
 
 	@Override
@@ -263,7 +262,7 @@ public class RuleTablePanel extends JPanel implements SWRLAPIView {
 
 						// request Table to update the view
 						update();
-					}
+					} 
 			}
 		}
 	}

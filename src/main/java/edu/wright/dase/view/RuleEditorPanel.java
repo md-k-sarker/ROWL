@@ -106,7 +106,7 @@ public class RuleEditorPanel extends JPanel {
 	private static final String DUPLICATE_RULE_TEXT = "Name already in use - please pick another name.";
 	private static final String DUPLICATE_RULE_TITLE = "Duplicate Name";
 	private static final String INTERNAL_ERROR_TITLE = "Internal Error";
-	private static final String CANT_CONVERT_TO_OWL_AXIOM_TEXT = "Not transferable to OWL Axiom."; 
+	private static final String CANT_CONVERT_TO_OWL_AXIOM_TEXT = "Not transferable to OWL Axiom.";
 
 	private static final int BUTTON_PREFERRED_WIDTH = 200;
 	private static final int BUTTON_PREFERRED_HEIGHT = 30;
@@ -706,8 +706,8 @@ public class RuleEditorPanel extends JPanel {
 		}
 
 		pnlForCreateNewEntity.setLayout(new BorderLayout());
-		lbl1.setText(message + " can not be transformed to OWL Axiom.");
-		lbl2.setText("Do you want to switch to SWRLTab ?");
+		lbl1.setText("<html><p><b><font color=\"red\">"+message+"</font></b>" + " can not be transformed to OWL Axiom."+"</p></html>");
+		lbl2.setText("<html><br>Do you want to switch to SWRLTab ?</html>");
 		pnlForCreateNewEntity.add(lbl1, BorderLayout.PAGE_START);
 		pnlForCreateNewEntity.add(lbl2, BorderLayout.PAGE_END);
 		return pnlForCreateNewEntity;
@@ -931,19 +931,24 @@ public class RuleEditorPanel extends JPanel {
 
 	}
 
-	private void switchToSWRLTab(String ruleName, String ruleText, String ruleComment) {
+	private void switchToSWRLTab(String ruleName, String ruleText, String ruleComment, boolean ExceptionOccurred) {
 
-		if (JOptionPane.OK_OPTION == JOptionPane.showOptionDialog(this, getPnlForSwitchToSWRLTab(ruleText),
-				CANT_CONVERT_TO_OWL_AXIOM_TEXT, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null,
-				null, null)) {
-			// switch to swrltab;
-			tabbedPane.setSelectedIndex(1);
-			SWRLRuleEditorDialog dialog = (SWRLRuleEditorDialog) this.dialogManager.getSWRLRuleEditorDialog(this,
-					ruleName, ruleText, ruleComment);
-			dialog.setVisible(true);
-			// System.out.println("Clicked to switch to swrltab");
+		if (ExceptionOccurred) {
 
+		} else {
+			if (JOptionPane.OK_OPTION == JOptionPane.showOptionDialog(this, getPnlForSwitchToSWRLTab(ruleText),
+					CANT_CONVERT_TO_OWL_AXIOM_TEXT, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null,
+					null, null)) {
+				// switch to swrltab;
+				tabbedPane.setSelectedIndex(1);
+				SWRLRuleEditorDialog dialog = (SWRLRuleEditorDialog) this.dialogManager.getSWRLRuleEditorDialog(this,
+						ruleName, ruleText, ruleComment);
+				dialog.setVisible(true);
+				// System.out.println("Clicked to switch to swrltab");
+
+			}
 		}
+
 	}
 
 	private Engine getEngine() {
@@ -994,7 +999,8 @@ public class RuleEditorPanel extends JPanel {
 							translator.ruleToAxioms();
 						} catch (Exception exception) {
 							System.out.println("exception occurred when transferring to axioms");
-							switchToSWRLTab(ruleName, ruleText, comment);
+							switchToSWRLTab(ruleName, ruleText, comment, true);
+							//exception.printStackTrace();
 						}
 						if (!translator.resultingAxioms.isEmpty()) {
 
@@ -1010,7 +1016,7 @@ public class RuleEditorPanel extends JPanel {
 							// can not transfer to axioms need to switch
 							// to swrltab
 
-							switchToSWRLTab(ruleName, ruleText, comment);
+							switchToSWRLTab(ruleName, ruleText, comment, false);
 							System.out.println("can not transfer to axioms");
 						}
 						return;

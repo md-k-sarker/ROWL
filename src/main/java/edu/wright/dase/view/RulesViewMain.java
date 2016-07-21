@@ -22,48 +22,47 @@ import edu.wright.dase.model.RuleTableModel;
 public class RulesViewMain extends JSplitPane implements SWRLAPIView {
 	private static final long serialVersionUID = 1L;
 
-	private static final double SPLIT_PANE_RESIZE_WEIGHT = 0.6;
+	private static final double SPLIT_PANE_RESIZE_WEIGHT = 0.4;
 
 	@NonNull
-	private final RuleTablePanel ruleTablesView;
+	private final RuleTablePanel ruleTablesPanel;
 
 	@NonNull
-	private final RuleEditorPanel ruleEditorView;
+	private final RuleEditorPanel ruleEditorPanel;
 
 	@NonNull
 	private RuleTableModel ruleTableModel;
 
 	public RulesViewMain(@NonNull SWRLRuleEngineDialogManager dialogManager, JTabbedPane tabbedPane)
 			throws SWRLAPIException {
-
-		this.ruleEditorView = new RuleEditorPanel(dialogManager, tabbedPane);
 		
-		//Constants.engineAsStaticReference.setRuleEditorPanel(this.ruleEditorView);
+		this.ruleEditorPanel = new RuleEditorPanel(dialogManager, tabbedPane);
+		Constants.engineAsStaticReference.setRuleEditorPanel(this.ruleEditorPanel);
 
 		this.ruleTableModel = new RuleTableModel(Constants.engineAsStaticReference);
 		Constants.engineAsStaticReference.setRuleTableModel(this.ruleTableModel);
 
-		this.ruleTablesView = new RuleTablePanel(this.ruleTableModel, ruleEditorView);
-		Constants.engineAsStaticReference.setRuleTablePanel(this.ruleTablesView);
+		this.ruleTablesPanel = new RuleTablePanel(this.ruleTableModel, ruleEditorPanel);
+		Constants.engineAsStaticReference.setRuleTablePanel(this.ruleTablesPanel);
 
-		this.ruleTableModel.setView(this.ruleTablesView);
+		this.ruleTableModel.setView(this.ruleTablesPanel);
 
 	}
 
 	@Override
 	public void initialize() {
-		this.ruleTablesView.initialize();
+		//this.ruleTablesPanel.initialize();
 		// this.ruleExecutionView.initialize();
 
 		setOrientation(JSplitPane.VERTICAL_SPLIT);
 		setResizeWeight(SPLIT_PANE_RESIZE_WEIGHT);
-		setTopComponent(this.ruleEditorView);
-		setBottomComponent(this.ruleTablesView);
+		setTopComponent(this.ruleEditorPanel);
+		setBottomComponent(this.ruleTablesPanel);
 	}
 
 	@Override
 	public void update() {
-		this.ruleTablesView.update();
+		this.ruleTablesPanel.update();
 		// this.ruleExecutionView.update();
 	}
 }
