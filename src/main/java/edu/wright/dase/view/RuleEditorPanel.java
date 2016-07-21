@@ -106,6 +106,7 @@ public class RuleEditorPanel extends JPanel {
 	private static final String DUPLICATE_RULE_TEXT = "Name already in use - please pick another name.";
 	private static final String DUPLICATE_RULE_TITLE = "Duplicate Name";
 	private static final String INTERNAL_ERROR_TITLE = "Internal Error";
+	private static final String CANT_CONVERT_TO_OWL_AXIOM_TEXT = "Not transferable to OWL Axiom."; 
 
 	private static final int BUTTON_PREFERRED_WIDTH = 200;
 	private static final int BUTTON_PREFERRED_HEIGHT = 30;
@@ -933,10 +934,9 @@ public class RuleEditorPanel extends JPanel {
 	private void switchToSWRLTab(String ruleName, String ruleText, String ruleComment) {
 
 		if (JOptionPane.OK_OPTION == JOptionPane.showOptionDialog(this, getPnlForSwitchToSWRLTab(ruleText),
-				"Not transferable to OWL Axiom.", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null,
+				CANT_CONVERT_TO_OWL_AXIOM_TEXT, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null,
 				null, null)) {
 			// switch to swrltab;
-
 			tabbedPane.setSelectedIndex(1);
 			SWRLRuleEditorDialog dialog = (SWRLRuleEditorDialog) this.dialogManager.getSWRLRuleEditorDialog(this,
 					ruleName, ruleText, ruleComment);
@@ -988,8 +988,14 @@ public class RuleEditorPanel extends JPanel {
 						Set<OWLObjectProperty> objectProperitesAfterConverting = new HashSet<OWLObjectProperty>();
 
 						// try to convert rule to OWL
-						Translator translator = new Translator(swrlRule, getEngine());
-						translator.ruleToAxioms();
+						Translator translator = null;
+						try {
+							translator = new Translator(swrlRule, getEngine());
+							translator.ruleToAxioms();
+						} catch (Exception exception) {
+							System.out.println("exception occurred when transferring to axioms");
+							switchToSWRLTab(ruleName, ruleText, comment);
+						}
 						if (!translator.resultingAxioms.isEmpty()) {
 
 							generatedAxioms.clear();
