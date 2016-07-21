@@ -223,8 +223,6 @@ public class Engine {
 		Constants.owlOntologyManagerAsStaticReference = this.owlOntologyManager;
 		Constants.owlDataFactoryAsStaticReference = this.owlDataFactory;
 		Constants.engineAsStaticReference = this;
-
-		System.out.println("inside Engine--ontology id:" + this.activeOntology.getOntologyID().toString());
 	}
 
 	public String getNextFreshObjProp() {
@@ -505,10 +503,15 @@ public class Engine {
 						String[] values = val.split("___");
 						// System.out.println("values.length while retrieving: "
 						// + values.length);
-						if (values.length >= 3) {
+						if (values.length >= 2) {
 							String ruleID = values[0];
 							String ruleText = values[1];
-							String ruleComment = values[2];
+							String ruleComment;
+							if (values.length >= 3) {
+								ruleComment = values[2];
+							} else {
+								ruleComment = "";
+							}
 							if (ruleID.length() > 0 && ruleText.length() > 0) {
 
 								// add to rulewith ID

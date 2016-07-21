@@ -326,7 +326,7 @@ public class SWRLParser {
 				throw new SWRLParseException(
 						"Variable ?" + variableName + " used in consequent is not present in antecedent");
 		}
-		System.out.println("sarker.3 variableName "+variableName);
+		
 		return !tokenizer.isInteractiveParseOnly()
 				? Optional.of(this.swrlParserSupport.createSWRLVariable(variableName))
 				: Optional.<@NonNull SWRLVariable> empty();

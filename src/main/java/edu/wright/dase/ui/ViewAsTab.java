@@ -146,7 +146,6 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 		// Constants.engineAsStaticReference = engine;
 
 		if (this.rulesView != null) {
-			System.out.println("removing rulesView");
 			remove(this.rulesView);
 		}
 

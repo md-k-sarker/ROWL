@@ -85,9 +85,6 @@ public class AxiomsDialog extends JDialog {
 		ManchesterOWLSyntaxPrefixNameShortFormProvider shortFormProvider = new ManchesterOWLSyntaxPrefixNameShortFormProvider(
 				activeOntology);
 		rendering.setShortFormProvider(shortFormProvider);
-		
-
-		System.out.println("inside AxiomsDialog--ontology id:" + activeOntology.getOntologyID().toString());
 
 		initUI();
 		showUI();

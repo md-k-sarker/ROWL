@@ -176,9 +176,7 @@ class SWRLParserSupport {
 
 	@NonNull
 	public SWRLVariable createSWRLVariable(@NonNull String variableName) throws SWRLParseException {
-		System.out.println("sarker.3 createSWRLVariable before- variableName: " + variableName);
 		IRI iri = prefixedName2IRI(variableName);
-		System.out.println("sarker.3 createSWRLVariable after- iri: " + getOWLDataFactory().getSWRLVariable(iri));
 		if (isOWLEntity(variableName))
 			throw new SWRLParseException(variableName
 					+ " cannot be used as a SWRL variable name because it refers to an existing OWL entity");
@@ -202,7 +200,6 @@ class SWRLParserSupport {
 	public SWRLRule createSWRLRule(@NonNull String ruleName, @NonNull Set<@NonNull SWRLAtom> head,
 			@NonNull Set<@NonNull SWRLAtom> body, @NonNull String comment, boolean isEnabled) {
 
-		System.out.println("inside SWRL Parser 0. rule, body: " + body + " head:" + head);
 		Set<@NonNull OWLAnnotation> annotations = this.swrlapiOWLOntology.generateRuleAnnotations(ruleName, comment,
 				isEnabled);
 		// SWRLRule tmprule = getOWLDataFactory().getSWRLRule(body, head,

@@ -843,8 +843,6 @@ public class RuleEditorPanel extends JPanel {
 
 		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
 
-		System.out.println("inside RuleEditorPanel--ontology id:"
-				+ Constants.activeOntologyAsStaticReference.getOntologyID().toString());
 		// show the dialog
 		AxiomsDialog axiomDialog = new AxiomsDialog(this, topFrame, Constants.activeOntologyAsStaticReference);
 
