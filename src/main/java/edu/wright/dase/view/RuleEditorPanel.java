@@ -129,8 +129,6 @@ public class RuleEditorPanel extends JPanel {
 	private SuggestionPopup suggestionPopup;
 
 	@NonNull
-	private SWRLRuleEngineModel swrlRuleEngineModel;
-	@NonNull
 	private SWRLRuleEngineDialogManager dialogManager;
 
 	private Set<OWLObjectProperty> newlyCreatedObjectProperitesList;
@@ -159,9 +157,6 @@ public class RuleEditorPanel extends JPanel {
 			.<@NonNull SWRLRuleEditorAutoCompleteState> empty(); // Present if
 																	// auto-complete
 	private boolean editMode = false;
-	private OWLOntology activeOntology;
-	private OWLDataFactory owlDataFactory;
-	private OWLOntologyManager owlOntologyManager;
 	JPanel pnlForCreateNewEntity;
 
 	// // for test purpose only
@@ -180,11 +175,8 @@ public class RuleEditorPanel extends JPanel {
 	// initialize();
 	// }
 
-	public RuleEditorPanel(@NonNull SWRLRuleEngineModel swrlRuleEngineModel, @NonNull Engine engine,
-			@NonNull OWLOntology activeOntology, @NonNull SWRLRuleEngineDialogManager dialogManager,
-			@NonNull JTabbedPane tabbedPane) {
+	public RuleEditorPanel(@NonNull SWRLRuleEngineDialogManager dialogManager, @NonNull JTabbedPane tabbedPane) {
 
-		this.swrlRuleEngineModel = swrlRuleEngineModel;
 		this.dialogManager = dialogManager;
 		// this.engine = engine;
 		// System.out.println("inside RuleEditorPanel() constructor: "+
@@ -197,16 +189,13 @@ public class RuleEditorPanel extends JPanel {
 		this.tabbedPane = tabbedPane;
 		this.convertToOWLButton = new JButton(CONVERT_TO_OWL_BUTTON_TITLE);
 		this.cancelButton = new JButton(CANCEL_BUTTON_TITLE);
-		this.activeOntology = activeOntology;
-		this.owlDataFactory = activeOntology.getOWLOntologyManager().getOWLDataFactory();
-		this.owlOntologyManager = activeOntology.getOWLOntologyManager();
 		lbl1 = new JLabel();
 		lbl2 = new JLabel();
 		this.ruleNameTextField = new JTextField("");
 		this.commentTextField = new JTextField("");
 		this.statusTextField = new JTextField(STATUS_NO_RULE_TEXT);
 		initialize();
-		
+
 		setInitialRuleName();
 	}
 
@@ -457,7 +446,7 @@ public class RuleEditorPanel extends JPanel {
 
 	@NonNull
 	private SWRLAutoCompleter createSWRLAutoCompleter() {
-		return this.swrlRuleEngineModel.createSWRLAutoCompleter();
+		return Constants.swrlRuleEngineModelAsStaticReference.createSWRLAutoCompleter();
 	}
 
 	private void disableSave() {
@@ -539,12 +528,12 @@ public class RuleEditorPanel extends JPanel {
 
 	@NonNull
 	private SWRLRuleEngine getSWRLRuleEngine() {
-		return this.swrlRuleEngineModel.getSWRLRuleEngine();
+		return Constants.swrlRuleEngineModelAsStaticReference.getSWRLRuleEngine();
 	}
 
 	@NonNull
 	private SWRLRuleEngineModel getSWRLRuleEngineModel() {
-		return this.swrlRuleEngineModel;
+		return Constants.swrlRuleEngineModelAsStaticReference;
 	}
 
 	@NonNull
@@ -553,7 +542,7 @@ public class RuleEditorPanel extends JPanel {
 	}
 
 	private SWRLParser createSWRLParser() {
-		return this.swrlRuleEngineModel.createSWRLParser();
+		return Constants.swrlRuleEngineModelAsStaticReference.createSWRLParser();
 	}
 
 	private @NonNull RuleTableModel getRuleTableModel() {
@@ -760,11 +749,11 @@ public class RuleEditorPanel extends JPanel {
 		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
 
 		for (OWLAxiom axiom : owlAxioms) {
-			AddAxiom addaxiom = new AddAxiom(activeOntology, axiom);
+			AddAxiom addaxiom = new AddAxiom(Constants.activeOntologyAsStaticReference, axiom);
 			changes.add(addaxiom);
 		}
 
-		ChangeApplied changeResult = owlOntologyManager.applyChanges(changes);
+		ChangeApplied changeResult = Constants.owlOntologyManagerAsStaticReference.applyChanges(changes);
 		if (changeResult == ChangeApplied.SUCCESSFULLY) {
 			this.statusTextField.setText("Selected axioms integrated with protege successfully.");
 		} else if (changeResult == ChangeApplied.UNSUCCESSFULLY) {
@@ -778,8 +767,9 @@ public class RuleEditorPanel extends JPanel {
 	private OWLAnnotation getOWLAnnotation() {
 
 		OWLAnnotationProperty fixedAnnotationProperty;
-		fixedAnnotationProperty = owlDataFactory.getOWLAnnotationProperty(Constants.FIXED_ANNOTATION_NAME,
-				PrefixUtilities.getPrefixOWLOntologyFormat(activeOntology));
+		fixedAnnotationProperty = Constants.owlDataFactoryAsStaticReference.getOWLAnnotationProperty(
+				Constants.FIXED_ANNOTATION_NAME,
+				PrefixUtilities.getPrefixOWLOntologyFormat(Constants.activeOntologyAsStaticReference));
 
 		String value;
 
@@ -793,8 +783,9 @@ public class RuleEditorPanel extends JPanel {
 			value = getRuleName() + "___" + getRuleText() + "___" + getComment();
 		}
 
-		OWLAnnotationValue owlLiteral = owlDataFactory.getOWLLiteral(value);
-		OWLAnnotation annotation = owlDataFactory.getOWLAnnotation(fixedAnnotationProperty, owlLiteral);
+		OWLAnnotationValue owlLiteral = Constants.owlDataFactoryAsStaticReference.getOWLLiteral(value);
+		OWLAnnotation annotation = Constants.owlDataFactoryAsStaticReference.getOWLAnnotation(fixedAnnotationProperty,
+				owlLiteral);
 
 		return annotation;
 	}
@@ -851,8 +842,11 @@ public class RuleEditorPanel extends JPanel {
 		Set<OWLObjectProperty> objectProperitesAfterAxiomSelection = new HashSet<OWLObjectProperty>();
 
 		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+
+		System.out.println("inside RuleEditorPanel--ontology id:"
+				+ Constants.activeOntologyAsStaticReference.getOntologyID().toString());
 		// show the dialog
-		AxiomsDialog axiomDialog = new AxiomsDialog(this, topFrame, activeOntology);
+		AxiomsDialog axiomDialog = new AxiomsDialog(this, topFrame, Constants.activeOntologyAsStaticReference);
 
 		/**
 		 * create axioms with annotation from the generated axiom annotation:-

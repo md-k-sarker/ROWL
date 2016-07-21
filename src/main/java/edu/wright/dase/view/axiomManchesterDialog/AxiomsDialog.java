@@ -54,7 +54,6 @@ public class AxiomsDialog extends JDialog {
 	private JPanel axiomsPnl;
 	private JScrollPane axiomsScroll;
 	// private static final double SPLIT_PANE_RESIZE_WEIGHT = 0.5;
-	OWLOntology activeOntology;
 	private DefaultMutableTreeNode axiomsTreeRoot;
 	private final Set<OWLAxiom> selectedAxioms;
 	private JCheckBoxTree axiomsTree;
@@ -86,6 +85,9 @@ public class AxiomsDialog extends JDialog {
 		ManchesterOWLSyntaxPrefixNameShortFormProvider shortFormProvider = new ManchesterOWLSyntaxPrefixNameShortFormProvider(
 				activeOntology);
 		rendering.setShortFormProvider(shortFormProvider);
+		
+
+		System.out.println("inside AxiomsDialog--ontology id:" + activeOntology.getOntologyID().toString());
 
 		initUI();
 		showUI();

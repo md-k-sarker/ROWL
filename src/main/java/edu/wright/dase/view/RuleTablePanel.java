@@ -29,6 +29,7 @@ import org.swrlapi.ui.model.SWRLRulesAndSQWRLQueriesTableModel;
 import org.swrlapi.ui.view.SWRLAPIView;
 
 import edu.wright.dase.controller.Engine;
+import edu.wright.dase.model.Constants;
 import edu.wright.dase.model.RuleTableModel;
 
 /**
@@ -49,8 +50,8 @@ public class RuleTablePanel extends JPanel implements SWRLAPIView {
 	private static final int COMMENT_COLUMN_PREFERRED_WIDTH = 200;
 	private static final int COMMENT_COLUMN_MAX_WIDTH = 300;
 
-	@NonNull
-	private final Engine engine;
+	//@NonNull
+	//private final Engine engine;
 	@NonNull
 	private final RuleEditorPanel ruleEditorPanel;
 	@NonNull
@@ -62,9 +63,9 @@ public class RuleTablePanel extends JPanel implements SWRLAPIView {
 	@NonNull
 	private final Component parent;
 
-	public RuleTablePanel(@NonNull Engine engine, @NonNull RuleTableModel ruleTableModel,
+	public RuleTablePanel( @NonNull RuleTableModel ruleTableModel,
 			@NonNull RuleEditorPanel ruleEditorPanel) {
-		this.engine = engine;
+
 		this.rulesTableModel = ruleTableModel;
 		this.ruleEditorPanel = ruleEditorPanel;
 
@@ -219,7 +220,7 @@ public class RuleTablePanel extends JPanel implements SWRLAPIView {
 
 	@NonNull
 	private Engine getEngine() {
-		return this.engine;
+		return Constants.engineAsStaticReference;
 	}
 
 	private class EditRuleActionListener implements ActionListener {

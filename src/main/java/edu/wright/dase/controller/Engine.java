@@ -193,17 +193,6 @@ public class Engine {
 		this.ruleTableModel = ruleTableModel;
 	}
 
-	// public static Engine getEngineasStaticValue() {
-	//
-	// return engineThisPointer;
-	// }
-	//
-	// public Engine getEngine() {
-	// return this;
-	// }
-
-	private Engine engineThisPointer;
-
 	public Engine(OWLOntology activeOntology, ProtegeIRIResolver iriResolver) {
 		this.activeOntology = activeOntology;
 		this.owlOntologyManager = this.activeOntology.getOWLOntologyManager();
@@ -219,19 +208,9 @@ public class Engine {
 			if (defaultPrefix == null) {
 				defaultPrefix = "";
 			}
-			//System.out.println("add prefix returned false");
+			// System.out.println("add prefix returned false");
 		}
-		//System.out.println(this);
-		// System.out.println("inside Engine constructor() default prefix: " +
-		// this.defaultPrefix);
-		// Map<String, String> namesMap =
-		// prefixManager.getPrefixName2PrefixMap();
-		// //System.out.println("defaultPrefix: " + defaultPrefix);
-		// System.out.println("prefixMaps------------");
-		// for (String key : namesMap.keySet()) {
-		// System.out.println(key + "\t" + namesMap.get(key));
-		// }
-		// System.out.println("prefixMaps------------");
+
 		fixedAnnotationProperty = activeOntology.getOWLOntologyManager().getOWLDataFactory()
 				.getOWLAnnotationProperty(Constants.FIXED_ANNOTATION_NAME, prefixManager);
 
@@ -239,7 +218,13 @@ public class Engine {
 
 		reloadRulesAndAxiomsFromOntology();
 
+		// Save the reference
+		Constants.activeOntologyAsStaticReference = this.activeOntology;
+		Constants.owlOntologyManagerAsStaticReference = this.owlOntologyManager;
+		Constants.owlDataFactoryAsStaticReference = this.owlDataFactory;
 		Constants.engineAsStaticReference = this;
+
+		System.out.println("inside Engine--ontology id:" + this.activeOntology.getOntologyID().toString());
 	}
 
 	public String getNextFreshObjProp() {
@@ -299,7 +284,8 @@ public class Engine {
 				return null;
 			}
 		} else {
-			//System.out.println("inside getValueAsOWLCompatibleName() defaultPrefix: " + this.defaultPrefix);
+			// System.out.println("inside getValueAsOWLCompatibleName()
+			// defaultPrefix: " + this.defaultPrefix);
 			String val = this.defaultPrefix + name;
 			// System.out.println("defaultPrefix with val: "+val);
 			return this.defaultPrefix + name;
@@ -447,17 +433,18 @@ public class Engine {
 			}
 
 			ChangeApplied CA = owlOntologyManager.applyChanges(remover.getChanges());
-			//System.out.println("changeApplied result: " + CA.name());
-			
+			// System.out.println("changeApplied result: " + CA.name());
+
 			// remove from map also
 			newlyCreatedObjectPropertiesWithID.remove(ruleName);
 		}
 	}
-	
+
 	/**
-	 * this method is called only when new objprops is created but the rule is not integrated into the system
+	 * this method is called only when new objprops is created but the rule is
+	 * not integrated into the system
 	 */
-	public void deleteNewlyCreatedObjProperties(Set<OWLObjectProperty> owlObjectProperties){
+	public void deleteNewlyCreatedObjProperties(Set<OWLObjectProperty> owlObjectProperties) {
 		OWLEntityRemover remover = new OWLEntityRemover(Collections.singleton(activeOntology));
 
 		for (OWLObjectProperty op : owlObjectProperties) {
@@ -465,7 +452,8 @@ public class Engine {
 		}
 
 		ChangeApplied CA = owlOntologyManager.applyChanges(remover.getChanges());
-		//System.out.println("inside deleteNewlyCreatedObjProperties changeApplied result: " + CA.name());
+		// System.out.println("inside deleteNewlyCreatedObjProperties
+		// changeApplied result: " + CA.name());
 	}
 
 	public void OntologyChanged() {
@@ -515,7 +503,8 @@ public class Engine {
 						// ax.toString() + "\n\n");
 						String val = ann.getValue().asLiteral().get().getLiteral();
 						String[] values = val.split("___");
-						//System.out.println("values.length while retrieving: " + values.length);
+						// System.out.println("values.length while retrieving: "
+						// + values.length);
 						if (values.length >= 3) {
 							String ruleID = values[0];
 							String ruleText = values[1];
@@ -544,11 +533,13 @@ public class Engine {
 									// newlyCreatedObjectPropertiesWithID
 									OWLObjectProperty owlObjectProperty;
 									for (int counter = values.length; counter > 3; counter--) {
-										String iriString = values[counter-1];
+										String iriString = values[counter - 1];
 										IRI iri = IRI.create(iriString);
 										owlObjectProperty = owlDataFactory.getOWLObjectProperty(iri);
 
-										//System.out.println("objprop while retrieving: " + owlObjectProperty.getIRI());
+										// System.out.println("objprop while
+										// retrieving: " +
+										// owlObjectProperty.getIRI());
 
 										if (newlyCreatedObjectPropertiesWithID.containsKey(ruleID)) {
 

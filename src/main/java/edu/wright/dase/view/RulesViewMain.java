@@ -11,6 +11,7 @@ import org.swrlapi.ui.model.SWRLRuleEngineModel;
 import org.swrlapi.ui.view.SWRLAPIView;
 
 import edu.wright.dase.controller.Engine;
+import edu.wright.dase.model.Constants;
 import edu.wright.dase.model.RuleTableModel;
 
 /**
@@ -30,31 +31,21 @@ public class RulesViewMain extends JSplitPane implements SWRLAPIView {
 	private final RuleEditorPanel ruleEditorView;
 
 	@NonNull
-	private final Engine engine;
-
-	@NonNull
 	private RuleTableModel ruleTableModel;
 
-	@NonNull
-	private OWLOntology activeOntology;
-
-	public RulesViewMain(@NonNull SWRLRuleEngineModel swrlRuleEngineModel, Engine engine,
-			@NonNull SWRLRuleEngineDialogManager dialogManager, OWLOntology activeOntology, JTabbedPane tabbedPane)
+	public RulesViewMain(@NonNull SWRLRuleEngineDialogManager dialogManager, JTabbedPane tabbedPane)
 			throws SWRLAPIException {
 
-		this.activeOntology = activeOntology;
-		this.engine = engine;
-
-		this.ruleEditorView = new RuleEditorPanel(swrlRuleEngineModel, this.engine, this.activeOntology, dialogManager,
-				tabbedPane);
-		this.engine.setRuleEditorPanel(this.ruleEditorView);
-
-		this.ruleTableModel = new RuleTableModel(this.engine);
-		this.engine.setRuleTableModel(this.ruleTableModel);
-
-		this.ruleTablesView = new RuleTablePanel(this.engine, this.ruleTableModel, ruleEditorView);
-		this.engine.setRuleTablePanel(this.ruleTablesView);
+		this.ruleEditorView = new RuleEditorPanel(dialogManager, tabbedPane);
 		
+		//Constants.engineAsStaticReference.setRuleEditorPanel(this.ruleEditorView);
+
+		this.ruleTableModel = new RuleTableModel(Constants.engineAsStaticReference);
+		Constants.engineAsStaticReference.setRuleTableModel(this.ruleTableModel);
+
+		this.ruleTablesView = new RuleTablePanel(this.ruleTableModel, ruleEditorView);
+		Constants.engineAsStaticReference.setRuleTablePanel(this.ruleTablesView);
+
 		this.ruleTableModel.setView(this.ruleTablesView);
 
 	}

@@ -21,6 +21,7 @@ import org.swrlapi.ui.view.rules.SWRLRulesView;
 import org.swrltab.ui.ProtegeIRIResolver;
 
 import edu.wright.dase.controller.Engine;
+import edu.wright.dase.model.Constants;
 import edu.wright.dase.view.RulesViewMain;
 
 public class ViewAsTab extends OWLWorkspaceViewsTab {
@@ -33,8 +34,6 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 	private RulesViewMain rulesView;
 	private SWRLRuleEngineDialogManager dialogManager;
 	private SWRLRulesView swrlRulesView;
-	private ProtegeIRIResolver iriResolver;
-	private OWLOntology activeOntology;
 
 	private JTabbedPane tabbedPane;
 
@@ -62,36 +61,44 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 
 	@Override
 	public void dispose() {
-		super.dispose();
+		// super.dispose();
 		getOWLModelManager().removeListener(this.listener);
 		this.swrlRuleEngineModel.unregisterOntologyListener();
+
 	}
 
 	private void update() {
 		this.updating = true;
 		try {
 
-			this.activeOntology = getOWLModelManager().getActiveOntology();
-			// System.out.println("ontology id:
-			// "+this.activeOntology.getOntologyID().toString());
+			ProtegeIRIResolver iriResolver;
+			OWLOntology activeOntology;
 
-			if (this.activeOntology != null) {
-				// first initilize the tabbedPane
-				this.tabbedPane = new JTabbedPane();
+			activeOntology = getOWLModelManager().getActiveOntology();
+			// System.out.println("inside ViewAsTab--ontology id:" +
+			// this.activeOntology.getOntologyID().toString());
+
+			if (activeOntology != null) {
 
 				// Create an IRI resolver using Protege's entity finder and
 				// entity renderer
-				this.iriResolver = new ProtegeIRIResolver(getOWLModelManager().getOWLEntityFinder(),
+				iriResolver = new ProtegeIRIResolver(getOWLModelManager().getOWLEntityFinder(),
 						getOWLModelManager().getOWLEntityRenderer());
 
-				updateSWRLTab();
+				// save the references
+				// saveTheReferences(activeOntology);
 
-				updateROWLTab();
+				updateSWRLTab(activeOntology, iriResolver);
+
+				updateROWLTab(activeOntology, iriResolver);
 
 				// remove tab view if existing
 				if (this.tabbedPane != null) {
 					remove(this.tabbedPane);
 				}
+
+				//initilize the tabbedPane
+				this.tabbedPane = new JTabbedPane();
 
 				this.tabbedPane.addTab("ROWL", this.rulesView);
 				this.tabbedPane.addTab("SWRL", this.swrlRulesView);
@@ -110,12 +117,14 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 		this.updating = false;
 	}
 
-	private void updateSWRLTab() {
+	private void updateSWRLTab(OWLOntology activeOntology, IRIResolver iriResolver) {
 		// Create a rule engine
-		SWRLRuleEngine ruleEngine = SWRLAPIFactory.createSWRLRuleEngine(this.activeOntology, this.iriResolver);
+		SWRLRuleEngine ruleEngine = SWRLAPIFactory.createSWRLRuleEngine(activeOntology, iriResolver);
 
 		// Create a rule engine model. This is the core plugin model.
 		this.swrlRuleEngineModel = SWRLAPIFactory.createSWRLRuleEngineModel(ruleEngine);
+		// save the reference
+		Constants.swrlRuleEngineModelAsStaticReference = this.swrlRuleEngineModel;
 
 		// Create the rule engine dialog manager
 		this.dialogManager = SWRLAPIFactory.createSWRLRuleEngineDialogManager(this.swrlRuleEngineModel);
@@ -130,16 +139,28 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 		this.swrlRuleEngineModel.registerOntologyListener();
 	}
 
-	private void updateROWLTab() {
+	private void updateROWLTab(OWLOntology activeOntology, ProtegeIRIResolver iriResolver) {
 		// Create the custom tab View
-		Engine engine = new Engine(this.activeOntology, this.iriResolver);
+		Engine engine = new Engine(activeOntology, iriResolver);
+		// Save the reference
+		// Constants.engineAsStaticReference = engine;
 
-		if (this.rulesView != null)
+		if (this.rulesView != null) {
+			System.out.println("removing rulesView");
 			remove(this.rulesView);
+		}
 
-		this.rulesView = new RulesViewMain(this.swrlRuleEngineModel, engine, this.dialogManager, this.activeOntology,
-				tabbedPane);
+		this.rulesView = new RulesViewMain(this.dialogManager, tabbedPane);
 		this.rulesView.initialize();
+	}
+
+	private void saveTheReferences(OWLOntology activeOntology) {
+		// Constants.activeOntologyAsStaticReference = activeOntology;
+		// Constants.owlOntologyManagerAsStaticReference =
+		// activeOntology.getOWLOntologyManager();
+		// Constants.owlDataFactoryAsStaticReference =
+		// activeOntology.getOWLOntologyManager().getOWLDataFactory();
+
 	}
 
 	public class ViewAsTabListener implements OWLModelManagerListener {
@@ -150,7 +171,8 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 				if ((event.getType() == EventType.ACTIVE_ONTOLOGY_CHANGED) || (event.isType(EventType.ONTOLOGY_LOADED))
 						|| (event.isType(EventType.ONTOLOGY_RELOADED))) {
 
-					//System.out.println("Ontology changed: " + event.getType().name());
+					// System.out.println("Ontology changed: " +
+					// event.getType().name());
 
 					update();
 				}

@@ -46,11 +46,6 @@ public class SuggestionPopup extends JPopupMenu {
 	private PrefixManager prefixManager;
 	private Engine engine;
 	private RuleEditorPanel ruleEditorPanel;
-	private JButton addClassButton;
-	private JButton addIndVButton;
-	private JButton addObjPropButton;
-	private JButton addDataPropButton;
-	private JButton addDataTypeButton;
 
 	/**
 	 * 
