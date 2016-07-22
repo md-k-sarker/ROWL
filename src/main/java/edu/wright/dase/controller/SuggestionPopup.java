@@ -174,7 +174,7 @@ public class SuggestionPopup extends JPopupMenu {
 	}
 
 	private Engine getEngine() {
-		//System.out.println(this.engine);
+		// System.out.println(this.engine);
 		return this.engine;
 	}
 
@@ -222,7 +222,8 @@ public class SuggestionPopup extends JPopupMenu {
 
 	private int createOWLClass(String Name) {
 
-		//System.out.println("New Class Name: " + Name + "\t" + prefixManager.getDefaultPrefix());
+		// System.out.println("New Class Name: " + Name + "\t" +
+		// prefixManager.getDefaultPrefix());
 		OWLClass newClass = owlDataFactory.getOWLClass(Name, prefixManager);
 
 		OWLAxiom declareaxiom = owlDataFactory.getOWLDeclarationAxiom(newClass);
@@ -256,6 +257,10 @@ public class SuggestionPopup extends JPopupMenu {
 		return 0;
 	}
 
+	private Component getParentForView() {
+		return this.ruleEditorPanel;
+	}
+
 	public class AddClassAction extends AbstractAction {
 		/**
 		 * 
@@ -276,8 +281,14 @@ public class SuggestionPopup extends JPopupMenu {
 		public void actionPerformed(ActionEvent e) {
 			Engine ee = getEngine();
 			String owlCompatibleName = ee.getValueAsOWLCompatibleName(this.name);
-			//System.out.println("inside actionPerformed to createOWLClass() in showSuggestionPopup: " + ee);
-			createOWLClass(owlCompatibleName);
+			// System.out.println("inside actionPerformed to createOWLClass() in
+			// showSuggestionPopup: " + ee);
+			if (owlCompatibleName == null) {
+				JOptionPane.showMessageDialog(getParentForView(), "Can not create OWLEntity with name " + this.name,
+						"Syntax Error", JOptionPane.ERROR_MESSAGE);
+			} else {
+				createOWLClass(owlCompatibleName);
+			}
 		}
 	}
 
@@ -300,8 +311,12 @@ public class SuggestionPopup extends JPopupMenu {
 		 */
 		public void actionPerformed(ActionEvent e) {
 			String owlCompatibleName = getEngine().getValueAsOWLCompatibleName(this.name);
-
-			createOWLObjectProperty(owlCompatibleName);
+			if (owlCompatibleName == null) {
+				JOptionPane.showMessageDialog(getParentForView(), "Can not create OWLEntity with name " + this.name,
+						"Syntax Error", JOptionPane.ERROR_MESSAGE);
+			} else {
+				createOWLObjectProperty(owlCompatibleName);
+			}
 		}
 	}
 
@@ -324,7 +339,12 @@ public class SuggestionPopup extends JPopupMenu {
 		 */
 		public void actionPerformed(ActionEvent e) {
 			String owlCompatibleName = getEngine().getValueAsOWLCompatibleName(this.name);
-			createOWLDataProperty(owlCompatibleName);
+			if (owlCompatibleName == null) {
+				JOptionPane.showMessageDialog(getParentForView(), "Can not create OWLEntity with name " + this.name,
+						"Syntax Error", JOptionPane.ERROR_MESSAGE);
+			} else {
+				createOWLDataProperty(owlCompatibleName);
+			}
 		}
 	}
 
@@ -347,7 +367,12 @@ public class SuggestionPopup extends JPopupMenu {
 		 */
 		public void actionPerformed(ActionEvent e) {
 			String owlCompatibleName = getEngine().getValueAsOWLCompatibleName(this.name);
-			createOWLDataType(owlCompatibleName);
+			if (owlCompatibleName == null) {
+				JOptionPane.showMessageDialog(getParentForView(), "Can not create OWLEntity with name " + this.name,
+						"Syntax Error", JOptionPane.ERROR_MESSAGE);
+			} else {
+				createOWLDataType(owlCompatibleName);
+			}
 		}
 	}
 
@@ -370,7 +395,12 @@ public class SuggestionPopup extends JPopupMenu {
 		 */
 		public void actionPerformed(ActionEvent e) {
 			String owlCompatibleName = getEngine().getValueAsOWLCompatibleName(this.name);
-			createOWLNamedIndividual(owlCompatibleName);
+			if (owlCompatibleName == null) {
+				JOptionPane.showMessageDialog(getParentForView(), "Can not create OWLEntity with name " + this.name,
+						"Syntax Error", JOptionPane.ERROR_MESSAGE);
+			} else {
+				createOWLNamedIndividual(owlCompatibleName);
+			}
 		}
 	}
 

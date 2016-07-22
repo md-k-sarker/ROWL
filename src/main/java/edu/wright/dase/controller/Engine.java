@@ -52,8 +52,6 @@ public class Engine {
 
 	private String defaultPrefix;
 
-	private int freshCounter;
-
 	// /**
 	// * @return the defaultPrefix
 	// */
@@ -205,8 +203,8 @@ public class Engine {
 			// prefixManager.setPrefix("", Constants.ANONYMOUS_DEFUALT_ID);
 			// defaultPrefix = Constants.ANONYMOUS_DEFUALT_ID;
 			// defaultPrefix = "";
-			if (defaultPrefix == null) {
-				defaultPrefix = "";
+			if (this.defaultPrefix == null) {
+				this.defaultPrefix = "";
 			}
 			// System.out.println("add prefix returned false");
 		}
@@ -236,10 +234,11 @@ public class Engine {
 
 		String freshPropName = Constants.FRESH_PROP_NAME + counter;
 
-		// System.out.println("name: "+ freshPropName);
-
+		// no null pointer checking is necessary here
+		// for getValueAsOWLCompatibleName
+		// Because freshPropName never include colon(:)
 		freshPropName = getValueAsOWLCompatibleName(freshPropName);
-		// System.out.println("freshPropName: " + freshPropName);
+
 		return freshPropName;
 	}
 
@@ -256,36 +255,27 @@ public class Engine {
 	}
 
 	public String getValueAsOWLCompatibleName(String name) {
-		boolean shouldContinue;
+
+		// try to add prefix
+		// this is checked because Ontology ID may change at any time and after
+		// changing ontology ID ontologyChange Event not fired
+		addPrefix();
+
 		if (name.contains(":")) {
 			String[] subParts = name.split(":");
 			if (subParts.length == 2) {
 				if (prefixManager.containsPrefixMapping(subParts[0] + ":")) {
 					return name;
 				} else {
-					// it can occur only when validation is executing.
-					// After validation it should not occur here.
-					// print error here
+					// it should not occur because SWRL is checking the syntax
 					return null;
 				}
 			} else {
-
-				// it can occur only when validation is executing.
-				// After validation it should not occur here.
-				// print error here
-				String time = " time.";
-				if (subParts.length > 2) {
-					time = " times.";
-				}
-
-				shouldContinue = false;
+				// it should not occur because SWRL is checking the syntax
 				return null;
 			}
 		} else {
-			// System.out.println("inside getValueAsOWLCompatibleName()
-			// defaultPrefix: " + this.defaultPrefix);
-			String val = this.defaultPrefix + name;
-			// System.out.println("defaultPrefix with val: "+val);
+			// defaultPrefix
 			return this.defaultPrefix + name;
 		}
 
@@ -301,9 +291,9 @@ public class Engine {
 				// Ontology ID(Ontology IRI) first.");
 				return false;
 			}
+
 			// ontoID can contain anonymous.
 			// need more checking
-
 			com.google.common.base.Optional<IRI> iri = ontoID.getDefaultDocumentIRI();
 			if (!iri.isPresent()) {
 
@@ -333,32 +323,27 @@ public class Engine {
 			if (!uriString.endsWith("#") && !uriString.endsWith("/")) {
 				uriString = uriString + "#";
 			}
-
 			if (prefix.length() < 1) {
-
-				// editor.status("Error with Ontology ID. Operation aborted.");
 				return false;
 			}
+
+			// set current ontology id as a prefix name
+			prefixManager.setPrefix(prefix, uriString);
+
+			// get the defaultprefix if exist otherwise take the current
+			// ontology id as defaultprefix
 			String _defaultPrefix = prefixManager.getDefaultPrefix();
 			if (_defaultPrefix != null) {
 				defaultPrefix = ":";
 			} else {
 				defaultPrefix = prefix + ":";
 			}
-			// System.out.println("inside addPrefix() defaultPrefix: " +
-			// this.defaultPrefix);
-			// System.out.println("before setting: prefix: "+prefix+".
-			// uriString: "+uriString);
-			prefixManager.setPrefix(prefix, uriString);
-			// System.out.println("after setting: prefix: "+prefix+". uriString:
-			// "+prefixManager.getPrefix(prefix+":"));
 			return true;
-		} catch (IllegalStateException e) {
 
+		} catch (IllegalStateException e) {
 			e.printStackTrace();
 			return false;
 		} catch (Exception e) {
-
 			e.printStackTrace();
 			return false;
 		}

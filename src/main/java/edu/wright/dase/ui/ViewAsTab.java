@@ -97,7 +97,7 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 					remove(this.tabbedPane);
 				}
 
-				//initilize the tabbedPane
+				// initilize the tabbedPane
 				this.tabbedPane = new JTabbedPane();
 
 				this.tabbedPane.addTab("ROWL", this.rulesView);
