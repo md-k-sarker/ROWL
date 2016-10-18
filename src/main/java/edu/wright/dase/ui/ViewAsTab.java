@@ -2,6 +2,7 @@ package edu.wright.dase.ui;
 
 import java.awt.BorderLayout;
 
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -85,13 +86,7 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 				iriResolver = new ProtegeIRIResolver(getOWLModelManager().getOWLEntityFinder(),
 						getOWLModelManager().getOWLEntityRenderer());
 
-				// save the references
-				// saveTheReferences(activeOntology);
-
-				updateSWRLTab(activeOntology, iriResolver);
-
-				updateROWLTab(activeOntology, iriResolver);
-
+				
 				// remove tab view if existing
 				if (this.tabbedPane != null) {
 					remove(this.tabbedPane);
@@ -99,6 +94,10 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 
 				// initilize the tabbedPane
 				this.tabbedPane = new JTabbedPane();
+
+				updateSWRLTab(activeOntology, iriResolver);
+
+				updateROWLTab(activeOntology, iriResolver);
 
 				this.tabbedPane.addTab("ROWL", this.rulesView);
 				this.tabbedPane.addTab("SWRL", this.swrlRulesView);
@@ -149,7 +148,9 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 			remove(this.rulesView);
 		}
 
+		// Create ROWL tab View
 		this.rulesView = new RulesViewMain(this.dialogManager, tabbedPane);
+		//JOptionPane.showMessageDialog(this, this.tabbedPane.getSelectedIndex() + "  \n inside updateROWLTab. ");
 		this.rulesView.initialize();
 	}
 
