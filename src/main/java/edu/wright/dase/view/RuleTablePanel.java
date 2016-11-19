@@ -35,7 +35,7 @@ import edu.wright.dase.model.RuleTableModel;
 /**
  * Provides a model for graphical display of SWRL rules
  *
- * @see SWRLRulesAndSQWRLQueriesTableModel
+ * @see SWRLRulesTableModel
  */
 public class RuleTablePanel extends JPanel implements SWRLAPIView {
 	private static final long serialVersionUID = 1L;

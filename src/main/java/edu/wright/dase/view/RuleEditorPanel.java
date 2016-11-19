@@ -89,10 +89,12 @@ public class RuleEditorPanel extends JPanel {
 	private static final Logger log = LoggerFactory.getLogger(RuleEditorPanel.class);
 
 	// private static final String TITLE = "Edit";
-	private static final String RULE_NAME_TITLE = "Name";
-	private static final String COMMENT_LABEL_TITLE = "Comment";
+	private static final String RULE_NAME_TITLE = "Rule Name (Mandatory). Rule Will be saved using this name. ";
+	private static final String COMMENT_LABEL_TITLE = "Comment (Optional) ";
+	private static final String RULE_TEXT_LABEL = "Rule Text";
 	private static final String STATUS_LABEL_TITLE = "Status";
 	private static final String CONVERT_TO_OWL_BUTTON_TITLE = "Convert to OWL Axiom";
+
 	private static final String CANCEL_BUTTON_TITLE = "Clear";
 	private static final String STATUS_OK = "Ok";
 	private static final String STATUS_NO_RULE_TEXT = "Use Tab key to cycle through auto-completions;"
@@ -155,8 +157,8 @@ public class RuleEditorPanel extends JPanel {
 
 	@NonNull
 	private Optional<@NonNull SWRLRuleEditorAutoCompleteState> autoCompleteState = Optional
-			.<@NonNull SWRLRuleEditorAutoCompleteState> empty(); // Present if
-																	// auto-complete
+			.<@NonNull SWRLRuleEditorAutoCompleteState>empty(); // Present if
+																// auto-complete
 	private boolean editMode = false;
 	JPanel pnlForCreateNewEntity;
 
@@ -286,8 +288,19 @@ public class RuleEditorPanel extends JPanel {
 		JLabel ruleNameLabel = new JLabel(RULE_NAME_TITLE);
 		JLabel commentLabel = new JLabel(COMMENT_LABEL_TITLE);
 		JLabel statusLabel = new JLabel(STATUS_LABEL_TITLE);
-		JPanel upperPanel = new JPanel(new GridLayout(6, 2));
+		JLabel templateSuggestion = new JLabel(
+				"<html> <br> &nbsp; &nbsp; <font > Now model your own sentence and click </font> <font  color='green'> Convert to OWL Axiom. </font> You need to give <font size='4' color='green'> rule name </font> and <font size='4' color='green'> rule text.</font> </br> </html>");
+		JLabel templateSentence = new JLabel(
+				"<html> <br> &nbsp; &nbsp; Example sentence to model: </br> <font size='4'; font-family= 'Courier New'> Man is mortal.</font></html>");
+		JLabel templateRule = new JLabel(
+				"<html> <br> &nbsp; &nbsp; Corresponding rule (Man is mortal) : </br> <font size='4'; font-family= 'Courier New'>Man(?x) -> Mortal(?x)</font> </html>");
+		JLabel ruleTextLabel = new JLabel(RULE_TEXT_LABEL);
+		JLabel blankLabel = new JLabel("");
+		JPanel upperPanel = new JPanel(new BorderLayout());
+		JPanel upperPanel1stHalf = new JPanel(new BorderLayout());
+		JPanel upperPanel2ndHalf = new JPanel(new GridLayout(8, 1));
 		JPanel rulePanel = new JPanel(new GridLayout(1, 1));
+		JPanel lowerPanel = new JPanel(new GridLayout(1, 1));
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JPanel surroundPanel = new JPanel(new BorderLayout());
 		// Container contentPane = getRootPane();
@@ -311,14 +324,27 @@ public class RuleEditorPanel extends JPanel {
 
 		this.setLayout(new BorderLayout());
 
-		upperPanel.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
-		upperPanel.add(ruleNameLabel);
-		upperPanel.add(this.ruleNameTextField);
-		upperPanel.add(commentLabel);
-		upperPanel.add(this.commentTextField);
-		upperPanel.add(statusLabel);
-		upperPanel.add(this.statusTextField);
+		// consist of template example
+		upperPanel1stHalf.add(templateSentence, BorderLayout.NORTH);
+		upperPanel1stHalf.add(templateRule, BorderLayout.CENTER);
+		upperPanel1stHalf.add(templateSuggestion, BorderLayout.SOUTH);
 
+		// consist of ruleName, comment,template example and status.
+		upperPanel2ndHalf.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
+		upperPanel2ndHalf.add(blankLabel);
+		upperPanel2ndHalf.add(ruleNameLabel);
+		upperPanel2ndHalf.add(this.ruleNameTextField);
+		upperPanel2ndHalf.add(commentLabel);
+		upperPanel2ndHalf.add(this.commentTextField);
+		upperPanel2ndHalf.add(statusLabel);
+		upperPanel2ndHalf.add(this.statusTextField);
+		upperPanel2ndHalf.add(ruleTextLabel);
+
+		// consist of upperfisrst and upper2ndHalf
+		upperPanel.add(upperPanel1stHalf, BorderLayout.NORTH);
+		upperPanel.add(upperPanel2ndHalf, BorderLayout.CENTER);
+
+		// consist of rule text area
 		rulePanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 		this.scrollPane = new JScrollPane(this.ruleTextTextPane);
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -329,11 +355,14 @@ public class RuleEditorPanel extends JPanel {
 		buttonPanel.add(cancelButton);
 		buttonPanel.add(this.convertToOWLButton);
 
+		// consist of buttons
+		lowerPanel.add(buttonPanel);
+
 		surroundPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
 		surroundPanel.add(upperPanel, BorderLayout.NORTH);
 		surroundPanel.add(rulePanel, BorderLayout.CENTER);
-		surroundPanel.add(buttonPanel, BorderLayout.SOUTH);
+		surroundPanel.add(lowerPanel, BorderLayout.SOUTH);
 		this.add(surroundPanel, BorderLayout.CENTER);
 		// pack();
 	}
@@ -390,7 +419,7 @@ public class RuleEditorPanel extends JPanel {
 	}
 
 	private void disableAutoCompleteMode() {
-		this.autoCompleteState = Optional.<@NonNull SWRLRuleEditorAutoCompleteState> empty();
+		this.autoCompleteState = Optional.<@NonNull SWRLRuleEditorAutoCompleteState>empty();
 	}
 
 	private void cancelAutoCompleteIfNecessary() {
@@ -706,7 +735,8 @@ public class RuleEditorPanel extends JPanel {
 		}
 
 		pnlForCreateNewEntity.setLayout(new BorderLayout());
-		lbl1.setText("<html><p><b><font color=\"red\">"+message+"</font></b>" + " can not be transformed to OWL Axiom."+"</p></html>");
+		lbl1.setText("<html><p><b><font color=\"red\">" + message + "</font></b>"
+				+ " can not be transformed to OWL Axiom." + "</p></html>");
 		lbl2.setText("<html><br>Do you want to switch to SWRLTab ?</html>");
 		pnlForCreateNewEntity.add(lbl1, BorderLayout.PAGE_START);
 		pnlForCreateNewEntity.add(lbl2, BorderLayout.PAGE_END);
@@ -1000,7 +1030,7 @@ public class RuleEditorPanel extends JPanel {
 						} catch (Exception exception) {
 							System.out.println("exception occurred when transferring to axioms");
 							switchToSWRLTab(ruleName, ruleText, comment, true);
-							//exception.printStackTrace();
+							// exception.printStackTrace();
 						}
 						if (!translator.resultingAxioms.isEmpty()) {
 
