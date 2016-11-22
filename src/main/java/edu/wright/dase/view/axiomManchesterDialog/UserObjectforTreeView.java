@@ -27,6 +27,7 @@ public class UserObjectforTreeView {
 
 	static ManchesterOWLSyntaxOWLObjectRendererImpl rendering = new ManchesterOWLSyntaxOWLObjectRendererImpl();
 
+	//setting the activeOntology and parent
 	public UserObjectforTreeView(Component parent, OWLOntology activeO) {
 		activeOntology = activeO;
 		this.parent = parent;
@@ -94,8 +95,6 @@ public class UserObjectforTreeView {
 		return "<html>" + fullAxiomAsFormattedString + "</html>";
 	}
 	
-	
-	 
 	 
 	@Override
 	public String toString() {

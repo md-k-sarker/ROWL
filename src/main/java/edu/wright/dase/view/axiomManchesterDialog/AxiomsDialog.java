@@ -6,19 +6,25 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 
 import org.semanticweb.owlapi.manchestersyntax.renderer.ManchesterOWLSyntaxOWLObjectRendererImpl;
@@ -27,6 +33,10 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import edu.wright.dase.view.RuleEditorPanel;
+
+/*
+ * Create and show the dialog of generated axioms.
+ */
 
 public class AxiomsDialog extends JDialog {
 
@@ -37,31 +47,23 @@ public class AxiomsDialog extends JDialog {
 	final String cancelBtnText = "Cancel";
 	final String existingAxiomsLblText = "Existing Axioms";
 	final String newAxiomsLblText = "Generated Axioms";
-	final String declarationAxiomTypeText = "Declaration Axioms";
-	final String existentialAxiomTypeText = "Existential Axioms";
-	final String cardinalityAxiomTypeText = "Cardinality Axioms";
-	final String domainandRangeAxiomTypeText = "Domain-Range Axioms";
-	final String subClassOfAxiomTypeText = "SubClassOf Axioms";
-	final String disJointAxiomTypeText = "Disjoint Classes Axioms";
-	final String classAssertionAxiomTypeText = "Class (Type) Assertion Axioms";
-	final String otherAxiomTypeText = "Other Axioms";
 	final String infoText = "  Select axioms which you want to integrate.";
 
 	private JPanel mainPnl;
-	// private JSplitPane splitPane;
 	private JPanel bottomPnl;
 	private JLabel infoLbl;
 	private JPanel axiomsPnl;
 	private JScrollPane axiomsScroll;
-	// private static final double SPLIT_PANE_RESIZE_WEIGHT = 0.5;
-	private DefaultMutableTreeNode axiomsTreeRoot;
 	private final Set<OWLAxiom> selectedAxioms;
-	private JCheckBoxTree axiomsTree;
-	// private JCheckBoxTree existingAxiomsTree;
-	// private IntegrateOntologyWithProtege intgOntWProtege;
 	private JFrame parent;
 	private boolean isClickedOK;
 	private final RuleEditorPanel ruleEditorPanel;
+	
+	private static ManchesterOWLSyntaxOWLObjectRendererImpl rendering = new ManchesterOWLSyntaxOWLObjectRendererImpl();
+	
+	static ArrayList<String> boldFaceText = new ArrayList<String>(
+			Arrays.asList("disjointwith", "min", "max", "some", "only", "subclassof", "inverse", "or", "and",
+					"equivalentto", "self", "value", "not", "inverseof", "subpropertyof", "exactly"));
 
 	public boolean isClickedOK() {
 		return this.isClickedOK;
@@ -72,16 +74,18 @@ public class AxiomsDialog extends JDialog {
 	}
 
 	public AxiomsDialog(RuleEditorPanel ruleEditorPanel, JFrame parent, OWLOntology activeOntology) {
+
 		super(parent);
 		this.ruleEditorPanel = ruleEditorPanel;
 		this.parent = parent;
 		this.selectedAxioms = new HashSet<OWLAxiom>();
-		// this.intgOntWProtege = integrateOntologyWithProtege;
+		
 		this.isClickedOK = false;
 
+		// call to set the activeOntology and parent
 		new UserObjectforTreeView(parent, activeOntology);
 
-		// for sorting rendering is accomplished
+		// for  rendering
 		ManchesterOWLSyntaxPrefixNameShortFormProvider shortFormProvider = new ManchesterOWLSyntaxPrefixNameShortFormProvider(
 				activeOntology);
 		rendering.setShortFormProvider(shortFormProvider);
@@ -114,7 +118,7 @@ public class AxiomsDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// now integrate with protege
-				extractSelectedAxioms();
+				// extractSelectedAxioms();
 				setClickedOK(true);
 				dispose();
 			}
@@ -143,7 +147,6 @@ public class AxiomsDialog extends JDialog {
 			}
 		});
 
-		deActivateIntegrateBtn();
 
 		JPanel pnl2 = new JPanel();
 		pnl2.setLayout(new BorderLayout());
@@ -162,26 +165,9 @@ public class AxiomsDialog extends JDialog {
 		this.setVisible(true);
 	}
 
-	private void extractSelectedAxioms() {
-		TreePath[] paths;
-
-		// new axioms
-		paths = axiomsTree.getCheckedPaths();
-
-		for (TreePath tp : paths) {
-			DefaultMutableTreeNode eachNode = (DefaultMutableTreeNode) tp.getLastPathComponent();
-			if (eachNode.getUserObject() instanceof UserObjectforTreeView) {
-
-				UserObjectforTreeView objTV = (UserObjectforTreeView) eachNode.getUserObject();
-				if (objTV.isAxiom()) {
-					selectedAxioms.add(objTV.getAxiom());
-				}
-			}
-		}
-
-	}
 
 	private JPanel getAxiomsPnl() {
+
 		axiomsPnl = new JPanel();
 		axiomsPnl.setLayout(new BorderLayout());
 
@@ -190,166 +176,80 @@ public class AxiomsDialog extends JDialog {
 		lblNewAxioms.setHorizontalAlignment(SwingConstants.CENTER);
 		axiomsPnl.add(lblNewAxioms, BorderLayout.NORTH);
 
-		// just for checking
-		//new JCheckBoxTree().activeontologyAxioms = activeOntology.getAxioms();
+		//create tree
+		
+		String value = "<html><b style=\"color:#624FDB;\">" + "Axioms" + "</b></html>";
+		
+		DefaultMutableTreeNode treeRoot = new DefaultMutableTreeNode(value);
 
-		DefaultMutableTreeNode treeRoot = getAxiomsTreeRoot();
-		if (treeRoot.getChildCount() > 0) {
-			axiomsTree = new JCheckBoxTree(getAxiomsTreeRoot());
-			axiomsTree.addCheckChangeEventListener(new JCheckBoxTree.CheckChangeEventListener() {
+		DefaultMutableTreeNode childNode;
 
-				public void checkStateChanged(JCheckBoxTree.CheckChangeEvent event) {
-					TreePath[] paths = axiomsTree.getCheckedPaths();
-					if (paths.length > 1) {
-						activateIntegrateBtn();
-					} else {
-						deActivateIntegrateBtn();
-					}
-				}
-			});
-			axiomsScroll = new JScrollPane(axiomsTree);
-			axiomsPnl.add(axiomsScroll, BorderLayout.CENTER);
-		} else {
-			JPanel pnl = new JPanel();
-			pnl.setLayout(new BorderLayout());
+		// create child node from each Axioms
+		if (ruleEditorPanel.getGeneratedAxioms() != null && !ruleEditorPanel.getGeneratedAxioms().isEmpty()) {
 
-			String htmlFormattedText = "<html><h3>These type of axioms</h3>" + "<ul>" + "<li>"
-					+ existentialAxiomTypeText + "</li>" + "<li>" + cardinalityAxiomTypeText + "</li>" + "<li>"
-					+ domainandRangeAxiomTypeText + "</li>" + "<li>" + subClassOfAxiomTypeText + "</li>" + "<li>"
-					+ disJointAxiomTypeText + "</li>" + "<li>" + classAssertionAxiomTypeText + "</li>" + "</ul>"
-					+ "<b> Could not be generated from the diagram.<b>" + "<br><br><br>"
-					+ "<h3> But declarations integrated with protege.</h3>" + "</html>";
+			for (OWLAxiom axiom : ruleEditorPanel.getGeneratedAxioms()) {
 
-			JLabel lbl = new JLabel(htmlFormattedText);
-			lbl.setBorder(new EmptyBorder(10, 35, 20, 20));
-			pnl.add(lbl, BorderLayout.CENTER);
-
-			axiomsPnl.add(pnl, BorderLayout.CENTER);
-			infoLbl.setText("");
+				childNode = new DefaultMutableTreeNode(getAxiomWithCostemtics(axiom));
+				treeRoot.add(childNode);
+			}
 		}
+
+		JTree axiomTree = new JTree(treeRoot);
+		try{
+			//add icon
+			//Icon closedIcon = new ImageIcon(getClass().getResource("tree.png"));
+			//DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) axiomTree.getCellRenderer();
+			//renderer.setClosedIcon(closedIcon);
+		}
+		catch (Exception e) {
+			// TODO: handle exception
+		}
+		axiomsScroll = new JScrollPane(axiomTree);
+
+		axiomsPnl.add(axiomsScroll, BorderLayout.CENTER);
 
 		return axiomsPnl;
 	}
 
-	public void activateIntegrateBtn() {
-		integrateBtn.setEnabled(true);
-		cancelBtn.setLabel(cancelBtnText);
+	
+	private String getAxiomWithCostemtics(OWLAxiom axiom) {
+
+		String value = "";
+
+		String tmpValue = rendering.render(axiom);
+		tmpValue = tmpValue.replace("<", "&lt;");
+		value = getCosmetics(tmpValue);
+
+		return value;
 	}
 
-	public void deActivateIntegrateBtn() {
-		integrateBtn.setEnabled(false);
-		cancelBtn.setLabel("OK");
-	}
+	private String getCosmetics(String fullAxiomAsString) {
 
-	static ManchesterOWLSyntaxOWLObjectRendererImpl rendering = new ManchesterOWLSyntaxOWLObjectRendererImpl();
+		fullAxiomAsString = fullAxiomAsString.replace("  ", " ");
+		String fullAxiomAsFormattedString = " ";
 
-	public DefaultMutableTreeNode getAxiomsTreeRoot() {
-		axiomsTreeRoot = new DefaultMutableTreeNode(new UserObjectforTreeView(false, "Select All"));
-		DefaultMutableTreeNode childNode;
+		String[] values = fullAxiomAsString.split(" ");
 
-		// create Axioms Node
-		if (ruleEditorPanel.getGeneratedAxioms() != null && !ruleEditorPanel.getGeneratedAxioms().isEmpty()) {
-
-			for (OWLAxiom axiom : ruleEditorPanel.getGeneratedAxioms()) {
-				childNode = new DefaultMutableTreeNode(new UserObjectforTreeView(true, axiom));
-				axiomsTreeRoot.add(childNode);
+		for (String eachToken : values) {
+			// System.out.println(eachToken);
+			if (boldFaceText.contains(eachToken.toLowerCase())) {
+				// fullAxiomAsString = fullAxiomAsString.replace(eachToken, "<b
+				// style=\"color:#F09128;\">" + eachToken + "</b>");
+				fullAxiomAsFormattedString += "<b style=\"color:#F09128;\">" + eachToken + "</b>" + " ";
+			} else {
+				fullAxiomAsFormattedString += eachToken + " ";
 			}
-			// axiomsTreeRoot.add(subRoot);
 		}
 
-		return axiomsTreeRoot;
+		return "<html>" + fullAxiomAsFormattedString + "</html>";
 	}
-
-	// private boolean isAlreadyListed(OWLAxiom axiom) {
-	//
-	// if (intgOntWProtege.getClassAssertionAxioms().contains(axiom))
-	// return true;
-	// if (intgOntWProtege.getSubClassOfAxioms().contains(axiom))
-	// return true;
-	// if (intgOntWProtege.getCardinalityAxioms().contains(axiom))
-	// return true;
-	// if (intgOntWProtege.getDomainAndRangeAxioms().contains(axiom))
-	// return true;
-	// if (intgOntWProtege.getDisJointOfAxioms().contains(axiom))
-	// return true;
-	// if (intgOntWProtege.getExistentialAxioms().contains(axiom))
-	// return true;
-	//
-	// return false;
-	// }
 
 
 	public Set<OWLAxiom> getSelectedAxioms() {
 		return this.selectedAxioms;
 	}
-
 	// for testing purpose only
-	public DefaultMutableTreeNode getRoot() {
 
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode(new UserObjectforTreeView(false, "Music"));
-		DefaultMutableTreeNode category;
-		DefaultMutableTreeNode composer;
-		DefaultMutableTreeNode style;
-		// Classical
-		category = new DefaultMutableTreeNode(new UserObjectforTreeView(false, "Classical"));
 
-		// Beethoven
-		category.add(composer = new DefaultMutableTreeNode(new UserObjectforTreeView(false, "Beethoven")));
-
-		composer.add(style = new DefaultMutableTreeNode(new UserObjectforTreeView(false, "Concertos")));
-		composer.add(style = new DefaultMutableTreeNode("Quartets"));
-
-		style.add(new DefaultMutableTreeNode(new UserObjectforTreeView(false, "No. 1 - C Major")));
-		style.add(new DefaultMutableTreeNode(new UserObjectforTreeView(false, "Six String Quartets")));
-
-		root.add(category);
-
-		return root;
-	}
-
-	// for testing purpose only
-	public AxiomsDialog() {
-		super();
-
-		this.selectedAxioms = new HashSet<OWLAxiom>();
-		this.ruleEditorPanel = null;
-
-		DefaultMutableTreeNode root = getRoot();
-
-		final JCheckBoxTree cbt = new JCheckBoxTree(root);
-
-		DefaultMutableTreeNode inferredroot = (DefaultMutableTreeNode) cbt.getModel().getRoot();
-		Enumeration e = inferredroot.breadthFirstEnumeration();
-
-		initUI();
-
-		cbt.addCheckChangeEventListener(new JCheckBoxTree.CheckChangeEventListener() {
-
-			public void checkStateChanged(JCheckBoxTree.CheckChangeEvent event) {
-				// System.out.println("event");
-				TreePath[] paths = cbt.getCheckedPaths();
-				for (TreePath tp : paths) {
-					for (Object pathPart : tp.getPath()) {
-						DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) tp.getLastPathComponent();
-						if (parentNode.getUserObject() instanceof UserObjectforTreeView) {
-							// System.out.println("outside: can be done");
-							// System.out.println(((UserObjectforTreeView)
-							// parentNode.getUserObject()).isAxiom());
-						} // else
-							// System.out.println("outside: not posible");
-
-					}
-					//System.out.println();
-				}
-			}
-		});
-		// this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-	}
-
-	// for testing purpose only
-	public static void main(String args[]) {
-		AxiomsDialog m = new AxiomsDialog();
-		m.setVisible(true);
-
-	}
+	
 }

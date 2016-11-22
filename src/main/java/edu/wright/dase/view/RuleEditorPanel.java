@@ -884,7 +884,9 @@ public class RuleEditorPanel extends JPanel {
 		Set<OWLAxiom> axiomWithAnnotations = new HashSet<OWLAxiom>();
 
 		if (axiomDialog.isClickedOK()) {
-			Set<OWLAxiom> selectedAxioms = axiomDialog.getSelectedAxioms();
+			
+			Set<OWLAxiom> selectedAxioms = getGeneratedAxioms();
+			
 			if (!selectedAxioms.isEmpty()) {
 
 				/// create list of newly created obj-properties from selected
