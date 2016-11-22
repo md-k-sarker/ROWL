@@ -47,7 +47,7 @@ public class AxiomsDialog extends JDialog {
 	final String cancelBtnText = "Cancel";
 	final String existingAxiomsLblText = "Existing Axioms";
 	final String newAxiomsLblText = "Generated Axioms";
-	final String infoText = "  Select axioms which you want to integrate.";
+	final String infoText = "    Click Integrate to combine the axioms with active ontology.";
 
 	private JPanel mainPnl;
 	private JPanel bottomPnl;
@@ -96,9 +96,9 @@ public class AxiomsDialog extends JDialog {
 
 	public void initUI() {
 
-		setSize(500, 500);
+		setSize(800, 500);
 		setLocationRelativeTo(parent);
-		setTitle("Select Axioms");
+		setTitle("Integrate with active ontology");
 		this.getContentPane().setLayout(new BorderLayout());
 
 		// main panel
