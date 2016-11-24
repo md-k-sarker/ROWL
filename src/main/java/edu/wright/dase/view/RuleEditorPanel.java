@@ -246,6 +246,9 @@ public class RuleEditorPanel extends JPanel {
 				this.ruleTextTextPane.requestFocus();
 				setInformationalStatusText(STATUS_OK);
 				enableSave();
+				if ((!ruleText.contains("->"))) {
+					disableSave();
+				}
 
 			} catch (SWRLIncompleteRuleException e) {
 				setIncompleteStatusText(e.getMessage() == null ? "" : e.getMessage());
@@ -288,12 +291,13 @@ public class RuleEditorPanel extends JPanel {
 		JLabel ruleNameLabel = new JLabel(RULE_NAME_TITLE);
 		JLabel commentLabel = new JLabel(COMMENT_LABEL_TITLE);
 		JLabel statusLabel = new JLabel(STATUS_LABEL_TITLE);
-		JLabel templateSuggestion = new JLabel(
-				"<html> <br> &nbsp; &nbsp; <font > Now model your own sentence and click </font> <font  color='green'> Convert to OWL Axiom. </font> You need to give <font size='4' color='green'> rule name </font> and <font size='4' color='green'> rule text.</font> </br> </html>");
 		JLabel templateSentence = new JLabel(
-				"<html> <br> &nbsp; &nbsp; Example sentence to model: </br> <font size='4'; font-family= 'Courier New'> Man is mortal.</font></html>");
+				"<html> &nbsp; &nbsp; EXAMPLE <br>&nbsp; &nbsp; Given sentence to model: <font size='4'; font-family= 'Courier New'> Every man is mortal.</font></html>");
 		JLabel templateRule = new JLabel(
-				"<html> <br> &nbsp; &nbsp; Corresponding rule (Man is mortal) : </br> <font size='4'; font-family= 'Courier New'>Man(?x) -> Mortal(?x)</font> </html>");
+				"<html> <br> &nbsp; &nbsp; The above sentence modeled as rule: <font size='4'; font-family= 'Courier New'>Man(?x) -> Mortal(?x)</font> </html>");
+		JLabel templateSuggestion = new JLabel(
+				"<html> <br> &nbsp; &nbsp; <font > Now, model the sentences given to you in the Evaluator window as a rule. Put the rule name in the Rule Name text field and the rule itself in the Rule Text box. <br> &nbsp; &nbsp; When you are done writing your rule in ROWL Tab, click </font> <font  color='green'>Convert to OWL Axiom button. </font>  </br> </html>");
+
 		JLabel ruleTextLabel = new JLabel(RULE_TEXT_LABEL);
 		JLabel blankLabel = new JLabel("");
 		JPanel upperPanel = new JPanel(new BorderLayout());
@@ -884,9 +888,9 @@ public class RuleEditorPanel extends JPanel {
 		Set<OWLAxiom> axiomWithAnnotations = new HashSet<OWLAxiom>();
 
 		if (axiomDialog.isClickedOK()) {
-			
+
 			Set<OWLAxiom> selectedAxioms = getGeneratedAxioms();
-			
+
 			if (!selectedAxioms.isEmpty()) {
 
 				/// create list of newly created obj-properties from selected
