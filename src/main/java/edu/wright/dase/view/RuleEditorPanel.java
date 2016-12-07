@@ -292,11 +292,11 @@ public class RuleEditorPanel extends JPanel {
 		JLabel commentLabel = new JLabel(COMMENT_LABEL_TITLE);
 		JLabel statusLabel = new JLabel(STATUS_LABEL_TITLE);
 		JLabel templateSentence = new JLabel(
-				"<html> &nbsp; &nbsp; EXAMPLE <br>&nbsp; &nbsp; Given sentence to model: <font size='4'; font-family= 'Courier New'> Every man is mortal.</font></html>");
+				"<html> &nbsp; &nbsp; EXAMPLE <br>&nbsp; &nbsp; Given sentence to model: <font size='4'; font-family= 'Courier New'> If a person has a baby then that person is a parent. </font></html>");
 		JLabel templateRule = new JLabel(
-				"<html> <br> &nbsp; &nbsp; The above sentence modeled as rule: <font size='4'; font-family= 'Courier New'>Man(?x) -> Mortal(?x)</font> </html>");
+				"<html> <br> &nbsp; &nbsp; The above sentence modeled as rule: <font size='4'; font-family= 'Courier New'> Person(?x) ^ hasBaby(?x,?y) -> Parent(?x)</font> </html>");
 		JLabel templateSuggestion = new JLabel(
-				"<html> <br> &nbsp; &nbsp; <font > Now, model the sentences given to you in the Evaluator window as a rule. Put the rule name in the Rule Name text field and the rule itself in the Rule Text box. <br> &nbsp; &nbsp; When you are done writing your rule in ROWL Tab, click </font> <font  color='green'>Convert to OWL Axiom button. </font>  </br> </html>");
+				"<html> <br> &nbsp; &nbsp; <font > Now, model the sentences given to you in the Evaluator window as a rule. Put the rule name in the Rule Name text field and the rule itself in the Rule Text box. <br> &nbsp; &nbsp; When you are done writing your rule in ROWL Tab, click </font> <font  color='green'>Convert to OWL Axiom </font> button.  Then confirm by clicking <font  color='green'> Integrate </font> on the pop-up window.  </br> </html>");
 
 		JLabel ruleTextLabel = new JLabel(RULE_TEXT_LABEL);
 		JLabel blankLabel = new JLabel("");
