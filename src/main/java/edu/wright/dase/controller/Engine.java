@@ -424,9 +424,6 @@ public class Engine {
 	 * @param ruleName
 	 */
 	public void deleteRule(String ruleName) {
-		if (rulesWithID.containsKey(ruleName)) {
-			rulesWithID.remove(ruleName);
-		}
 
 		// remove the corresponding axioms
 		if (axiomsWithID.containsKey(ruleName)) {
@@ -447,6 +444,11 @@ public class Engine {
 
 			// remove from map also
 			newlyCreatedObjectPropertiesWithID.remove(ruleName);
+		}
+
+		// remove rules at-last
+		if (rulesWithID.containsKey(ruleName)) {
+			rulesWithID.remove(ruleName);
 		}
 	}
 
@@ -509,12 +511,16 @@ public class Engine {
 			for (OWLAnnotation ann : ax.getAnnotations()) {
 				for (OWLAnnotationProperty anp : ann.getAnnotationPropertiesInSignature()) {
 					if (anp.equals(fixedAnnotationProperty)) {
+
 						// System.out.println("\n\naxiom before parse: " +
 						// ax.toString() + "\n\n");
+
 						String val = ann.getValue().asLiteral().get().getLiteral();
 						String[] values = val.split("___");
+
 						// System.out.println("values.length while retrieving: "
 						// + values.length);
+
 						if (values.length >= 2) {
 							String ruleID = values[0];
 							String ruleText = values[1];
@@ -576,6 +582,11 @@ public class Engine {
 					}
 				}
 			}
+		}
+
+		for (String s : axiomsWithID.keySet()) {
+			// System.out.println("Name: "+ s+ "\tAxioms: "
+			// +axiomsWithID.get(s));
 		}
 	}
 

@@ -296,7 +296,7 @@ public class RuleEditorPanel extends JPanel {
 		JLabel templateRule = new JLabel(
 				"<html> <br> &nbsp; &nbsp; The above sentence modeled as rule: <font size='4'; font-family= 'Courier New'> Person(?x) ^ hasBaby(?x,?y) -> Parent(?x)</font> </html>");
 		JLabel templateSuggestion = new JLabel(
-				"<html> <br> &nbsp; &nbsp; <font > Now, model the sentences given to you in the Evaluator window as a rule. Put the rule name in the Rule Name text field and the rule itself in the Rule Text box. <br> &nbsp; &nbsp; When you are done writing your rule in ROWL Tab, click </font> <font  color='green'>Convert to OWL Axiom </font> button.  Then confirm by clicking <font  color='green'> Integrate </font> on the pop-up window.  </br> </html>");
+				"<html> <br> &nbsp; &nbsp; <font > Now, model your own sentence as a rule. Put the rule name in the Rule Name text field and the rule itself in the Rule Text box. <br> &nbsp; &nbsp; When you are done writing your rule in ROWL Tab, click </font> <font  color='green'>Convert to OWL Axiom </font> button.  Then confirm by clicking <font  color='green'> Integrate </font> on the pop-up window.  </br> </html>");
 
 		JLabel ruleTextLabel = new JLabel(RULE_TEXT_LABEL);
 		JLabel blankLabel = new JLabel("");
@@ -913,6 +913,10 @@ public class RuleEditorPanel extends JPanel {
 
 				// save changes in the ontology.
 				applyChangetoOntology(axiomWithAnnotations);
+				
+				//save axioms into axiomsID
+				//necessary when ontology is not saved or reloaded but new rule is inserted
+				Constants.engineAsStaticReference.addAxiomsWithID(getRuleName(), axiomWithAnnotations);
 
 				// show the rule in the table
 				RuleModel rule = new RuleModel(getRuleName(), getRuleText(), getComment());
