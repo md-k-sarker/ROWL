@@ -223,9 +223,21 @@ public class Engine {
 		Constants.engineAsStaticReference = this;
 	}
 
+	private int getFreshObjPropCounter() {
+		int counter = 0;
+		for (OWLObjectProperty owlObjectProperty : getActiveOntology().getObjectPropertiesInSignature(true)) {
+			if (owlObjectProperty.getIRI().toString().contains(Constants.FRESH_PROP_NAME)) {
+				counter++;
+			}
+		}
+		counter++;
+		return counter;
+	}
+
 	public String getNextFreshObjProp() {
 		int counter = 0;
 
+		// Should Work
 		OWLEntity owlEntity;
 		do {
 			++counter;
@@ -276,9 +288,24 @@ public class Engine {
 			}
 		} else {
 			// defaultPrefix
-			return this.defaultPrefix + name;
-		}
+			// return this.defaultPrefix + name;
+			String prefixString = this.prefixManager.getPrefix(this.defaultPrefix);
+			String modifiedName = "";
 
+			if (null != prefixString) {
+
+				if (prefixString.endsWith("#") || prefixString.endsWith("/") || prefixString.endsWith(":")) {
+					modifiedName = this.defaultPrefix + name;
+				} else {
+					modifiedName = this.defaultPrefix + "#" + name;
+				}
+
+				return modifiedName;
+			} else {
+				modifiedName = this.defaultPrefix + name;
+				return modifiedName;
+			}
+		}
 	}
 
 	public boolean addPrefix() {
