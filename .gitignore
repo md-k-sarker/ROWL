@@ -6,7 +6,7 @@
 .settings/
 target/
 bin/
-plugin/
+
 
 # Eclipse project files
 .classpath
