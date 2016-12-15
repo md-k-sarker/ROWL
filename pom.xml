@@ -5,19 +5,19 @@
 	<parent>
 		<groupId>edu.stanford.swrl</groupId>
 		<artifactId>swrlapi-parent</artifactId>
-		<version>1.0.8</version>
+		<version>1.1.4</version>
 	</parent>
 
 	<groupId>edu.wright.dase</groupId>
 	<artifactId>ROWL</artifactId>
-	<version>1.5.0</version>
+	<version>1.6.0</version>
 	<name>ROWL Protege 5.0+ Plugin</name>
 	<description>ROWL Plugin for Desktop Protege 5.0+</description>
 	<packaging>bundle</packaging>
 
 	<properties>
-		<swrlapi.version>1.0.8</swrlapi.version>
-		<swrlapi.drools.version>1.0.8</swrlapi.drools.version>
+		<swrlapi.version>1.1.4</swrlapi.version>
+		<swrlapi.drools.version>1.1.4</swrlapi.drools.version>
 	</properties>
 
 	<developers>
@@ -34,8 +34,8 @@
 	<scm>
 		<connection>scm:git:git@github.com/md-k-sarker/ROWL.git</connection>
 		<developerConnection>scm:git:git@github.com:md-k-sarker/ROWL.git</developerConnection>
-		<url>https://github.com/protegeproject/swrltab-plugin</url>
-		<tag>release-0.0.1-beta-0</tag>
+		<url>https://github.com/md-k-sarker/ROWL</url>
+		<tag>release-1.5.0</tag>
 	</scm>
 
 	<issueManagement>
@@ -176,7 +176,7 @@
 						<Import-Package>
 							org.protege.editor.core.*;version="5.0.0",
 							org.protege.editor.owl.*;version="5.0.0",
-							org.semanticweb.owlapi.*;version="[4.1.3,5.0.0)",
+							org.semanticweb.owlapi.*;version="[4.2.5,5.0.0)",
 							org.swrlapi.*;version="1.0.0",
 							org.swrlapi.drools.*;version="1.0.0",
 							com.ibm.*;resolution:=optional,
