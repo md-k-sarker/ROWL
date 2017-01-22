@@ -52,20 +52,6 @@ public class Engine {
 
 	private String defaultPrefix;
 
-	// /**
-	// * @return the defaultPrefix
-	// */
-	// public String getDefaultPrefix() {
-	// return defaultPrefix;
-	// }
-	//
-	// /**
-	// * @param defaultPrefix
-	// * the defaultPrefix to set
-	// */
-	// public void setDefaultPrefix(String defaultPrefix) {
-	// this.defaultPrefix = defaultPrefix;
-	// }
 
 	/**
 	 * @return the prefixManager
@@ -206,7 +192,6 @@ public class Engine {
 			if (this.defaultPrefix == null) {
 				this.defaultPrefix = "";
 			}
-			// System.out.println("add prefix returned false");
 		}
 
 		fixedAnnotationProperty = activeOntology.getOWLOntologyManager().getOWLDataFactory()
@@ -464,8 +449,6 @@ public class Engine {
 		}
 
 		ChangeApplied CA = owlOntologyManager.applyChanges(remover.getChanges());
-		// System.out.println("inside deleteNewlyCreatedObjProperties
-		// changeApplied result: " + CA.name());
 	}
 
 	public void OntologyChanged() {
@@ -512,14 +495,8 @@ public class Engine {
 				for (OWLAnnotationProperty anp : ann.getAnnotationPropertiesInSignature()) {
 					if (anp.equals(fixedAnnotationProperty)) {
 
-						// System.out.println("\n\naxiom before parse: " +
-						// ax.toString() + "\n\n");
-
 						String val = ann.getValue().asLiteral().get().getLiteral();
 						String[] values = val.split("___");
-
-						// System.out.println("values.length while retrieving: "
-						// + values.length);
 
 						if (values.length >= 2) {
 							String ruleID = values[0];
@@ -534,12 +511,6 @@ public class Engine {
 
 								// add to rulewith ID
 								rulesWithID.put(ruleID, new RuleModel(ruleID, ruleText, ruleComment));
-
-								// System.out.println("axiomsWithID length
-								// before: " + axiomsWithID.size());
-								// add to axioms with ID
-								// System.out.println("equal or not: " +
-								// tmpRuleID + " " + ruleID);
 
 								// add into axiomsWithID
 								if (axiomsWithID.containsKey(ruleID)) {
@@ -557,10 +528,6 @@ public class Engine {
 										String iriString = values[counter - 1];
 										IRI iri = IRI.create(iriString);
 										owlObjectProperty = owlDataFactory.getOWLObjectProperty(iri);
-
-										// System.out.println("objprop while
-										// retrieving: " +
-										// owlObjectProperty.getIRI());
 
 										if (newlyCreatedObjectPropertiesWithID.containsKey(ruleID)) {
 
@@ -582,11 +549,6 @@ public class Engine {
 					}
 				}
 			}
-		}
-
-		for (String s : axiomsWithID.keySet()) {
-			// System.out.println("Name: "+ s+ "\tAxioms: "
-			// +axiomsWithID.get(s));
 		}
 	}
 
