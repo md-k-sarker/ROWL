@@ -28,6 +28,8 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.PrefixManager;
 import org.semanticweb.owlapi.model.parameters.ChangeApplied;
 import org.swrlapi.core.IRIResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.wright.dase.view.RuleEditorPanel;
 
@@ -73,15 +75,6 @@ public class SuggestionPopup extends JPopupMenu {
 	 */
 	@Override
 	public void show(Component invoker, int x, int y) {
-		// TODO Auto-generated method stub
-
-		// OWLOntologyID ontoID = this.activeOntology.getOntologyID();
-		//
-		// if (ontoID == null) {
-		// JOptionPane.showMessageDialog(invoker, "Please Specify Ontology
-		// ID(Ontology IRI) first.");
-		// return;
-		// }
 
 		super.show(invoker, x, y);
 	}
@@ -94,22 +87,6 @@ public class SuggestionPopup extends JPopupMenu {
 		if (!this.errorText.contains("cannot use name of existing OWL class")) {
 
 			if (this.errorText.contains("Invalid SWRL atom predicate")) {
-
-				// if (noOfArgument(ruleText, entityName) == 1) {
-				// // class
-				// add(bind("Add '" + entityName + "' as OWLClass", new
-				// AddClassAction(entityName), "/class.add.png"));
-				// } else if (noOfArgument(ruleText, entityName) == 2) {
-				// // object property
-				// add(bind("Add '" + entityName + "' as OWLObjectProperty", new
-				// AddObjPropAction(entityName),
-				// "/objprop.add.png"));
-				// addSeparator();
-				// // data property
-				// add(bind("Add '" + entityName + "' as OWLDataProperty", new
-				// AddDataPropAction(entityName),
-				// "/dataprop.add.png"));
-				// } else
 				{
 					// class
 					add(bind("Add '" + entityName + "' as OWLClass", new AddClassAction(entityName), "/class.add.png"));
@@ -146,7 +123,7 @@ public class SuggestionPopup extends JPopupMenu {
 
 			return atom;
 		} else {
-			// System.out.println("not found");
+			// not found;
 			return "";
 		}
 	}

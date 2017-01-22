@@ -248,8 +248,5 @@ public class AxiomsDialog extends JDialog {
 	public Set<OWLAxiom> getSelectedAxioms() {
 		return this.selectedAxioms;
 	}
-	// for testing purpose only
 
-
-	
 }

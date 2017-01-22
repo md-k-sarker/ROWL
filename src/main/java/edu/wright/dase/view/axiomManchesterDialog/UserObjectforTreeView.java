@@ -9,7 +9,13 @@ import org.semanticweb.owlapi.manchestersyntax.renderer.ManchesterOWLSyntaxPrefi
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class UserObjectforTreeView {
+	
+	private static final long serialVersionUID = -4194122328392241790L;
+	private static final Logger log = LoggerFactory.getLogger(UserObjectforTreeView.class);
 
 	private boolean isAxiom;
 	private OWLAxiom axiom;

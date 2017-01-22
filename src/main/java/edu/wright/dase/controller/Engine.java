@@ -26,6 +26,8 @@ import org.semanticweb.owlapi.model.parameters.ChangeApplied;
 import org.semanticweb.owlapi.util.OWLEntityRemover;
 import org.swrlapi.core.IRIResolver;
 import org.swrltab.ui.ProtegeIRIResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.wright.dase.model.Constants;
 import edu.wright.dase.model.RuleModel;
@@ -35,6 +37,8 @@ import edu.wright.dase.view.RuleTablePanel;
 
 public class Engine {
 
+	private static final Logger log = LoggerFactory.getLogger(Engine.class);
+	
 	private OWLOntology activeOntology;
 	private TreeMap<String, Set<OWLAxiom>> axiomsWithID;
 	private TreeMap<String, Set<OWLObjectProperty>> newlyCreatedObjectPropertiesWithID;

@@ -181,9 +181,7 @@ public class RuleEditorPanel extends JPanel {
 	public RuleEditorPanel(@NonNull SWRLRuleEngineDialogManager dialogManager, @NonNull JTabbedPane tabbedPane) {
 
 		this.dialogManager = dialogManager;
-		// this.engine = engine;
-		// System.out.println("inside RuleEditorPanel() constructor: "+
-		// this.engine);
+
 		this.loweredBevelBorder = BorderFactory.createLoweredBevelBorder();
 		this.yellowBorder = BorderFactory.createLineBorder(Color.YELLOW);
 		this.ruleTextTextPane = new JTextPane();
@@ -203,7 +201,6 @@ public class RuleEditorPanel extends JPanel {
 	}
 
 	public void initialize() {
-		// Container contentPane = getContentPane();
 
 		initializeComponents();
 
@@ -228,10 +225,6 @@ public class RuleEditorPanel extends JPanel {
 	public void update() {
 		updateStatus();
 	}
-
-	/**
-	 * 
-	 */
 
 	private void updateStatus() {
 		String ruleText = getRuleText();
@@ -270,7 +263,6 @@ public class RuleEditorPanel extends JPanel {
 			} catch (RuntimeException e) {
 				setInformationalStatusText(e.getMessage() == null ? "" : e.getMessage());
 				disableSave();
-				// System.out.println("runtime: " + e.getMessage());
 			}
 		}
 	}
@@ -636,7 +628,7 @@ public class RuleEditorPanel extends JPanel {
 	}
 
 	/**
-	 * Not working properly Future implementation
+	 * Not working properly To.Do Future implementation
 	 */
 	private void showColor(String errorText) {
 		// String atom = getAtom(errorText);
@@ -662,7 +654,7 @@ public class RuleEditorPanel extends JPanel {
 	}
 
 	/**
-	 * Not working properly Future implementation
+	 * Not working properly To DO. Future implementation
 	 */
 	private void removeColor() {
 		// styledDoc.setCharacterAttributes(0, styledDoc.getLength(),
@@ -687,8 +679,6 @@ public class RuleEditorPanel extends JPanel {
 	private class StatusTextFieldMouseMotionAdapter extends MouseMotionAdapter {
 		@Override
 		public void mouseMoved(MouseEvent event) {
-			// System.out.println("mouseMoved called");
-			// showSuggestionPopup(event);
 			event.consume();
 		}
 	}
@@ -913,9 +903,10 @@ public class RuleEditorPanel extends JPanel {
 
 				// save changes in the ontology.
 				applyChangetoOntology(axiomWithAnnotations);
-				
-				//save axioms into axiomsID
-				//necessary when ontology is not saved or reloaded but new rule is inserted
+
+				// save axioms into axiomsID
+				// necessary when ontology is not saved or reloaded but new rule
+				// is inserted
 				Constants.engineAsStaticReference.addAxiomsWithID(getRuleName(), axiomWithAnnotations);
 
 				// show the rule in the table
@@ -984,8 +975,6 @@ public class RuleEditorPanel extends JPanel {
 				SWRLRuleEditorDialog dialog = (SWRLRuleEditorDialog) this.dialogManager.getSWRLRuleEditorDialog(this,
 						ruleName, ruleText, ruleComment);
 				dialog.setVisible(true);
-				// System.out.println("Clicked to switch to swrltab");
-
 			}
 		}
 
@@ -1057,7 +1046,8 @@ public class RuleEditorPanel extends JPanel {
 							// to swrltab
 
 							switchToSWRLTab(ruleName, ruleText, comment, false);
-							System.out.println("can not transfer to axioms");
+							System.out.println();
+							log.info("can not transfer to axioms");
 						}
 						return;
 					}
@@ -1086,6 +1076,7 @@ public class RuleEditorPanel extends JPanel {
 		}
 	}
 
+	// Only for test purpose
 	// public static void main(String[] arg) {
 	// JFrame frame = new JFrame();
 	// frame.add(new RuleEditorPanel());

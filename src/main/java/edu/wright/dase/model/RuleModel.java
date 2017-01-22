@@ -2,8 +2,15 @@ package edu.wright.dase.model;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.wright.dase.controller.Engine;
 
 public class RuleModel {
+	
+	private static final Logger log = LoggerFactory.getLogger(RuleModel.class);
+	
 	@NonNull
 	private final String ruleName, ruleText, comment;
 

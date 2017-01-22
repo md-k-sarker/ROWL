@@ -22,6 +22,11 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.wright.dase.controller.Engine;
+
 import org.semanticweb.owlapi.model.OWLAxiom;
 
 /**
@@ -38,13 +43,14 @@ import org.semanticweb.owlapi.model.OWLAxiom;
  * implementation Created new event type for checking of the checkboxes Created
  * special data structures that help to indicate fast the state of each node
  * 
- * @author sarker
+ * @author 
  *
  */
 
 public class JCheckBoxTree extends JTree {
 
 	private static final long serialVersionUID = -4194122328392241790L;
+	private static final Logger log = LoggerFactory.getLogger(JCheckBoxTree.class);
 
 	JCheckBoxTree selfPointer = this;
 
@@ -313,10 +319,11 @@ public class JCheckBoxTree extends JTree {
 		}
 	}
 
-	public void setSelectedOtherAxioms(TreePath tp) {
-		// checkSubTree(tp, true);
-		// updatePredecessorsWithCheckMode(tp, true);
-
+	//Not required now
+//	public void setSelectedOtherAxioms(TreePath tp) {
+//		checkSubTree(tp, true);
+//		updatePredecessorsWithCheckMode(tp, true);
+//
 //		CheckedNode cn = nodesCheckingState.get(tp);
 //		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tp.getLastPathComponent();
 //
@@ -352,6 +359,6 @@ public class JCheckBoxTree extends JTree {
 //		} else {
 //			checkedPaths.remove(tp);
 //		}
-	}
+//	}
 
 }

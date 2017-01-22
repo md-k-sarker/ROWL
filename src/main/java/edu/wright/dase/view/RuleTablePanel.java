@@ -81,7 +81,6 @@ public class RuleTablePanel extends JPanel implements SWRLAPIView {
 
 	@Override
 	public void initialize() {
-		// this.swrlRuleEngineModel.getSWRLRulesTableModel().setView(this);
 
 		addTableListeners();
 
@@ -89,7 +88,6 @@ public class RuleTablePanel extends JPanel implements SWRLAPIView {
 
 		createComponents();
 
-		// createPopupMenu();
 	}
 
 	@Override

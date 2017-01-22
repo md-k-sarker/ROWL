@@ -35,7 +35,7 @@ public class RulesViewMain extends JSplitPane implements SWRLAPIView {
 
 	public RulesViewMain(@NonNull SWRLRuleEngineDialogManager dialogManager, JTabbedPane tabbedPane)
 			throws SWRLAPIException {
-		
+
 		this.ruleEditorPanel = new RuleEditorPanel(dialogManager, tabbedPane);
 		Constants.engineAsStaticReference.setRuleEditorPanel(this.ruleEditorPanel);
 
@@ -51,9 +51,6 @@ public class RulesViewMain extends JSplitPane implements SWRLAPIView {
 
 	@Override
 	public void initialize() {
-		//this.ruleTablesPanel.initialize();
-		// this.ruleExecutionView.initialize();
-
 		setOrientation(JSplitPane.VERTICAL_SPLIT);
 		setResizeWeight(SPLIT_PANE_RESIZE_WEIGHT);
 		setTopComponent(this.ruleEditorPanel);
@@ -63,6 +60,5 @@ public class RulesViewMain extends JSplitPane implements SWRLAPIView {
 	@Override
 	public void update() {
 		this.ruleTablesPanel.update();
-		// this.ruleExecutionView.update();
 	}
 }

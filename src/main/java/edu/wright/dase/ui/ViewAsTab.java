@@ -177,8 +177,6 @@ public class ViewAsTab extends OWLWorkspaceViewsTab {
 					update();
 				}
 			} else {
-				// System.out.println("ROWLLTab ignoring ontology change - still
-				// processing old change");
 				log.warn("ROWLTab ignoring ontology change - still processing old change");
 			}
 		}

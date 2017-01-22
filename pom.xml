@@ -77,8 +77,7 @@
 			<artifactId>owlapi-osgidistribution</artifactId>
 		</dependency>
 
-		<!-- dependency copied from swrlapi -->
-
+		<!-- dependency from swrlapi -->
 		<dependency>
 			<groupId>com.google.code.findbugs</groupId>
 			<artifactId>jsr305</artifactId>
@@ -109,7 +108,7 @@
 			<artifactId>hamcrest-core</artifactId>
 		</dependency>
 
-		<!--end dependency copied from swrlapi -->
+		<!--end dependency from swrlapi -->
 
 		<dependency>
 			<groupId>org.apache.geronimo.bundles</groupId>

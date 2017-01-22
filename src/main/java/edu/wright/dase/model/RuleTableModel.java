@@ -9,6 +9,8 @@ import java.util.TreeMap;
 import javax.swing.table.AbstractTableModel;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.swrlapi.ui.view.SWRLAPIView;
 
 import edu.wright.dase.controller.Engine;
@@ -23,6 +25,7 @@ import edu.wright.dase.controller.Engine;
  */
 public class RuleTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
+	private static final Logger log = LoggerFactory.getLogger(RuleTableModel.class);
 
 	public static final int RULE_NAME_COLUMN = 0;
 	public static final int RULE_TEXT_COLUMN = 1;
@@ -45,9 +48,6 @@ public class RuleTableModel extends AbstractTableModel {
 	 */
 	@NonNull
 	private final SortedMap<@NonNull String, @NonNull RuleModel> ruleModels;
-	// @NonNull
-	// private Optional<@NonNull SWRLAPIView> view = Optional.<@NonNull
-	// SWRLAPIView> empty();
 
 	private boolean isModified;
 

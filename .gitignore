@@ -15,6 +15,9 @@ bin/
 #Java Memory error log file
 *.log
 
+#Bash Script
+gu
+
 # local configuration file (for Android sdk path, etc)
 local.properties
 
